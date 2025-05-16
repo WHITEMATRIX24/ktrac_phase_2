@@ -1,4 +1,4 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { BusAllotmentLineChart } from "@/components/bus_allotment_linechart";
 import { SectionCards } from "@/components/section-cards";
 import React from "react";
 
@@ -64,7 +64,7 @@ const BusAllotment = () => {
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
           <SectionCards data={dummyData} />
           <div className="px-4 lg:px-6">
-            <ChartAreaInteractive />
+            <BusAllotmentLineChart />
           </div>
         </div>
       </div>
