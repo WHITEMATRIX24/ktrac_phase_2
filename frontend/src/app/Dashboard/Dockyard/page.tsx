@@ -6,55 +6,19 @@ const DockYardPage = () => {
   const dummyData = [
     {
       title: "No of Docked",
-      subData: [
-        {
-          title: "Swift",
-          value: 1000,
-        },
-        {
-          title: "Number of Engined",
-          value: 1000,
-        },
-      ],
+      value: 50,
     },
     {
       title: "Daily Run",
-      subData: [
-        {
-          title: "Swift",
-          value: 199,
-        },
-        {
-          title: "KURTC",
-          value: 888,
-        },
-      ],
+      value: 199,
     },
     {
       title: "Maintanance Scheduled",
-      subData: [
-        {
-          title: "Swift",
-          value: 199,
-        },
-        {
-          title: "Samudhara",
-          value: 888,
-        },
-      ],
+      value: 199,
     },
     {
       title: "Repaired",
-      subData: [
-        {
-          title: "Swift",
-          value: 199,
-        },
-        {
-          title: "Samudhara",
-          value: 888,
-        },
-      ],
+      value: 199,
     },
   ];
 
