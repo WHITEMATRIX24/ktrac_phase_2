@@ -54,7 +54,6 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.13 0.028 261.692);
@@ -77,9 +76,9 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0.002 247.839);
+  --sidebar: #235789;
   /* sidebar hover */
-  --sidebar-foreground: oklch(0.13 0.028 261.692);
+  --sidebar-foreground: #ffffff;
   /* sidebartext */
   --sidebar-primary: oklch(0.21 0.034 264.665);
   --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
@@ -87,13 +86,13 @@
   --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
   --sidebar-border: oklch(0.928 0.006 264.531);
   --sidebar-ring: oklch(0.707 0.022 261.325);
-  --background: #ffffff;
+  --background: #F5F5F5;
   --foreground: #171717;
   --themeBlue: #4e5166;
   --themeGreen: #04724d;
   --themeRed: #d95d39;
   --themeGrey: #b9b7a7;
-  --themeYellow: #ffc857;
+  --themeYellow: #F1D302;
 }
 
 .dark {

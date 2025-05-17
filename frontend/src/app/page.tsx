@@ -9,8 +9,9 @@ export default function Home() {
           <h6 className="text-2xl font-bold">KTRAC</h6>
         </div>
       </div>
-      <div className="flex justify-center items-center h-full w-1/2">
-        <div className="flex flex-col items-center gap-8 rounded-md shadow-sm px-12 py-5 pb-10">
+      <div className="flex flex-col gap-8 justify-space-around items-center h-full w-1/2">
+        <h5 className="text-red-600 text-900 text-[24px] mt-[50px]">Your Gateway to God’s Own Country</h5>
+        <div className="flex flex-col items-center gap-8 rounded-md shadow-sm px-12 py-5 pb-10 mt-[100px]">
           <h6 className="text-themeBlue text-2xl font-semibold">Login</h6>
           <form className="flex flex-col gap-3">
             <input

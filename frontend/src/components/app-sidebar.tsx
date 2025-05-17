@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {/* <NavUser user={data.user} /> */}
-        <p className="text-center text-[12px] text-gray-500">Ktrac V 2.0</p>
+        <p className="text-center text-[10px] text-white">Ktrac v 2.0</p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Input } from "@/components/ui/input"
 
-import { SearchIcon } from "lucide-react"
+import { Calendar, SearchIcon } from "lucide-react"
 import { NavUser } from "./nav-user"
 
 export default function Header() {
@@ -24,7 +24,7 @@ export default function Header() {
     const lastSegment = pathSegments[pathSegments.length - 1]
     const data = {
         user: {
-            name: "CMD",
+            name: "Schedule Manager",
             email: "Admin",
             avatar: "/user.png",
         },
@@ -32,15 +32,15 @@ export default function Header() {
     return (
         <header className="flex items-center justify-between px-6 py-2  text-black">
             <div>
-                <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px]">{mainTitle}</h1>
+                <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px]">DASHBOARD</h1>
                 <Breadcrumb className="h-[18px]">
                     <BreadcrumbList className="text-[12px] leading-[1.2]">
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/" className="text-black">
+                            <BreadcrumbLink href="/" className="text-grey-500">
                                 {mainTitle}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                        <BreadcrumbSeparator className="text-black" />
+                        <BreadcrumbSeparator className="text-[#C1292E]" />
                         <BreadcrumbItem>
                             <BreadcrumbEllipsis className="text-black" />
                         </BreadcrumbItem>
@@ -60,7 +60,9 @@ export default function Header() {
 
 
             <div className="flex items-center gap-4">
-                <div className="relative w-64">
+                <Calendar
+                    className="w-5 h-5 text-black opacity-70" />
+                <div className="relative w-54">
                     <Input
                         type="text"
                         placeholder="Search..."

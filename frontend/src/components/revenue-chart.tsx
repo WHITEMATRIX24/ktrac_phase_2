@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts"
+import { Line, LineChart, CartesianGrid, XAxis, Tooltip } from "recharts"
 import {
     Card,
     CardAction,
@@ -36,7 +36,6 @@ type RevenueData = {
 }
 import rawData from "../data/bus_finance_2024_2025.json";
 const depots = ["Thiruvananthapuram", "Ernakulam", "Kozhikode", "Thrissur", "Kannur"]
-
 
 const chartData = rawData
 const chartConfig = {
@@ -122,7 +121,6 @@ export function RevenueAnalysisChart() {
 
         // Prepare final data structure
         const showTotal = selectedBusTypes.length === 4
-
         return aggregatedData.map(d => ({
             date: d.date,
             ...(showTotal && {
@@ -166,10 +164,8 @@ export function RevenueAnalysisChart() {
         }
         return filteredData
     }, [filteredData, timeRange])
-
     return (
-
-        <Card className="@container/card bg-[var(--themeGrey)]">
+        <Card className="@container/card">
             <CardHeader>
                 <CardTitle>KSRTC Revenue Analysis</CardTitle>
                 <CardDescription>
@@ -177,28 +173,46 @@ export function RevenueAnalysisChart() {
                         ? `Showing data for ${new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}`
                         : `Yearly data for ${selectedYear}`}
                 </CardDescription>
-                <CardAction className="flex flex-col gap-4 @[440px]/card:flex-row">
+                <CardAction className="flex flex-col gap-2 @[440px]/card:flex-row">
                     <Select value={selectedDepot} onValueChange={setSelectedDepot}>
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger className="w-48 bg-white border border-slate-300 rounded-md pl-3 pr-8 py-2 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 hover:border-slate-400 transition duration-200">
                             <SelectValue>{selectedDepot === "All" ? "All Depots" : selectedDepot}</SelectValue>
                         </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="All">All Depots</SelectItem>
-                            {depots.map(depot => (
-                                <SelectItem key={depot} value={depot}>{depot}</SelectItem>
+
+                        <SelectContent className="bg-white border border-slate-200 rounded-md shadow-lg text-sm text-slate-700">
+                            <SelectItem
+                                value="All"
+                                className="cursor-pointer px-3 py-2 hover:bg-slate-100 focus:bg-slate-100 focus:outline-none"
+                            >
+                                All Depots
+                            </SelectItem>
+                            {depots.map((depot) => (
+                                <SelectItem
+                                    key={depot}
+                                    value={depot}
+                                    className="cursor-pointer px-3 py-2 hover:bg-slate-100 focus:bg-slate-100 focus:outline-none"
+                                >
+                                    {depot}
+                                </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
 
-                    <ToggleGroup
-                        type="single"
+
+                    <Select
+
                         value={timeRange}
                         onValueChange={(v) => setTimeRange(v as "month" | "year")}
-                        variant="outline"
+                    // variant="outline"
                     >
-                        <ToggleGroupItem value="month">Month View</ToggleGroupItem>
-                        <ToggleGroupItem value="year">Year View</ToggleGroupItem>
-                    </ToggleGroup>
+                        <SelectTrigger className="w-48">
+                            <SelectValue>{timeRange === "month" ? "Month View" : "Year View"}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="month">Month View</SelectItem>
+                            <SelectItem value="year">Year View</SelectItem>
+                        </SelectContent>
+                    </Select>
 
                     {timeRange === "month" ? (
                         <div className="flex gap-2">
@@ -242,7 +256,7 @@ export function RevenueAnalysisChart() {
                                 <SelectValue>{selectedYear}</SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {[2023, 2024].map(year => (
+                                {[2023, 2024, 2025].map(year => (
                                     <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -272,23 +286,12 @@ export function RevenueAnalysisChart() {
                     </Select>
                 </CardAction>
             </CardHeader>
-            <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+            <CardContent className="px-2 pt-0 sm:px-6 sm:pt-0">
                 <ChartContainer
                     config={chartConfig}
                     className="aspect-auto h-[300px] w-full"
                 >
-                    <AreaChart data={processedData}>
-                        <defs>
-                            {Object.entries(chartConfig).map(([key, config]) => {
-                                if (key === 'totalRevenue' && selectedBusTypes.length !== 4) return null
-                                return (
-                                    <linearGradient key={key} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor={config.color} stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor={config.color} stopOpacity={0.1} />
-                                    </linearGradient>
-                                )
-                            })}
-                        </defs>
+                    <LineChart data={processedData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="date"
@@ -302,35 +305,32 @@ export function RevenueAnalysisChart() {
                             content={
                                 <ChartTooltipContent
                                     labelFormatter={(value) => value}
-                                    valueFormatter={(value) => `₹${value.toLocaleString()}`}
                                 />
                             }
                         />
                         {selectedBusTypes.length === 4 ? (
-                            <Area
+                            <Line
                                 type="monotone"
                                 dataKey="totalRevenue"
-                                stackId="1"
                                 stroke={chartConfig.totalRevenue.color}
-                                fill={`url(#fill-totalRevenue)`}
+                                strokeWidth={2}
+                                dot={false}
                             />
                         ) : (
                             selectedBusTypes.map((busType) => (
-                                <Area
+                                <Line
                                     key={busType}
                                     type="monotone"
                                     dataKey={busType}
-                                    stackId="1"
                                     stroke={(chartConfig as any)[busType].color}
-                                    fill={`url(#fill-${busType})`}
+                                    strokeWidth={2}
+                                    dot={false}
                                 />
                             ))
                         )}
-                    </AreaChart>
+                    </LineChart>
                 </ChartContainer>
             </CardContent>
         </Card>
     )
 }
-
-

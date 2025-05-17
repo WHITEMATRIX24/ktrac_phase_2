@@ -6,26 +6,26 @@ export default function Page() {
         {
             title: "Yesterday's Collection",
             subData: [
-                { title: "Total", value: 15230 },
+                { title: "", value: 15230 },
             ],
         },
         {
             title: "Revenue",
             subData: [
-                { title: "Total", value: 8000 },
+                { title: "", value: 8000 },
             ],
         },
         {
-            title: "Expenses",
+            title: "Fuel Expenses",
             subData: [
-                { title: "Fuel", value: 3200 },
-                { title: "Maintenance", value: 1500 },
+                { title: "", value: 3200 },
+
             ],
         },
         {
             title: "Total Passengers",
             subData: [
-                { title: "Count", value: 1340 },
+                { title: "", value: 1340 },
             ],
         },
     ];
