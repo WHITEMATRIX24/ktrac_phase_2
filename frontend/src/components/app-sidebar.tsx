@@ -1,22 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Layers,
-  PieChart,
-} from "lucide-react"
+import * as React from "react";
+import { LayoutDashboard, ShoppingBag, Layers, PieChart } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/nav-main";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { TeamSwitcherStatic } from "./team-switcher"
+} from "@/components/ui/sidebar";
+import { TeamSwitcherStatic } from "./team-switcher";
 
 // Sample data
 const data = {
@@ -41,7 +36,8 @@ const data = {
       items: [
         { title: "Revenue", url: "/Dashboard/Revenue" },
         { title: "Vehicle Details", url: "/Dashboard/Vehicle_Details" },
-        { title: "Bus Allotment", url: "/Home/Dashboard/Vehicle_Details" },
+        { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
+        { title: "Dockyard", url: "/Dashboard/Dockyard" },
         { title: "HR", url: "/Home/Dashboard/Vehicle_Details" },
       ],
     },
@@ -77,7 +73,7 @@ const data = {
       ],
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -94,5 +90,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

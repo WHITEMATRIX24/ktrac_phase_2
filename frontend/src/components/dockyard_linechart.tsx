@@ -124,7 +124,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function BusAllotmentLineChart() {
+const DockyardLineChart = () => {
   const [chartValues, setChartValues] = React.useState(chartData);
   const [graphFilter, setGraphFilter] = React.useState<{
     location: string;
@@ -354,4 +354,6 @@ export function BusAllotmentLineChart() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default DockyardLineChart;
