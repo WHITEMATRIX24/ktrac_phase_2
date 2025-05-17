@@ -4,12 +4,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { WalletCards } from "lucide-react";
+import { ReactNode } from "react";
 
 interface Props {
   data?: {
     title: string;
     value: number;
+    icon: ReactNode;
   }[];
 }
 
@@ -28,11 +29,7 @@ export function SectionCards({ data }: Props) {
             {data[0].value}
           </CardDescription>
         </CardHeader>
-
-        {/* Wallet Icon at bottom right */}
-        <div className="absolute bottom-2 right-2">
-          <WalletCards className="w-15 h-15 text-white opacity-70" />
-        </div>
+        <div className="absolute bottom-2 right-2">{data[0].icon}</div>
       </Card>
       <Card className="@container/card bg-themeGreen border-gray relative shadow-md h-[125px]">
         <CardHeader className="flex flex-col gap-0">
@@ -43,6 +40,7 @@ export function SectionCards({ data }: Props) {
             {data[1].value}
           </CardDescription>
         </CardHeader>
+        <div className="absolute bottom-2 right-2">{data[1].icon}</div>
       </Card>
       <Card className="@container/card bg-[#C1292E] border-gray relative shadow-md h-[125px]">
         <CardHeader className="flex flex-col gap-0">
@@ -53,6 +51,7 @@ export function SectionCards({ data }: Props) {
             {data[2].value}
           </CardDescription>
         </CardHeader>
+        <div className="absolute bottom-2 right-2">{data[2].icon}</div>
       </Card>
       <Card className="@container/card bg-[#610345] border-gray relative shadow-md h-[125px]">
         <CardHeader className="flex flex-col gap-0">
@@ -63,6 +62,7 @@ export function SectionCards({ data }: Props) {
             {data[3].value}
           </CardDescription>
         </CardHeader>
+        <div className="absolute bottom-2 right-2">{data[3].icon}</div>
       </Card>
     </div>
   );

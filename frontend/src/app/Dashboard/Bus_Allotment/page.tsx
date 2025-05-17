@@ -1,6 +1,7 @@
 import { BarChartComponent } from "@/components/bus_allotment_barchart";
 import { BusAllotmentLineChart } from "@/components/bus_allotment_linechart";
 import { SectionCards } from "@/components/section-cards";
+import { Bus, BusFront, CalendarOff, ClipboardList } from "lucide-react";
 import React from "react";
 
 const BusAllotment = () => {
@@ -8,18 +9,22 @@ const BusAllotment = () => {
     {
       title: "Bus Allotment",
       value: 1000,
+      icon: <BusFront className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Daily Run",
       value: 1000,
+      icon: <Bus className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Schedules Alloted",
       value: 888,
+      icon: <ClipboardList className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Cancelled",
       value: 199,
+      icon: <CalendarOff className="w-15 h-15 text-white opacity-70" />,
     },
   ];
 

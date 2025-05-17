@@ -53,7 +53,7 @@ export function RevenueBarchartComponent({
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="revenue" fill="#04724d" radius={8} />
+            <Bar dataKey="revenue" fill="#04724d" radius={4} barSize={40} />
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -1,5 +1,6 @@
 import DockyardLineChart from "@/components/dockyard_linechart";
 import { SectionCards } from "@/components/section-cards";
+import { Bus, ClipboardList, RefreshCcw, Wrench } from "lucide-react";
 import React from "react";
 
 const DockYardPage = () => {
@@ -7,18 +8,22 @@ const DockYardPage = () => {
     {
       title: "No of Docked",
       value: 50,
+      icon: <Wrench className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Daily Run",
       value: 199,
+      icon: <Bus className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Maintanance Scheduled",
       value: 199,
+      icon: <ClipboardList className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Repaired",
       value: 199,
+      icon: <RefreshCcw className="w-15 h-15 text-white opacity-70" />,
     },
   ];
 
