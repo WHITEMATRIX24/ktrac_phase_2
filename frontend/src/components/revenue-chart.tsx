@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts"
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
     Card,
     CardAction,
@@ -34,34 +33,12 @@ type RevenueData = {
     fastPassenger: number
     superFast: number
     swift: number
-    depot: string
 }
-
+import rawData from "../data/bus_finance_2024_2025.json";
 const depots = ["Thiruvananthapuram", "Ernakulam", "Kozhikode", "Thrissur", "Kannur"]
 
-const generateDummyData = (): RevenueData[] => {
-    const data: RevenueData[] = []
-    const currentDate = new Date()
-    const currentMonth = currentDate.getMonth()
-    const currentYear = currentDate.getFullYear()
 
-    for (let i = 0; i < 365; i++) {
-        const date = new Date(currentYear, currentMonth - 1, i + 1)
-
-        data.push({
-            date: date.toISOString().split('T')[0],
-            ordinary: Math.floor(Math.random() * 500000) + 200000,
-            fastPassenger: Math.floor(Math.random() * 300000) + 100000,
-            superFast: Math.floor(Math.random() * 200000) + 50000,
-            swift: Math.floor(Math.random() * 100000) + 20000,
-            depot: depots[Math.floor(Math.random() * depots.length)]
-        })
-    }
-    return data
-}
-
-const chartData = generateDummyData()
-
+const chartData = rawData
 const chartConfig = {
     totalRevenue: {
         label: "Total Revenue",
@@ -86,7 +63,6 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function RevenueAnalysisChart() {
-    const isMobile = useIsMobile()
     const currentDate = new Date()
     const [selectedDepot, setSelectedDepot] = React.useState("All")
     const [timeRange, setTimeRange] = React.useState<"month" | "year">("month")
@@ -95,24 +71,59 @@ export function RevenueAnalysisChart() {
     const [selectedBusTypes, setSelectedBusTypes] = React.useState<string[]>(["ordinary", "fastPassenger", "superFast", "swift"])
 
     const filteredData = React.useMemo(() => {
-        let data = chartData.filter(d =>
-            selectedDepot === "All" || d.depot === selectedDepot
+        // Filter by selected depot
+        let data = chartData.filter(entry =>
+            selectedDepot === "All" || entry.depot === selectedDepot
         )
 
+        // Filter by time range
         if (timeRange === "month") {
-            data = data.filter(d => {
-                const date = new Date(d.date)
+            data = data.filter(entry => {
+                const date = new Date(entry.date)
                 return date.getMonth() + 1 === selectedMonth &&
                     date.getFullYear() === selectedYear
             })
         } else {
-            data = data.filter(d => new Date(d.date).getFullYear() === selectedYear)
+            data = data.filter(entry => new Date(entry.date).getFullYear() === selectedYear)
         }
 
-        // Calculate total revenue when showing all bus types
+        // Aggregate data by date and busType
+        const aggregated = data.reduce((acc, entry) => {
+            const dateKey = entry.date
+            if (!acc[dateKey]) {
+                acc[dateKey] = {
+                    date: dateKey,
+                    ordinary: 0,
+                    fastPassenger: 0,
+                    superFast: 0,
+                    swift: 0
+                }
+            }
+
+            switch (entry.busType) {
+                case "ordinary":
+                    acc[dateKey].ordinary += entry.revenue
+                    break
+                case "fastPassenger":
+                    acc[dateKey].fastPassenger += entry.revenue
+                    break
+                case "superFast":
+                    acc[dateKey].superFast += entry.revenue
+                    break
+                case "swift":
+                    acc[dateKey].swift += entry.revenue
+                    break
+            }
+
+            return acc
+        }, {} as Record<string, RevenueData>)
+
+        const aggregatedData = Object.values(aggregated)
+
+        // Prepare final data structure
         const showTotal = selectedBusTypes.length === 4
 
-        return data.map(d => ({
+        return aggregatedData.map(d => ({
             date: d.date,
             ...(showTotal && {
                 totalRevenue: Object.entries(d)
@@ -157,7 +168,8 @@ export function RevenueAnalysisChart() {
     }, [filteredData, timeRange])
 
     return (
-        <Card className="@container/card">
+
+        <Card className="@container/card bg-[var(--themeGrey)]">
             <CardHeader>
                 <CardTitle>KSRTC Revenue Analysis</CardTitle>
                 <CardDescription>
@@ -165,7 +177,7 @@ export function RevenueAnalysisChart() {
                         ? `Showing data for ${new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}`
                         : `Yearly data for ${selectedYear}`}
                 </CardDescription>
-                <CardAction className="flex flex-col gap-4 @[540px]/card:flex-row">
+                <CardAction className="flex flex-col gap-4 @[440px]/card:flex-row">
                     <Select value={selectedDepot} onValueChange={setSelectedDepot}>
                         <SelectTrigger className="w-48">
                             <SelectValue>{selectedDepot === "All" ? "All Depots" : selectedDepot}</SelectValue>
@@ -263,7 +275,7 @@ export function RevenueAnalysisChart() {
             <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
                 <ChartContainer
                     config={chartConfig}
-                    className="aspect-auto h-[400px] w-full"
+                    className="aspect-auto h-[300px] w-full"
                 >
                     <AreaChart data={processedData}>
                         <defs>
@@ -320,3 +332,5 @@ export function RevenueAnalysisChart() {
         </Card>
     )
 }
+
+

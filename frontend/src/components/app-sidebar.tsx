@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  GalleryVerticalEnd,
   LayoutDashboard,
   ShoppingBag,
   Layers,
@@ -10,7 +9,6 @@ import {
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -25,12 +23,12 @@ const data = {
   user: {
     name: "Ktrac",
     email: "Admin",
-    avatar: "logo",
+    avatar: "/logo.png",
   },
   teams: [
     {
       name: "Ktrac",
-      logo: GalleryVerticalEnd,
+      logo: "/logo.png",
       plan: "Enroute Kerala",
     },
   ],
@@ -41,8 +39,8 @@ const data = {
       icon: LayoutDashboard,
       isActive: true,
       items: [
-        { title: "Revenue", url: "/Home/Dashboard/Revenue" },
-        { title: "Vehicle Details", url: "/Home/Dashboard/Vehicle_Details" },
+        { title: "Revenue", url: "/Dashboard/Revenue" },
+        { title: "Vehicle Details", url: "/Dashboard/Vehicle_Details" },
         { title: "Bus Allotment", url: "/Home/Dashboard/Vehicle_Details" },
         { title: "HR", url: "/Home/Dashboard/Vehicle_Details" },
       ],
@@ -91,7 +89,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {/* <NavUser user={data.user} /> */}
+        <p className="text-center text-[12px] text-gray-500">Ktrac V 2.0</p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

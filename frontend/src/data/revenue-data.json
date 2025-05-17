@@ -1,0 +1,272 @@
+[
+    {
+        "date": "2024-05-01",
+        "collection": 400000,
+        "expense": 250000,
+        "revenue": 150000,
+        "busNo": 1,
+        "busType": "ordinary",
+        "depot": "Ernakulam"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 380000,
+        "expense": 200000,
+        "revenue": 180000,
+        "busNo": 2,
+        "busType": "superFast",
+        "depot": "Kozhikode"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 420000,
+        "expense": 220000,
+        "revenue": 200000,
+        "busNo": 3,
+        "busType": "fastPassenger",
+        "depot": "Thrissur"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 450000,
+        "expense": 230000,
+        "revenue": 220000,
+        "busNo": 4,
+        "busType": "swift",
+        "depot": "Kannur"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 390000,
+        "expense": 210000,
+        "revenue": 180000,
+        "busNo": 5,
+        "busType": "ordinary",
+        "depot": "Thiruvananthapuram"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 410000,
+        "expense": 240000,
+        "revenue": 170000,
+        "busNo": 6,
+        "busType": "superFast",
+        "depot": "Ernakulam"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 430000,
+        "expense": 260000,
+        "revenue": 170000,
+        "busNo": 7,
+        "busType": "fastPassenger",
+        "depot": "Kozhikode"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 460000,
+        "expense": 240000,
+        "revenue": 220000,
+        "busNo": 8,
+        "busType": "swift",
+        "depot": "Thrissur"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 400000,
+        "expense": 220000,
+        "revenue": 180000,
+        "busNo": 9,
+        "busType": "ordinary",
+        "depot": "Kannur"
+    },
+    {
+        "date": "2024-05-01",
+        "collection": 390000,
+        "expense": 210000,
+        "revenue": 180000,
+        "busNo": 10,
+        "busType": "superFast",
+        "depot": "Thiruvananthapuram"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 420000,
+        "expense": 230000,
+        "revenue": 190000,
+        "busNo": 1,
+        "busType": "ordinary",
+        "depot": "Ernakulam"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 400000,
+        "expense": 220000,
+        "revenue": 180000,
+        "busNo": 2,
+        "busType": "superFast",
+        "depot": "Kozhikode"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 430000,
+        "expense": 210000,
+        "revenue": 220000,
+        "busNo": 3,
+        "busType": "fastPassenger",
+        "depot": "Thrissur"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 460000,
+        "expense": 240000,
+        "revenue": 220000,
+        "busNo": 4,
+        "busType": "swift",
+        "depot": "Kannur"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 410000,
+        "expense": 230000,
+        "revenue": 180000,
+        "busNo": 5,
+        "busType": "ordinary",
+        "depot": "Thiruvananthapuram"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 440000,
+        "expense": 240000,
+        "revenue": 200000,
+        "busNo": 6,
+        "busType": "superFast",
+        "depot": "Ernakulam"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 450000,
+        "expense": 250000,
+        "revenue": 200000,
+        "busNo": 7,
+        "busType": "fastPassenger",
+        "depot": "Kozhikode"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 470000,
+        "expense": 260000,
+        "revenue": 210000,
+        "busNo": 8,
+        "busType": "swift",
+        "depot": "Thrissur"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 420000,
+        "expense": 230000,
+        "revenue": 190000,
+        "busNo": 9,
+        "busType": "ordinary",
+        "depot": "Kannur"
+    },
+    {
+        "date": "2024-05-02",
+        "collection": 410000,
+        "expense": 220000,
+        "revenue": 190000,
+        "busNo": 10,
+        "busType": "superFast",
+        "depot": "Thiruvananthapuram"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 430000,
+        "expense": 240000,
+        "revenue": 190000,
+        "busNo": 1,
+        "busType": "ordinary",
+        "depot": "Ernakulam"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 410000,
+        "expense": 230000,
+        "revenue": 180000,
+        "busNo": 2,
+        "busType": "superFast",
+        "depot": "Kozhikode"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 440000,
+        "expense": 220000,
+        "revenue": 220000,
+        "busNo": 3,
+        "busType": "fastPassenger",
+        "depot": "Thrissur"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 470000,
+        "expense": 250000,
+        "revenue": 220000,
+        "busNo": 4,
+        "busType": "swift",
+        "depot": "Kannur"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 420000,
+        "expense": 240000,
+        "revenue": 180000,
+        "busNo": 5,
+        "busType": "ordinary",
+        "depot": "Thiruvananthapuram"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 450000,
+        "expense": 250000,
+        "revenue": 200000,
+        "busNo": 6,
+        "busType": "superFast",
+        "depot": "Ernakulam"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 460000,
+        "expense": 260000,
+        "revenue": 200000,
+        "busNo": 7,
+        "busType": "fastPassenger",
+        "depot": "Kozhikode"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 480000,
+        "expense": 270000,
+        "revenue": 210000,
+        "busNo": 8,
+        "busType": "swift",
+        "depot": "Thrissur"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 430000,
+        "expense": 240000,
+        "revenue": 190000,
+        "busNo": 9,
+        "busType": "ordinary",
+        "depot": "Kannur"
+    },
+    {
+        "date": "2024-05-03",
+        "collection": 420000,
+        "expense": 230000,
+        "revenue": 190000,
+        "busNo": 10,
+        "busType": "superFast",
+        "depot": "Thiruvananthapuram"
+    }
+]

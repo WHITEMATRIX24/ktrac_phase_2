@@ -11,8 +11,9 @@ import {
     BreadcrumbEllipsis,
 } from "@/components/ui/breadcrumb"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 import { SearchIcon } from "lucide-react"
+import { NavUser } from "./nav-user"
 
 export default function Header() {
     const pathname = usePathname()
@@ -21,11 +22,17 @@ export default function Header() {
         ? pathSegments[0].charAt(0).toUpperCase() + pathSegments[0].slice(1)
         : "Home"
     const lastSegment = pathSegments[pathSegments.length - 1]
-
+    const data = {
+        user: {
+            name: "CMD",
+            email: "Admin",
+            avatar: "/user.png",
+        },
+    }
     return (
         <header className="flex items-center justify-between px-6 py-2  text-black">
             <div>
-                <h1 className="text-[18px] font-semibold leading-[1.2] mb-0">{mainTitle}</h1>
+                <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px]">{mainTitle}</h1>
                 <Breadcrumb className="h-[18px]">
                     <BreadcrumbList className="text-[12px] leading-[1.2]">
                         <BreadcrumbItem>
@@ -65,14 +72,15 @@ export default function Header() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Avatar className="h-7 w-7">
+                    {/* <Avatar className="h-7 w-7">
                         <AvatarImage src="/avatar.png" alt="User" />
                         <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                     <div className="text-right">
                         <div className="text-[12px]">John Doe</div>
                         <div className="text-xs text-black/80">Admin</div>
-                    </div>
+                    </div> */}
+                    <NavUser user={data.user} />
                 </div>
             </div>
         </header>
