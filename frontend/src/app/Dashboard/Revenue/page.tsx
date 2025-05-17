@@ -30,6 +30,12 @@ export default function Page() {
   ];
 
   const barChartData = [
+    { date: "June", revenue: 186 },
+    { date: "Jul", revenue: 73 },
+    { date: "Aug", revenue: 214 },
+    { date: "Sept", revenue: 237 },
+    { date: "Oct", revenue: 207 },
+    { date: "Nov", revenue: 267 },
     { date: "Dec", revenue: 186 },
     { date: "Jan", revenue: 305 },
     { date: "Feb", revenue: 237 },

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Input } from "@/components/ui/input"
 
-import { Calendar, SearchIcon } from "lucide-react"
+import { Calendar, SearchIcon, Settings } from "lucide-react"
 import { NavUser } from "./nav-user"
 
 export default function Header() {
@@ -26,14 +26,14 @@ export default function Header() {
         user: {
             name: "Schedule Manager",
             email: "Admin",
-            avatar: "/user.png",
+            avatar: "/Captureuseravathar.png",
         },
     }
     return (
-        <header className="flex items-center justify-between px-6 py-2  text-black">
+        <header className="flex items-center justify-between px-6 py-2 text-black">
             <div>
-                <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px]">DASHBOARD</h1>
-                <Breadcrumb className="h-[18px]">
+                <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px] uppercase">{mainTitle}</h1>
+                <Breadcrumb className="h-[18px] ml-[1px] mt-[5px]">
                     <BreadcrumbList className="text-[12px] leading-[1.2]">
                         <BreadcrumbItem>
                             <BreadcrumbLink href="/" className="text-grey-500">
@@ -42,13 +42,13 @@ export default function Header() {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator className="text-[#C1292E]" />
                         <BreadcrumbItem>
-                            <BreadcrumbEllipsis className="text-black" />
+                            <BreadcrumbEllipsis className="text-grey-500" />
                         </BreadcrumbItem>
                         {lastSegment && (
                             <>
-                                <BreadcrumbSeparator className="text-black" />
+                                <BreadcrumbSeparator className="text-[#C1292E]" />
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage className="text-black">
+                                    <BreadcrumbPage className="text-grey-500">
                                         {decodeURIComponent(lastSegment).replace(/-/g, " ")}
                                     </BreadcrumbPage>
                                 </BreadcrumbItem>
@@ -61,6 +61,8 @@ export default function Header() {
 
             <div className="flex items-center gap-4">
                 <Calendar
+                    className="w-5 h-5 text-black opacity-70" />
+                <Settings
                     className="w-5 h-5 text-black opacity-70" />
                 <div className="relative w-54">
                     <Input

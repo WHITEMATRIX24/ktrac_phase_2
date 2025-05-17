@@ -17,6 +17,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Assuming you're using a shadcn/ui or similar
 
 const chartConfig = {
   desktop: {
@@ -35,25 +42,51 @@ export function RevenueBarchartComponent({
 }) {
   return (
     <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Total collection</CardTitle>
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle>Total Collection</CardTitle>
+
+
+
       </CardHeader>
+
       <CardContent>
+        <div className="flex justify-end">
+          <Select disabled>
+            <SelectTrigger className="w-fit px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 hover:border-slate-400 transition duration-200 opacity-60 cursor-not-allowed">
+              <SelectValue placeholder="Select Depo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="depo1">Depo 1</SelectItem>
+              <SelectItem value="depo2">Depo 2</SelectItem>
+              <SelectItem value="depo3">Depo 3</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <ChartContainer config={chartConfig}>
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
+            <defs>
+              <linearGradient id="greenGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#04724d" />
+                <stop offset="100%" stopColor="#32a88b" />
+              </linearGradient>
+            </defs>
             <XAxis
               dataKey="date"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="revenue" fill="#04724d" radius={4} barSize={40} />
+            <Bar
+              dataKey="revenue"
+              fill="url(#greenGradient)"
+              radius={4}
+              barSize={40}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

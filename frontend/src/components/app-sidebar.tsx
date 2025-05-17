@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboard, ShoppingBag, Layers, PieChart } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Layers, PieChart, WalletCards } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import {
@@ -44,7 +44,7 @@ const data = {
     {
       title: "Revenue",
       url: "#",
-      icon: ShoppingBag,
+      icon: WalletCards,
       items: [
         { title: "Income", url: "#" },
         { title: "Expense", url: "#" },
@@ -78,7 +78,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader >
         <TeamSwitcherStatic team={data.teams[0]} />
       </SidebarHeader>
       <SidebarContent>

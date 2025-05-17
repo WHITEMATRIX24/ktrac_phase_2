@@ -25,6 +25,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 const chartData = [
+
   { month: "December", fuel: 214, mobile: 140 },
   { month: "January", fuel: 186, mobile: 80 },
   { month: "February", fuel: 305, mobile: 200 },
@@ -74,7 +75,7 @@ export function RevenueCustomBarchart() {
               tickFormatter={(value) => value.slice(0, 3)}
               hide
             />
-            <XAxis dataKey="fuel" type="number" hide />
+            <XAxis dataKey="fuel" type="number" />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
@@ -88,14 +89,14 @@ export function RevenueCustomBarchart() {
               <LabelList
                 dataKey="month"
                 position="insideLeft"
-                offset={8}
+                offset={4}
                 className="fill-[white]"
                 fontSize={12}
               />
               <LabelList
                 dataKey="fuel"
                 position="right"
-                offset={8}
+                offset={4}
                 className="fill-foreground"
                 fontSize={12}
               />
