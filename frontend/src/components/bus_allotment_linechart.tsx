@@ -158,7 +158,7 @@ export function BusAllotmentLineChart() {
             Showing total visitors for the last 3 months
           </CardDescription> */}
         </div>
-        <div className="flex gap-2 px-5">
+        <div className="flex gap-2 px-5 justify-end">
           <div className="relative">
             <select
               value={graphFilter.location}

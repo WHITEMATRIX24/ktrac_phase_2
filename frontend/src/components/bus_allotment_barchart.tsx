@@ -1,13 +1,10 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,21 +15,25 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig;
+// Dummy data with multiple bus types per day
+const chartData = [
+  { date: "May 1", RTC: 120, SWIFT: 100, KURTC: 90, Samudra: 80 },
+  { date: "May 2", RTC: 100, SWIFT: 130, KURTC: 130, Samudra: 100 },
+  { date: "May 3", RTC: 180, SWIFT: 140, KURTC: 120, Samudra: 110 },
+  { date: "May 4", RTC: 200, SWIFT: 160, KURTC: 130, Samudra: 120 },
+  { date: "May 5", RTC: 170, SWIFT: 150, KURTC: 100, Samudra: 90 },
+  { date: "May 6", RTC: 120, SWIFT: 100, KURTC: 90, Samudra: 125 },
+];
 
-export function BarChartComponent({
-  chartData,
-}: {
-  chartData: {
-    date: string;
-    bus: number;
-  }[];
-}) {
+// Green variants
+const barColors = {
+  RTC: "#04724d",        // Dark Green
+  SWIFT: "#059669",      // Medium Green
+  KURTC: "#10b981",      // Emerald Green
+  Samudra: "#34d399",    // Light Green
+};
+
+export function BarChartComponent() {
   return (
     <Card className="h-full">
       <CardHeader>
@@ -40,21 +41,31 @@ export function BarChartComponent({
         <CardDescription>past 6 days</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+        <ChartContainer config={{}}>
+          <BarChart
+            data={chartData}
+            margin={{ right: 30 }}
+            barCategoryGap={0}
+            barGap={0}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="date"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value}
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar dataKey="bus" fill="#04724d" radius={8} />
+            <YAxis />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            {Object.keys(barColors).map((busType) => (
+              <Bar
+                key={busType}
+                dataKey={busType}
+                fill={barColors[busType]}
+                radius={[0, 0, 0, 0]}
+                barSize={15}
+              />
+            ))}
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import styles from './chatBot.module.css';
 
 const sampleQA = [
-    { question: 'Which is the best performig depo of today', answer: 'Kozhikode with revenue of 120000' },
+    { question: 'Which is the best performig depo of the month May 2025', answer: 'Kozhikode with revenue of 120000' },
     { question: 'How to contact support?', answer: 'You can email us at support@example.com' },
     { question: 'Where can I find my profile?', answer: 'Click on the top-right avatar to access your profile.' },
 ];

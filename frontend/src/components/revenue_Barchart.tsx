@@ -41,10 +41,10 @@ export function RevenueBarchartComponent({
   }[];
 }) {
   return (
-    <Card className="h-full">
-      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <Card className="h-full gap-0">
+      <CardHeader className="flex flex-col gap-2 ">
         <CardTitle>Total Collection</CardTitle>
-
+        <CardDescription>Showing data from June 2024 - May 2025</CardDescription>
 
 
       </CardHeader>
@@ -52,7 +52,7 @@ export function RevenueBarchartComponent({
       <CardContent>
         <div className="flex justify-end">
           <Select disabled>
-            <SelectTrigger className="w-fit px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 hover:border-slate-400 transition duration-200 opacity-60 cursor-not-allowed">
+            <SelectTrigger className="w-fit px-3 py-0 bg-white border border-slate-300 rounded-md text-[12px] text-slate-700 shadow-sm opacity-60 cursor-not-allowed">
               <SelectValue placeholder="Select Depo" />
             </SelectTrigger>
             <SelectContent>
@@ -67,8 +67,8 @@ export function RevenueBarchartComponent({
             <CartesianGrid vertical={false} />
             <defs>
               <linearGradient id="greenGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#04724d" />
-                <stop offset="100%" stopColor="#32a88b" />
+                <stop offset="0%" stopColor="#f1d302" />
+                <stop offset="100%" stopColor="#f1d302" />
               </linearGradient>
             </defs>
             <XAxis

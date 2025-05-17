@@ -58,7 +58,7 @@ export default function Home() {
             </button>
           </form>
         </div>
-        <p className="text-xs text-gray-400">managed by whitematrix</p>
+        <p className="text-xs text-gray-400">Managed by Whitematrix Software Solutions</p>
       </div>
     </div>
   );

@@ -47,19 +47,19 @@ const chartConfig = {
     color: "#610345",
   },
   ordinary: {
-    label: "Ordinary",
+    label: "KURTC",
     color: "#8884d8",
   },
   fastPassenger: {
-    label: "Fast Passenger",
+    label: "RTC",
     color: "#82ca9d",
   },
   superFast: {
-    label: "Super Fast",
+    label: "Swift",
     color: "#ffc658",
   },
   swift: {
-    label: "Swift",
+    label: "Samudhra",
     color: "#ff8042",
   },
 } satisfies ChartConfig;
@@ -173,7 +173,8 @@ export function RevenueAnalysisChart() {
             ).toLocaleString("default", { month: "long", year: "numeric" })}`
             : `Yearly data for ${selectedYear}`}
         </CardDescription>
-        <CardAction className="flex flex-col gap-2 @[440px]/card:flex-row flex-wrap">
+        <CardAction className="flex self-end flex-row flex-wrap justify-end gap-2">
+
           <Select value={selectedDepot} onValueChange={setSelectedDepot}>
             <SelectTrigger className="w-fit px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 hover:border-slate-400 transition duration-200">
               <SelectValue>
