@@ -16,13 +16,13 @@ import { TeamSwitcherStatic } from "./team-switcher";
 // Sample data
 const data = {
   user: {
-    name: "Ktrac",
+    name: "KTRAC",
     email: "Admin",
     avatar: "/logo.png",
   },
   teams: [
     {
-      name: "Ktrac",
+      name: "KTRAC",
       logo: "/logo.png",
       plan: "Enroute Kerala",
     },
@@ -35,10 +35,10 @@ const data = {
       isActive: true,
       items: [
         { title: "Revenue", url: "/Dashboard/Revenue" },
-        { title: "Vehicle Details", url: "/Dashboard/Vehicle_Details" },
+        // { title: "Vehicle Details", url: "/Dashboard/Vehicle_Details" },
         { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
         { title: "Dockyard", url: "/Dashboard/Dockyard" },
-        { title: "HR", url: "/Home/Dashboard/Vehicle_Details" },
+        // { title: "HR", url: "/Home/Dashboard/Vehicle_Details" },
       ],
     },
     {
@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {/* <NavUser user={data.user} /> */}
-        <p className="text-center text-[10px] text-white">Ktrac v 2.0</p>
+        <p className="text-center text-[10px] text-white">KTRAC v 2.0</p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
