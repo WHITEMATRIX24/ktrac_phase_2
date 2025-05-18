@@ -25,12 +25,14 @@ const chartData = [
   { date: "May 6", RTC: 120, SWIFT: 100, KURTC: 90, Samudra: 125 },
 ];
 
+type BusType = "RTC" | "SWIFT" | "KURTC" | "Samudra";
+
 // Green variants
-const barColors = {
-  RTC: "#04724d",        // Dark Green
-  SWIFT: "#059669",      // Medium Green
-  KURTC: "#10b981",      // Emerald Green
-  Samudra: "#34d399",    // Light Green
+const barColors: Record<BusType, string> = {
+  RTC: "#04724d", // Dark Green
+  SWIFT: "#059669", // Medium Green
+  KURTC: "#10b981", // Emerald Green
+  Samudra: "#34d399", // Light Green
 };
 
 export function BarChartComponent() {
@@ -57,7 +59,7 @@ export function BarChartComponent() {
             />
             <YAxis />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            {Object.keys(barColors).map((busType) => (
+            {(Object.keys(barColors) as BusType[]).map((busType) => (
               <Bar
                 key={busType}
                 dataKey={busType}

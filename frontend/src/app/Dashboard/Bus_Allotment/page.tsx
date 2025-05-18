@@ -47,7 +47,7 @@ const BusAllotment = () => {
               <BusAllotmentLineChart />
             </div>
             <div className="pr-4 lg:pr-6">
-              <BarChartComponent chartData={barChartData} />
+              <BarChartComponent />
             </div>
           </div>
         </div>
