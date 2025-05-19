@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -28,11 +27,17 @@ const chartData = [
 type BusType = "RTC" | "SWIFT" | "KURTC" | "Samudra";
 
 // Green variants
+// const barColors: Record<BusType, string> = {
+//   RTC: "#04724d", 
+//   SWIFT: "#059669", 
+//   KURTC: "#10b981", 
+//   Samudra: "#34d399", 
+// };
 const barColors: Record<BusType, string> = {
-  RTC: "#04724d", // Dark Green
-  SWIFT: "#059669", // Medium Green
-  KURTC: "#10b981", // Emerald Green
-  Samudra: "#34d399", // Light Green
+  RTC: "var(--themeRed)",
+  SWIFT: "#ffa500",
+  KURTC: "var(--themeGreen)",
+  Samudra: "var(--themeBlue)",
 };
 
 export function BarChartComponent() {
@@ -70,6 +75,17 @@ export function BarChartComponent() {
             ))}
           </BarChart>
         </ChartContainer>
+        <div className="flex flex-wrap justify-center gap-4 mt-4">
+          {(Object.entries(barColors) as [BusType, string][]).map(([busType, color]) => (
+            <div key={busType} className="flex items-center gap-2 text-[10px] text-muted-foreground">
+              <div
+                className="w-2 h-2 "
+                style={{ backgroundColor: color }}
+              ></div>
+              <span>{busType}</span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

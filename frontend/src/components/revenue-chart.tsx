@@ -33,15 +33,103 @@ type RevenueData = {
 };
 import rawData from "../data/bus_finance_2024_2025.json";
 const depotGroups: Record<string, string[]> = {
-  TVM: [
-    "Thiruvananthapuram"
-  ],
-  KKD: ["Kozhikode"],
-  EKM: ["Ernakulam"],
-  TSR: ["Thrissur"],
-  KNR: ["Kannur"],
-  ALL: [] // 'All' for showing everything
+  ADR: ["Thiruvananthapuram"],
+  ALP: ["Kozhikode"],
+  ALY: ["Thrissur"],
+  ANK: ["Kannur"],
+  ARD: ["Thiruvananthapuram"],
+  ARK: ["Kozhikode"],
+  ATL: ["Thrissur"],
+  CDM: ["Kannur"],
+  CGR: ["Thiruvananthapuram"],
+  CHT: ["Kozhikode"],
+  CHY: ["Thrissur"],
+  CLD: ["Kannur"],
+  CTL: ["Thiruvananthapuram"],
+  CTR: ["Kozhikode"],
+  EDT: ["Thrissur"],
+  EKM: ["Kannur"],
+  EMY: ["Thiruvananthapuram"],
+  ETP: ["Kozhikode"],
+  GVR: ["Thrissur"],
+  HPD: ["Kannur"],
+  IJK: ["Thiruvananthapuram"],
+  KDR: ["Kozhikode"],
+  KGD: ["Thrissur"],
+  KHD: ["Kannur"],
+  KKD: ["Thiruvananthapuram"],
+  KKM: ["Kozhikode"],
+  KLM: ["Thrissur"],
+  KLP: ["Kannur"],
+  KMG: ["Thiruvananthapuram"],
+  KMR: ["Kozhikode"],
+  KMY: ["Thrissur"],
+  KNI: ["Kannur"],
+  KNP: ["Thiruvananthapuram"],
+  KNR: ["Kozhikode"],
+  KPM: ["Thrissur"],
+  KPT: ["Kannur"],
+  KTD: ["Thiruvananthapuram"],
+  KTM: ["Kozhikode"],
+  KTP: ["Thrissur"],
+  KTR: ["Kannur"],
+  KYM: ["Thiruvananthapuram"],
+  MKD: ["Kozhikode"],
+  MLA: ["Thrissur"],
+  MLP: ["Kannur"],
+  MLT: ["Thiruvananthapuram"],
+  MND: ["Kozhikode"],
+  MNR: ["Thrissur"],
+  MPY: ["Kannur"],
+  MVK: ["Thiruvananthapuram"],
+  MVP: ["Kozhikode"],
+  NBR: ["Thrissur"],
+  NDD: ["Kannur"],
+  NDM: ["Thiruvananthapuram"],
+  NPR: ["Kozhikode"],
+  NTA: ["Thrissur"],
+  PBR: ["Kannur"],
+  PDK: ["Thiruvananthapuram"],
+  PDM: ["Kozhikode"],
+  PLA: ["Thrissur"],
+  PLD: ["Kannur"],
+  PLK: ["Thiruvananthapuram"],
+  PLR: ["Kozhikode"],
+  PMN: ["Thrissur"],
+  PNI: ["Kannur"],
+  PNK: ["Thiruvananthapuram"],
+  PNR: ["Kozhikode"],
+  PPD: ["Thrissur"],
+  PPM: ["Kannur"],
+  PRK: ["Thiruvananthapuram"],
+  PSL: ["Kozhikode"],
+  PTA: ["Thrissur"],
+  PVM: ["Kannur"],
+  PVR: ["Thiruvananthapuram"],
+  RNI: ["Kozhikode"],
+  SBY: ["Thrissur"],
+  TDP: ["Kannur"],
+  TDY: ["Thiruvananthapuram"],
+  TLY: ["Kozhikode"],
+  TMY: ["Thrissur"],
+  TPM: ["Kannur"],
+  TSR: ["Thiruvananthapuram"],
+  TVL: ["Kozhikode"],
+  "TVM CL": ["Thrissur"],
+  "TVM CTY": ["Kannur"],
+  TVRA: ["Thiruvananthapuram"],
+  VDA: ["Kozhikode"],
+  VDY: ["Thrissur"],
+  VJD: ["Kannur"],
+  VKB: ["Thiruvananthapuram"],
+  VKM: ["Kozhikode"],
+  VLD: ["Thrissur"],
+  VRD: ["Kannur"],
+  VTR: ["Thiruvananthapuram"],
+  VZM: ["Kozhikode"],
+  ALL: []
 };
+
 
 
 const chartData = rawData;
@@ -52,19 +140,19 @@ const chartConfig = {
   },
   ordinary: {
     label: "KURTC",
-    color: "#8884d8",
+    color: "var(--themeGreen)",
   },
   fastPassenger: {
     label: "RTC",
-    color: "#82ca9d",
+    color: "var(--themeRed)",
   },
   superFast: {
     label: "Swift",
-    color: "#ffc658",
+    color: "#ffa500",
   },
   swift: {
     label: "Samudhra",
-    color: "#ff8042",
+    color: "var(--themeBlue)",
   },
 } satisfies ChartConfig;
 
@@ -314,6 +402,18 @@ export function RevenueAnalysisChart() {
           </LineChart>
         </ChartContainer>
       </CardContent>
+      <div className="flex flex-wrap justify-center gap-4 mt-4">
+        {Object.entries(chartConfig).map(([key, { label, color }]) => (
+          <div key={key} className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <div
+              className="w-2 h-2 "
+              style={{ backgroundColor: color }}
+            ></div>
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+
     </Card>
   );
 }

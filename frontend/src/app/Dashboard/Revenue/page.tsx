@@ -9,39 +9,39 @@ export default function Page() {
   const dummyData = [
     {
       title: "Yesterday's Collection",
-      value: 15230,
+      value: 135230,
       icon: <WalletCards className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Revenue",
-      value: 8000,
+      value: 87990,
       icon: <TrendingUp className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Fuel Expenses",
-      value: 3200,
+      value: 47240,
       icon: <Fuel className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Total Passengers",
-      value: 1340,
+      value: 53340,
       icon: <Users className="w-15 h-15 text-white opacity-70" />,
     },
   ];
 
   const barChartData = [
-    { date: "June", revenue: 186 },
-    { date: "Jul", revenue: 73 },
-    { date: "Aug", revenue: 214 },
-    { date: "Sept", revenue: 237 },
-    { date: "Oct", revenue: 207 },
-    { date: "Nov", revenue: 267 },
-    { date: "Dec", revenue: 186 },
-    { date: "Jan", revenue: 305 },
-    { date: "Feb", revenue: 237 },
-    { date: "March", revenue: 73 },
-    { date: "April", revenue: 209 },
-    { date: "May", revenue: 214 },
+    { date: "June", revenue: 126007 },
+    { date: "Jul", revenue: 73050 },
+    { date: "Aug", revenue: 61400 },
+    { date: "Sept", revenue: 53700 },
+    { date: "Oct", revenue: 107105 },
+    { date: "Nov", revenue: 167890 },
+    { date: "Dec", revenue: 186630 },
+    { date: "Jan", revenue: 105567 },
+    { date: "Feb", revenue: 83700 },
+    { date: "March", revenue: 73500 },
+    { date: "April", revenue: 109000 },
+    { date: "May", revenue: 21490 },
   ];
 
   return (

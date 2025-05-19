@@ -7,12 +7,12 @@ const DockYardPage = () => {
   const dummyData = [
     {
       title: "No of Docked",
-      value: 50,
+      value: 52,
       icon: <Wrench className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Daily Run",
-      value: 199,
+      value: 5432,
       icon: <Bus className="w-15 h-15 text-white opacity-70" />,
     },
     {
@@ -22,7 +22,7 @@ const DockYardPage = () => {
     },
     {
       title: "Repaired",
-      value: 199,
+      value: 1989,
       icon: <RefreshCcw className="w-15 h-15 text-white opacity-70" />,
     },
   ];

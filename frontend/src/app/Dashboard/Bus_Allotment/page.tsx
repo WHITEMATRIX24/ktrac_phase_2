@@ -8,17 +8,17 @@ const BusAllotment = () => {
   const dummyData = [
     {
       title: "Bus Allotment",
-      value: 1000,
+      value: 5470,
       icon: <BusFront className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Daily Run",
-      value: 1000,
+      value: 178600,
       icon: <Bus className="w-15 h-15 text-white opacity-70" />,
     },
     {
       title: "Schedules Alloted",
-      value: 888,
+      value: 4500,
       icon: <ClipboardList className="w-15 h-15 text-white opacity-70" />,
     },
     {
@@ -26,15 +26,6 @@ const BusAllotment = () => {
       value: 199,
       icon: <CalendarOff className="w-15 h-15 text-white opacity-70" />,
     },
-  ];
-
-  const barChartData = [
-    { date: "Today", bus: 186 },
-    { date: "Yestrday", bus: 305 },
-    { date: "17 May", bus: 237 },
-    { date: "16 May", bus: 73 },
-    { date: "15 May", bus: 209 },
-    { date: "14 May", bus: 214 },
   ];
 
   return (
@@ -46,7 +37,7 @@ const BusAllotment = () => {
             <div className="pl-4 lg:pl-6">
               <BusAllotmentLineChart />
             </div>
-            <div className="pr-4 lg:pr-6">
+            <div className="pr-4 lg:pr-6 ">
               <BarChartComponent />
             </div>
           </div>

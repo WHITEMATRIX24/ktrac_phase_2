@@ -25,17 +25,17 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 const chartData = [
-  { month: "December", fuel: 214, mobile: 140 },
-  { month: "January", fuel: 186, mobile: 80 },
-  { month: "February", fuel: 305, mobile: 200 },
-  { month: "March", fuel: 237, mobile: 120 },
-  { month: "April", fuel: 73, mobile: 190 },
-  { month: "May", fuel: 209, mobile: 130 },
+  { month: "December", expense: 98523, mobile: 140 },
+  { month: "January", expense: 114756, mobile: 80 },
+  { month: "February", expense: 90057, mobile: 200 },
+  { month: "March", expense: 104576, mobile: 120 },
+  { month: "April", expense: 89900, mobile: 190 },
+  { month: "May", expense: 67240, mobile: 130 },
 ];
 
 const chartConfig = {
-  fuel: {
-    label: "Fuel",
+  expense: {
+    label: "Expense",
     color: "hsl(var(--chart-1))",
   },
   mobile: {
@@ -53,7 +53,7 @@ export function RevenueCustomBarchart() {
       <CardHeader>
         <CardTitle>Fuel Expenses</CardTitle>
         <CardDescription>
-          Previous months fuel expenses in litre(L)
+          Previous months expense expenses
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,13 +76,13 @@ export function RevenueCustomBarchart() {
               tickFormatter={(value) => value.slice(0, 3)}
               hide
             />
-            <XAxis dataKey="fuel" type="number" />
+            <XAxis dataKey="expense" type="number" />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
             <Bar
-              dataKey="fuel"
+              dataKey="expense"
               layout="vertical"
               fill="var(--themeRed)"
               radius={4}
@@ -95,10 +95,10 @@ export function RevenueCustomBarchart() {
                 fontSize={12}
               />
               <LabelList
-                dataKey="fuel"
+                dataKey="expense"
                 position="right"
                 offset={4}
-                className="fill-foreground"
+                className="text-grey"
                 fontSize={12}
               />
             </Bar>

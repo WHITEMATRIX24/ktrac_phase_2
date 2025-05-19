@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
 import {
   Card,
@@ -85,8 +85,17 @@ export function RevenueBarchartComponent({
               dataKey="revenue"
               fill="url(#greenGradient)"
               radius={4}
-              barSize={40}
-            />
+              barSize={35}
+            >
+              <LabelList
+                dataKey="revenue"
+                position="top"
+                offset={4}
+                className="text-grey"
+                fontSize={12}
+              />
+            </Bar>
+
           </BarChart>
         </ChartContainer>
       </CardContent>
