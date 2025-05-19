@@ -162,19 +162,18 @@ export function RevenueAnalysisChart() {
   }, [filteredData, timeRange]);
 
   return (
-    <Card className="@container/card">
+    <Card className="@container/card h-full">
       <CardHeader className="flex flex-col">
         <CardTitle>KSRTC Revenue Analysis</CardTitle>
         <CardDescription>
           {timeRange === "month"
             ? `Showing data for ${new Date(
-              selectedYear,
-              selectedMonth - 1
-            ).toLocaleString("default", { month: "long", year: "numeric" })}`
+                selectedYear,
+                selectedMonth - 1
+              ).toLocaleString("default", { month: "long", year: "numeric" })}`
             : `Yearly data for ${selectedYear}`}
         </CardDescription>
         <CardAction className="flex self-end flex-row flex-wrap justify-end gap-2">
-
           <Select value={selectedDepot} onValueChange={setSelectedDepot}>
             <SelectTrigger className="w-fit px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 hover:border-slate-400 transition duration-200">
               <SelectValue>
@@ -274,10 +273,10 @@ export function RevenueAnalysisChart() {
           )}
         </CardAction>
       </CardHeader>
-      <CardContent className="px-2 pt-0 sm:px-6 sm:pt-0">
+      <CardContent className="px-2 pt-0 sm:px-6 sm:pt-0 h-full">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[300px] w-full"
+          className="aspect-auto h-full w-full"
         >
           <LineChart data={processedData}>
             <CartesianGrid vertical={true} />
@@ -291,7 +290,10 @@ export function RevenueAnalysisChart() {
             />
             <Tooltip
               content={
-                <ChartTooltipContent labelFormatter={(value) => value} />
+                <ChartTooltipContent
+                  className="w-60"
+                  labelFormatter={(value) => value}
+                />
               }
             />
             {Object.entries(chartConfig).map(([key, config]) => (

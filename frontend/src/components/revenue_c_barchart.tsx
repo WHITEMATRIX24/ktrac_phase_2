@@ -25,7 +25,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 const chartData = [
-
   { month: "December", fuel: 214, mobile: 140 },
   { month: "January", fuel: 186, mobile: 80 },
   { month: "February", fuel: 305, mobile: 200 },
@@ -53,7 +52,9 @@ export function RevenueCustomBarchart() {
     <Card>
       <CardHeader>
         <CardTitle>Fuel Expenses</CardTitle>
-        <CardDescription>Previous months</CardDescription>
+        <CardDescription>
+          Previous months fuel expenses in litre(L)
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

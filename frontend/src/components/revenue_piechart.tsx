@@ -17,10 +17,10 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 const chartData = [
-  { bus_type: "RTC", collection: 275, fill: "var(--themeGreen)" },
-  { bus_type: "SWIFT", collection: 200, fill: "var(--themeYellow)" },
-  { bus_type: "KURTC", collection: 187, fill: "var(--themeBlue)" },
-  { bus_type: "Samudra", collection: 173, fill: "var(--themeRed)" },
+  { bus_type: "RTC", collection: 275, fill: "var(--themeRed)" },
+  { bus_type: "SWIFT", collection: 200, fill: "#ffa500" },
+  { bus_type: "KURTC", collection: 187, fill: "var(--themeGreen)" },
+  { bus_type: "Samudra", collection: 173, fill: "var(--themeBlue)" },
 ];
 
 const chartConfig = {
@@ -59,7 +59,7 @@ export function RevenuePieChart() {
       <CardContent className="flex-1 pb-0 flex flex-row gap-8 items-center justify-center">
         <ChartContainer
           config={chartConfig}
-          className="aspect-square max-h-[300px]"
+          className="aspect-square h-[300px]"
         >
           <PieChart>
             <ChartTooltip
@@ -85,13 +85,17 @@ export function RevenuePieChart() {
           {/* <h3 className="text-sm font-medium text-muted-foreground">Legend</h3> */}
           <div className="grid grid-cols-1 gap-3">
             {chartData.map((item) => (
-              <div key={item.bus_type} className="flex items-center gap-2 text-sm">
+              <div
+                key={item.bus_type}
+                className="flex items-center gap-2 text-sm"
+              >
                 <span
                   className="w-4 h-4  shadow-sm"
                   style={{ backgroundColor: item.fill }}
                 />
-                <span className="text-muted-foreground text-[12px]">{item.bus_type}</span>
-
+                <span className="text-muted-foreground text-[12px]">
+                  {item.bus_type}
+                </span>
               </div>
             ))}
           </div>
