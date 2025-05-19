@@ -3,25 +3,45 @@
 import { useState } from "react";
 import Image from "next/image";
 import styles from "./chatBot.module.css";
-
 const sampleQA = [
   {
-    question: "Which is the best performig depo of the month May 2025",
-    answer: "Kozhikode with revenue of 120000",
+    question: "Which is the best performing depot of the month May 2025?",
+    answer: "Kozhikode with a revenue of ₹1,20,000",
   },
   {
-    question: "How to contact support?",
-    answer: "You can email us at support@example.com",
+    question: "What is the total revenue on 18th May 2025?",
+    answer: "₹2,58,325",
   },
   {
-    question: "Where can I find my profile?",
-    answer: "Click on the top-right avatar to access your profile.",
+    question: "How many trips were completed on 15th May 2025?",
+    answer: "164 trips were successfully completed.",
   },
   {
-    question: "What is the total revenue on 18th may 2025?",
-    answer: "2,58,325",
+    question: "Which route generated the highest revenue in May 2025?",
+    answer: "Ernakulam to Thiruvananthapuram route generated the highest revenue of ₹85,000.",
   },
+  {
+    question: "How many buses were under maintenance on 17th May 2025?",
+    answer: "12 buses were under maintenance on that day.",
+  },
+  {
+    question: "What was the average occupancy rate for the Thrissur depot in May?",
+    answer: "The average occupancy rate was 87%.",
+  },
+  {
+    question: "List all depots with revenue above ₹1,00,000 for May 2025.",
+    answer: "Kozhikode, Ernakulam, and Thiruvananthapuram depots reported revenues above ₹1,00,000.",
+  },
+  {
+    question: "Which day in May 2025 had the lowest revenue?",
+    answer: "7th May 2025 had the lowest revenue with ₹78,450.",
+  },
+  {
+    question: "Count of passengers on 16th May 2025?",
+    answer: "4,365",
+  }
 ];
+
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);

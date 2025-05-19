@@ -16,11 +16,18 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const chartData = [
-  { bus_type: "RTC", collection: 275, fill: "var(--themeRed)" },
-  { bus_type: "SWIFT", collection: 200, fill: "#ffa500" },
-  { bus_type: "KURTC", collection: 187, fill: "var(--themeGreen)" },
-  { bus_type: "Samudra", collection: 173, fill: "var(--themeBlue)" },
+  { bus_type: "RTC", collection: 62705, fill: "var(--themeRed)" },
+  { bus_type: "SWIFT", collection: 34200, fill: "#ffa500" },
+  { bus_type: "KURTC", collection: 25187, fill: "var(--themeGreen)" },
+  { bus_type: "Samudra", collection: 12173, fill: "var(--themeBlue)" },
 ];
 
 const chartConfig = {
@@ -56,10 +63,23 @@ export function RevenuePieChart() {
         <CardTitle>Total Collection</CardTitle>
         <CardDescription>By bus type</CardDescription>
       </CardHeader>
+      {/* <div className="flex justify-end">
+        <Select disabled>
+          <SelectTrigger className="w-fit mr-3 px-3 py-2 bg-white border border-slate-300 rounded-md text-[12px] text-slate-700 shadow-sm opacity-60 cursor-not-allowed">
+            <SelectValue placeholder="May 2025" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="depo1">Depo 1</SelectItem>
+            <SelectItem value="depo2">Depo 2</SelectItem>
+            <SelectItem value="depo3">Depo 3</SelectItem>
+          </SelectContent>
+        </Select>
+      </div> */}
       <CardContent className="flex-1 pb-0 flex flex-row gap-8 items-center justify-center">
+
         <ChartContainer
           config={chartConfig}
-          className="aspect-square h-[300px]"
+          className="aspect-square h-[250px]"
         >
           <PieChart>
             <ChartTooltip
