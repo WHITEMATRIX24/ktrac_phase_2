@@ -69,7 +69,7 @@ export default function ChatBot() {
           onClick={() => setIsOpen(true)}
         >
           <Image
-            src="/ai.png"
+            src="/elephant.png"
             alt="Chatbot Avatar"
             width={100}
             height={100}
@@ -88,7 +88,7 @@ export default function ChatBot() {
             <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-300">
               <div className="rounded-full overflow-hidden w-12 h-12 shadow-md">
                 <Image
-                  src="/ai.png"
+                  src="/elephant.png"
                   alt="Chatbot Avatar"
                   width={48}
                   height={48}
@@ -109,11 +109,10 @@ export default function ChatBot() {
               {chat.map((msg, i) => (
                 <div
                   key={i}
-                  className={`text-[12px] px-2 py-2 rounded-[5px] max-w-[80ch] w-fit animate-fadeBounce ${
-                    msg.from === "bot"
-                      ? "bg-gray-100 text-gray-800 self-start"
-                      : "bg-[#235789] text-white self-end ml-auto"
-                  }`}
+                  className={`text-[12px] px-2 py-2 rounded-[5px] max-w-[80ch] w-fit animate-fadeBounce ${msg.from === "bot"
+                    ? "bg-gray-100 text-gray-800 self-start"
+                    : "bg-[#235789] text-white self-end ml-auto"
+                    }`}
                 >
                   {msg.text}
                 </div>

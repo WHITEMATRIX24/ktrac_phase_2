@@ -24,9 +24,9 @@ export default function Header() {
   const lastSegment = pathSegments[pathSegments.length - 1];
   const data = {
     user: {
-      name: "Pramoj sanker",
+      name: "Pramoj Sanker",
       email: "Admin",
-      avatar: "/Captureuseravathar.png",
+      avatar: "/PRAMOJ.png",
     },
   };
   return (

@@ -32,13 +32,17 @@ type RevenueData = {
   totalRevenue: number;
 };
 import rawData from "../data/bus_finance_2024_2025.json";
-const depots = [
-  "Thiruvananthapuram",
-  "Ernakulam",
-  "Kozhikode",
-  "Thrissur",
-  "Kannur",
-];
+const depotGroups: Record<string, string[]> = {
+  TVM: [
+    "Thiruvananthapuram"
+  ],
+  KKD: ["Kozhikode"],
+  EKM: ["Ernakulam"],
+  TSR: ["Thrissur"],
+  KNR: ["Kannur"],
+  ALL: [] // 'All' for showing everything
+};
+
 
 const chartData = rawData;
 const chartConfig = {
@@ -66,7 +70,7 @@ const chartConfig = {
 
 export function RevenueAnalysisChart() {
   const currentDate = new Date();
-  const [selectedDepot, setSelectedDepot] = React.useState("All");
+  const [selectedDepot, setSelectedDepot] = React.useState("ALL");
   const [timeRange, setTimeRange] = React.useState<"month" | "year">("month");
   const [selectedMonth, setSelectedMonth] = React.useState(
     currentDate.getMonth() + 1
@@ -75,11 +79,18 @@ export function RevenueAnalysisChart() {
     currentDate.getFullYear()
   );
 
+
   const filteredData = React.useMemo(() => {
+    const selectedDepotNames = selectedDepot === "ALL"
+      ? Object.values(depotGroups).flat()
+      : depotGroups[selectedDepot] || [];
+
     let data = chartData.filter(
-      (entry) => selectedDepot === "All" || entry.depot === selectedDepot
+      (entry) =>
+        selectedDepot === "ALL" || selectedDepotNames.includes(entry.depot)
     );
 
+    // Filter by time range
     if (timeRange === "month") {
       data = data.filter((entry) => {
         const date = new Date(entry.date);
@@ -94,6 +105,7 @@ export function RevenueAnalysisChart() {
       );
     }
 
+    // Aggregate revenue
     const aggregated = data.reduce((acc, entry) => {
       const dateKey = entry.date;
       if (!acc[dateKey]) {
@@ -123,11 +135,15 @@ export function RevenueAnalysisChart() {
       }
 
       acc[dateKey].totalRevenue += entry.revenue;
+
       return acc;
     }, {} as Record<string, RevenueData>);
 
-    return Object.values(aggregated);
-  }, [selectedDepot, timeRange, selectedMonth, selectedYear]);
+    return Object.values(aggregated).sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+  }, [chartData, selectedDepot, timeRange, selectedMonth, selectedYear]);
+
 
   const processedData = React.useMemo(() => {
     if (timeRange === "year") {
@@ -168,36 +184,25 @@ export function RevenueAnalysisChart() {
         <CardDescription>
           {timeRange === "month"
             ? `Showing data for ${new Date(
-                selectedYear,
-                selectedMonth - 1
-              ).toLocaleString("default", { month: "long", year: "numeric" })}`
+              selectedYear,
+              selectedMonth - 1
+            ).toLocaleString("default", { month: "long", year: "numeric" })}`
             : `Yearly data for ${selectedYear}`}
         </CardDescription>
         <CardAction className="flex self-end flex-row flex-wrap justify-end gap-2">
-          <Select value={selectedDepot} onValueChange={setSelectedDepot}>
-            <SelectTrigger className="w-fit px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 hover:border-slate-400 transition duration-200">
-              <SelectValue>
-                {selectedDepot === "All" ? "All Depots" : selectedDepot}
-              </SelectValue>
+          <Select onValueChange={setSelectedDepot} defaultValue="ALL">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Depot Code" />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-slate-200 rounded-md shadow-lg text-sm text-slate-700">
-              <SelectItem
-                value="All"
-                className="cursor-pointer px-3 py-2 hover:bg-slate-100 focus:bg-slate-100 focus:outline-none"
-              >
-                All Depots
-              </SelectItem>
-              {depots.map((depot) => (
-                <SelectItem
-                  key={depot}
-                  value={depot}
-                  className="cursor-pointer px-3 py-2 hover:bg-slate-100 focus:bg-slate-100 focus:outline-none"
-                >
-                  {depot}
+            <SelectContent>
+              {Object.keys(depotGroups).map((code) => (
+                <SelectItem key={code} value={code}>
+                  {code}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
 
           <Select
             value={timeRange}
