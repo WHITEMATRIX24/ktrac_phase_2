@@ -3,6 +3,7 @@ import { RevenueBarchartComponent } from "@/components/revenue_Barchart";
 import { RevenueCustomBarchart } from "@/components/revenue_c_barchart";
 import { RevenuePieChart } from "@/components/revenue_piechart";
 import { SectionCards } from "@/components/section-cards";
+import { getBusPosition } from "@/lib/sql_query";
 import { Fuel, TrendingUp, Users, WalletCards } from "lucide-react";
 
 export default function Page() {
