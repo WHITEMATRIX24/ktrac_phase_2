@@ -67,7 +67,7 @@ const data = {
       url: "#",
       icon: PieChart,
       items: [
-        { title: "KMPL Report", url: "#" },
+        { title: "Bus Position", url: "/Reports/Busposition" },
         { title: "Job Report", url: "#" },
         { title: "Driver Report", url: "#" },
       ],
