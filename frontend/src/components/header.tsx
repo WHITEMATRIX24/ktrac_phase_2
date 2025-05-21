@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -11,9 +12,14 @@ import {
   BreadcrumbEllipsis,
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
-
 import { Calendar, SearchIcon, Settings } from "lucide-react";
 import { NavUser } from "./nav-user";
+
+interface User {
+  name: string;
+  email: string;
+  avatar: string;
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -22,13 +28,34 @@ export default function Header() {
     ? pathSegments[0].charAt(0).toUpperCase() + pathSegments[0].slice(1)
     : "Home";
   const lastSegment = pathSegments[pathSegments.length - 1];
-  const data = {
-    user: {
-      name: "Pramoj Sanker",
-      email: "Admin",
-      avatar: "/PRAMOJ.png",
-    },
-  };
+
+  const [user, setUser] = useState<User>({
+    name: "Pramoj Sanker",
+    email: "Admin",
+    avatar: "/PRAMOJ.png",
+  });
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    let userData = user;
+    console.log(role);
+    if (role === "Finance") {
+      userData = {
+        name: "Finance Unit",
+        email: "Supervisor",
+        avatar: "/Captureuseravathar.PNG",
+      };
+    } else if (role === "Maintenance") {
+      userData = {
+        name: "Maintenance Unit",
+        email: "Supervisor",
+        avatar: "/Captureuseravathar.PNG",
+      };
+    }
+
+    setUser(userData);
+  }, []);
+
   return (
     <header className="flex items-center justify-between px-6 py-2 text-black">
       <div>
@@ -75,15 +102,7 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* <Avatar className="h-7 w-7">
-                        <AvatarImage src="/avatar.png" alt="User" />
-                        <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                    <div className="text-right">
-                        <div className="text-[12px]">John Doe</div>
-                        <div className="text-xs text-black/80">Admin</div>
-                    </div> */}
-          <NavUser user={data.user} />
+          <NavUser user={user} />
         </div>
       </div>
     </header>

@@ -1,13 +1,50 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
 
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const users = [
+    {
+      username: "Admin",
+      password: "Admin@ktrac#",
+      role: "Admin",
+    },
+    {
+      username: "Finance Unit",
+      password: "Finance@ktrac#",
+      role: "Finance",
+    },
+    {
+      username: "Maintenance Unit",
+      password: "Maintenance@ktrac#",
+      role: "Maintenance",
+    },
+  ];
+
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.replace("/Dashboard/Revenue");
+    const user = users.find(
+      (u) => u.username === username && u.password === password
+    );
+
+    if (user) {
+      localStorage.setItem("userRole", user.role);
+      if (user.role === "Admin") {
+        router.replace("/Dashboard/Revenue");
+      } else if (user.role === "Finance") {
+        router.replace("/Finance/Transactions");
+      } else if (user.role === "Maintenance") {
+        router.replace("/Maintenance/Inventory");
+      }
+    } else {
+      alert("Invalid username or password");
+    }
   };
 
   return (
@@ -27,6 +64,7 @@ export default function Home() {
           GOD'S OWN COUNTRY
         </h5>
       </div>
+
       <div className="flex flex-col gap-8 justify-between items-center h-full col-span-2">
         <div className="flex flex-col gap-10 rounded-md px-12 py-5 pb-10 w-[28rem] my-auto">
           <div className="flex flex-col gap-1">
@@ -41,17 +79,21 @@ export default function Home() {
           </div>
           <form onSubmit={handleLogin} className="flex flex-col gap-3 w-full">
             <div className="flex flex-col gap-1 ">
-              <label className="pl-1">Email</label>
+              <label className="pl-1">User Name</label>
               <input
                 type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full bg-transparent placeholder:text-themeBlue/20 text-themeBlue text-sm border border-themeBlue/10 rounded-md px-3 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                placeholder="email"
+                placeholder="username"
               />
             </div>
             <div className="flex flex-col gap-1 mt-2">
               <label className="pl-1">Password</label>
               <input
-                type="text"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-transparent placeholder:text-themeBlue/20 text-themeBlue text-sm border border-themeBlue/10 rounded-md px-3 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                 placeholder="password"
               />
