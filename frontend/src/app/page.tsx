@@ -40,7 +40,7 @@ export default function Home() {
       } else if (user.role === "Finance") {
         router.replace("/Finance/Transactions");
       } else if (user.role === "Maintenance") {
-        router.replace("/Maintenance/Inventory");
+        router.replace("/Predictive_Maintenance_System/Inventory");
       }
     } else {
       alert("Invalid username or password");

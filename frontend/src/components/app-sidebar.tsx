@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   LayoutDashboard,
-  ShoppingBag,
   Layers,
   PieChart,
   WalletCards,
@@ -24,6 +23,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { TeamSwitcherStatic } from "./team-switcher";
+
 interface NavItem {
   title: string;
   url: string;
@@ -31,70 +31,71 @@ interface NavItem {
   isActive?: boolean;
   items?: { title: string; url: string }[];
 }
+const defaultNavItems: NavItem[] = [
+  {
+    title: "Dashboard",
+    url: "#",
+    icon: LayoutDashboard,
+    isActive: true,
+    items: [
+      { title: "Revenue", url: "/Dashboard/Revenue" },
+      { title: "Bus Position", url: "/Dashboard/Bus_Position" },
+      { title: "Unit wise bus allotment", url: "/Dashboard/Unit_Wise_Bus_Allotment" },
+      { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
+      { title: "Dockyard", url: "/Dashboard/Dockyard" },
+    ],
+  },
+  {
+    title: "Revenue",
+    url: "#",
+    icon: WalletCards,
+    items: [
+      { title: "Income", url: "#" },
+      { title: "Expense", url: "#" },
+      { title: "Balance Sheet", url: "#" },
+      { title: "Purchase Order", url: "#" },
+    ],
+  },
+  {
+    title: "Schedule Management",
+    url: "#",
+    icon: Layers,
+    items: [
+      { title: "Add Schedule", url: "#" },
+      { title: "Delete Schedule", url: "#" },
+      { title: "Update Schedule", url: "#" },
+    ],
+  },
+  {
+    title: "Reports",
+    url: "#",
+    icon: PieChart,
+    items: [
+      { title: "Bus Position", url: "/Reports/Busposition" },
+      { title: "Job Report", url: "#" },
+      { title: "Driver Report", url: "#" },
+    ],
+  },
+];
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [navItems, setNavItems] = React.useState<NavItem[]>([]);
 
+
+  const [navItems, setNavItems] = React.useState<NavItem[]>(defaultNavItems);
   React.useEffect(() => {
     const role = localStorage.getItem("userRole");
-
-    let navMain = [
-      {
-        title: "Dashboard",
-        url: "#",
-        icon: LayoutDashboard,
-        isActive: true,
-        items: [
-          { title: "Revenue", url: "/Dashboard/Revenue" },
-          { title: "Bus Position", url: "/Dashboard/Bus_Position" },
-          { title: "Unit wise bus allotment", url: "/Dashboard/Unit_Wise_Bus_Allotment" },
-          { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
-          { title: "Dockyard", url: "/Dashboard/Dockyard" },
-        ],
-      },
-      {
-        title: "Revenue",
-        url: "#",
-        icon: WalletCards,
-        items: [
-          { title: "Income", url: "#" },
-          { title: "Expense", url: "#" },
-          { title: "Balance Sheet", url: "#" },
-          { title: "Purchase Order", url: "#" },
-        ],
-      },
-      {
-        title: "Schedule Management",
-        url: "#",
-        icon: Layers,
-        items: [
-          { title: "Add Schedule", url: "#" },
-          { title: "Delete Schedule", url: "#" },
-          { title: "Update Shedule", url: "#" },
-        ],
-      },
-      {
-        title: "Reports",
-        url: "#",
-        icon: PieChart,
-        items: [
-          { title: "Bus Position", url: "/Reports/Busposition" },
-          { title: "Job Report", url: "#" },
-          { title: "Driver Report", url: "#" },
-        ],
-      },
-    ];
+    let computedNavItems: NavItem[];
 
     if (role === "Finance") {
-      navMain = [
+      computedNavItems = [
         {
           title: "Dashboard",
           url: "#",
           icon: LayoutDashboard,
           isActive: true,
           items: [
-            { title: "Financial Overview", url: "/Finance/Overview" },
-            { title: "Pending Payments", url: "/Finance/PendingPayments" },
-            { title: "Vendor Settlements", url: "/Finance/VendorSettlements" },
+            { title: "Financial Overview", url: "#" },
+            { title: "Pending Payments", url: "#" },
+            { title: "Vendor Settlements", url: "#" },
           ],
         },
         {
@@ -102,10 +103,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: WalletCards,
           items: [
-            { title: "Income", url: "/Finance/Income" },
-            { title: "Expenses", url: "/Finance/Expenses" },
-            { title: "Balance Sheet", url: "/Finance/BalanceSheet" },
-            { title: "Bank Reconciliation", url: "/Finance/BankReconciliation" },
+            { title: "Income", url: "#" },
+            { title: "Expenses", url: "#" },
+            { title: "Balance Sheet", url: "#" },
+            { title: "Bank Reconciliation", url: "#" },
           ],
         },
         {
@@ -113,8 +114,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: FileText,
           items: [
-            { title: "Generate Invoice", url: "/Finance/GenerateInvoice" },
-            { title: "Invoice History", url: "/Finance/InvoiceHistory" },
+            { title: "Generate Invoice", url: "#" },
+            { title: "Invoice History", url: "#" },
           ],
         },
         {
@@ -122,22 +123,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: BarChart2,
           items: [
-            { title: "Monthly Reports", url: "/Finance/MonthlyReports" },
-            { title: "Audit Reports", url: "/Finance/AuditReports" },
+            { title: "Monthly Reports", url: "#" },
+            { title: "Audit Reports", url: "#" },
           ],
         },
       ];
     } else if (role === "Maintenance") {
-      navMain = [
+      computedNavItems = [
         {
           title: "Dashboard",
           url: "#",
           icon: LayoutDashboard,
           isActive: true,
           items: [
-            { title: "Workshop Overview", url: "/Mechanical/Overview" },
-            { title: "Vehicle Status", url: "/Mechanical/VehicleStatus" },
-            { title: "Spare Parts Inventory", url: "/Mechanical/Inventory" },
+            { title: "Workshop Overview", url: "#" },
+            { title: "Vehicle Status", url: "#" },
+            { title: "Spare Parts Inventory", url: "#" },
           ],
         },
         {
@@ -145,9 +146,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: TouchpadOff,
           items: [
-            { title: "Scheduled Maintenance", url: "/Mechanical/ScheduledMaintenance" },
-            { title: "Breakdown Reports", url: "/Mechanical/BreakdownReports" },
-            { title: "Maintenance History", url: "/Mechanical/MaintenanceHistory" },
+            { title: "Scheduled Maintenance", url: "#" },
+            { title: "Breakdown Reports", url: "#" },
+            { title: "Maintenance History", url: "#" },
           ],
         },
         {
@@ -155,9 +156,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: Package,
           items: [
-            { title: "Spare Part Requests", url: "/Mechanical/PartRequests" },
-            { title: "Stock In/Out", url: "/Mechanical/Stock" },
-            { title: "Vendors", url: "/Mechanical/Vendors" },
+            { title: "Spare Part Requests", url: "#" },
+            { title: "Stock In/Out", url: "#" },
+            { title: "Vendors", url: "#" },
           ],
         },
         {
@@ -165,14 +166,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: BarChart,
           items: [
-            { title: "Vehicle Health", url: "/Mechanical/VehicleHealthReport" },
-            { title: "Parts Usage", url: "/Mechanical/PartsUsageReport" },
+            { title: "Vehicle Health", url: "#" },
+            { title: "Parts Usage", url: "#" },
           ],
         },
       ];
+    } else {
+      computedNavItems = defaultNavItems;
     }
 
-    setNavItems(navMain);
+    setNavItems(computedNavItems);
   }, []);
 
   return (

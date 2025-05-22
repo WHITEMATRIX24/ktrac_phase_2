@@ -60,13 +60,13 @@ export default function Header() {
     <header className="flex items-center justify-between px-6 py-2 text-black">
       <div>
         <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px] uppercase">
-          {mainTitle}
+          {decodeURIComponent(mainTitle).replace(/[-_]/g, " ")}
         </h1>
         <Breadcrumb className="h-[18px] ml-[1px] mt-[5px]">
           <BreadcrumbList className="text-[12px] leading-[1.2]">
             <BreadcrumbItem>
               <BreadcrumbLink href="/" className="text-grey-500">
-                {mainTitle}
+                {decodeURIComponent(mainTitle).replace(/[-_]/g, " ")}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-[#C1292E]" />
@@ -78,7 +78,7 @@ export default function Header() {
                 <BreadcrumbSeparator className="text-[#C1292E]" />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-grey-500">
-                    {decodeURIComponent(lastSegment).replace(/-/g, " ")}
+                    {decodeURIComponent(lastSegment).replace(/[-_]/g, " ")}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>
