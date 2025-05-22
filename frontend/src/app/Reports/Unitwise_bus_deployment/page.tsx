@@ -2,7 +2,7 @@
 
 import { ReportDataTable } from "@/components/report_datatable";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getBusPosition } from "@/lib/sql_query";
+import { getUnitwiseBusDeployment } from "@/lib/sql_query";
 import { useEffect, useState } from "react";
 
 // column data
@@ -30,48 +30,78 @@ const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "SL NO",
-    header: "SL No.",
-    id: "SL NO",
+    accessorKey: "Sl.No",
+    header: "Sl.No",
+    id: "Sl.No",
   },
   {
-    accessorKey: "CLASS OF BUS",
-    header: "Bus Class",
-    id: "CLASS OF BUS",
+    accessorKey: "Unit Name",
+    header: "Unit Name",
+    id: "Unit Name",
   },
   {
-    accessorKey: "Service",
-    header: "Service",
-    id: "Service",
+    accessorKey: "1 Bus Used for 2 or more services",
+    header: "1 Bus Used for 2 or more services",
+    id: "1 Bus Used for 2 or more services",
   },
   {
-    accessorKey: "Training\n/ STC",
-    header: "Training / STC",
-    id: "Training",
+    accessorKey: "Btc Operation",
+    header: "Btc Operation",
+    id: "Btc Operation",
   },
   {
-    accessorKey: "Enroute",
-    header: "Enroute",
-    id: "Enroute",
+    accessorKey: "Buses in Dock & Police Custody",
+    header: "Buses in Dock & Police Custody",
+    id: "Buses in Dock & Police Custody",
   },
   {
-    accessorKey: "BTC",
-    header: "BTC",
-    id: "BTC",
+    accessorKey: "Enroute buses including Pamba Special Services",
+    header: "Enroute buses including Pamba Special Services",
+    id: "Enroute buses including Pamba Special Services",
   },
   {
-    accessorKey: "PRIVATE HIRE",
-    header: "Private Hire",
-    id: "PRIVATE HIRE",
+    accessorKey: "Idle Buses",
+    header: "Idle Buses",
+    id: "Idle Buses",
   },
   {
-    accessorKey: "TOTAL",
-    header: "Total",
-    id: "TOTAL",
+    accessorKey: "No. of Buses Transfers Between Depots",
+    header: "No. of Buses Transfers Between Depots",
+    id: "No. of Buses Transfers Between Depots",
+  },
+  {
+    accessorKey: "Private Hire / Training / Test / Airport Services, etc",
+    header: "Private Hire / Training / Test / Airport Services, etc",
+    id: "Private Hire / Training / Test / Airport Services, etc",
+  },
+  {
+    accessorKey: "Spare buses used for 2 nd Spell & Non operted Jn Ac Buses",
+    header: "Spare buses used for 2 nd Spell & Non operted Jn Ac Buses",
+    id: "Spare buses used for 2 nd Spell & Non operted Jn Ac Buses",
+  },
+  {
+    accessorKey: "Total Bus Operated",
+    header: "Total Bus Operated",
+    id: "Total Bus Operated",
+  },
+  {
+    accessorKey: "Total Buses",
+    header: "Total Buses",
+    id: "Total Buses",
+  },
+  {
+    accessorKey: "Total Schedules Operated in unit",
+    header: "Total Schedules Operated in unit",
+    id: "Total Schedules Operated in unit",
+  },
+  {
+    accessorKey: "Transfer Bus Details",
+    header: "Transfer Bus Details",
+    id: "Transfer Bus Details",
   },
 ];
 
-export default function ReportPage() {
+const ReportUnitwiseBusDeployment = () => {
   const [tableData, setTableData] = useState<any>([]);
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -81,7 +111,7 @@ export default function ReportPage() {
 
   const handleTableData = async (date?: string) => {
     try {
-      const busData = await getBusPosition();
+      const busData = await getUnitwiseBusDeployment();
 
       if (date) {
         const startDateTime = new Date(`${date}T08:00:00`);
@@ -118,7 +148,7 @@ export default function ReportPage() {
   }, [date]);
 
   return (
-    <div className="flex flex-col gap-8 p-4">
+    <div className="flex flex-col gap-8 p-4 w-[82vw]">
       <div className="flex gap-1 items-center">
         <h6 className="font-medium">Date:</h6>
         <div className="flex items-center border rounded-md p-2 w-fit">
@@ -130,17 +160,20 @@ export default function ReportPage() {
           />
         </div>
       </div>
-
-      {loading ? (
-        <p>loading...</p>
-      ) : (
-        <ReportDataTable
-          data={tableData}
-          columns={columns}
-          searchKey="CLASS OF BUS"
-          tableLabel={tableLabel}
-        />
-      )}
+      <div className="relative">
+        {loading ? (
+          <p>loading...</p>
+        ) : (
+          <ReportDataTable
+            data={tableData}
+            columns={columns}
+            searchKey="Unit Name"
+            tableLabel={tableLabel}
+          />
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default ReportUnitwiseBusDeployment;

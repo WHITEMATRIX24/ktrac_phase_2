@@ -1,8 +1,8 @@
 "use client";
-
+import React from "react";
 import { ReportDataTable } from "@/components/report_datatable";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getBusPosition } from "@/lib/sql_query";
+import { getDockBusses } from "@/lib/sql_query";
 import { useEffect, useState } from "react";
 
 // column data
@@ -35,43 +35,43 @@ const columns = [
     id: "SL NO",
   },
   {
-    accessorKey: "CLASS OF BUS",
-    header: "Bus Class",
-    id: "CLASS OF BUS",
+    accessorKey: "ALLOTTED DEPOT",
+    header: "ALLOTTED DEPOT",
+    id: "ALLOTTED DEPOT",
   },
   {
-    accessorKey: "Service",
-    header: "Service",
-    id: "Service",
+    accessorKey: "BONNET NO",
+    header: "BONNET NO",
+    id: "BONNET NO",
   },
   {
-    accessorKey: "Training\n/ STC",
-    header: "Training / STC",
-    id: "Training",
+    accessorKey: "CLASS",
+    header: "CLASS",
+    id: "CLASS",
   },
   {
-    accessorKey: "Enroute",
-    header: "Enroute",
-    id: "Enroute",
+    accessorKey: "DOCK REASON",
+    header: "DOCK REASON",
+    id: "DOCK REASON",
   },
   {
-    accessorKey: "BTC",
-    header: "BTC",
-    id: "BTC",
+    accessorKey: "REG NO",
+    header: "REG NO",
+    id: "REG NO",
   },
   {
-    accessorKey: "PRIVATE HIRE",
-    header: "Private Hire",
-    id: "PRIVATE HIRE",
+    accessorKey: "TODAY\nstatus",
+    header: "TODAY\nstatus",
+    id: "TODAY\nstatus",
   },
   {
-    accessorKey: "TOTAL",
-    header: "Total",
-    id: "TOTAL",
+    accessorKey: "REPORT ED BY",
+    header: "REPORT ED BY",
+    id: "REPORT ED BY",
   },
 ];
 
-export default function ReportPage() {
+const ReportDockBusses = () => {
   const [tableData, setTableData] = useState<any>([]);
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -81,21 +81,21 @@ export default function ReportPage() {
 
   const handleTableData = async (date?: string) => {
     try {
-      const busData = await getBusPosition();
+      const dockBusData = await getDockBusses();
 
       if (date) {
         const startDateTime = new Date(`${date}T08:00:00`);
         const endDateTime = new Date(startDateTime);
         endDateTime.setUTCDate(endDateTime.getUTCDate() + 1);
         endDateTime.setUTCHours(7, 59, 59, 999);
-        const result = busData.filter((item: any) => {
+        const result = dockBusData.filter((item: any) => {
           const updatedAt = new Date(item.updated_at);
           return updatedAt >= startDateTime && updatedAt <= endDateTime;
         });
         setTableData(result);
         return;
       }
-      setTableData(busData);
+      setTableData(dockBusData);
     } catch (error) {
       console.error(`error in bus position report`);
     } finally {
@@ -104,7 +104,7 @@ export default function ReportPage() {
       end.setDate(start.getDate() + 1);
       end.setHours(7, 59, 59);
       setTableLabel(
-        `Bus Position Report (${start.toLocaleDateString()} 08:00 AM - ${end.toLocaleDateString()} 07:59 AM)`
+        `Dock Busses Report (${start.toLocaleDateString()} 08:00 AM - ${end.toLocaleDateString()} 07:59 AM)`
       );
       setLoading(false);
     }
@@ -116,6 +116,7 @@ export default function ReportPage() {
       handleTableData(date);
     }
   }, [date]);
+  console.log(tableData);
 
   return (
     <div className="flex flex-col gap-8 p-4">
@@ -137,10 +138,12 @@ export default function ReportPage() {
         <ReportDataTable
           data={tableData}
           columns={columns}
-          searchKey="CLASS OF BUS"
+          searchKey="BONNET NO"
           tableLabel={tableLabel}
         />
       )}
     </div>
   );
-}
+};
+
+export default ReportDockBusses;

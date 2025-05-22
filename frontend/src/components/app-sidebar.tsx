@@ -40,7 +40,10 @@ const defaultNavItems: NavItem[] = [
     items: [
       { title: "Revenue", url: "/Dashboard/Revenue" },
       { title: "Bus Position", url: "/Dashboard/Bus_Position" },
-      { title: "Unit wise bus allotment", url: "/Dashboard/Unit_Wise_Bus_Allotment" },
+      {
+        title: "Unit wise bus allotment",
+        url: "/Dashboard/Unit_Wise_Bus_Allotment",
+      },
       { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
       { title: "Dockyard", url: "/Dashboard/Dockyard" },
     ],
@@ -72,14 +75,17 @@ const defaultNavItems: NavItem[] = [
     icon: PieChart,
     items: [
       { title: "Bus Position", url: "/Reports/Busposition" },
-      { title: "Job Report", url: "#" },
-      { title: "Driver Report", url: "#" },
+      { title: "Classwise Dock", url: "/Reports/Classwise_Dock" },
+      { title: "Dock Busses", url: "/Reports/Dock_Busses" },
+      {
+        title: "Unitwise Bus Deployment",
+        url: "/Reports/Unitwise_bus_deployment",
+      },
+      { title: "Enroute Buses", url: "/Reports/Enroute_buses" },
     ],
   },
 ];
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-
-
   const [navItems, setNavItems] = React.useState<NavItem[]>(defaultNavItems);
   React.useEffect(() => {
     const role = localStorage.getItem("userRole");
@@ -181,7 +187,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcherStatic team={{ name: "KTRAC", logo: "/logo.png", plan: "Enroute Kerala" }} />
+        <TeamSwitcherStatic
+          team={{ name: "KTRAC", logo: "/logo.png", plan: "Enroute Kerala" }}
+        />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />

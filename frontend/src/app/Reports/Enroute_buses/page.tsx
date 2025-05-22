@@ -2,7 +2,7 @@
 
 import { ReportDataTable } from "@/components/report_datatable";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getBusPosition } from "@/lib/sql_query";
+import { getEnrouteBusses } from "@/lib/sql_query";
 import { useEffect, useState } from "react";
 
 // column data
@@ -35,43 +35,33 @@ const columns = [
     id: "SL NO",
   },
   {
-    accessorKey: "CLASS OF BUS",
-    header: "Bus Class",
-    id: "CLASS OF BUS",
+    accessorKey: "BONNET NO",
+    header: "BONNET NO",
+    id: "BONNET NO",
   },
   {
-    accessorKey: "Service",
-    header: "Service",
-    id: "Service",
+    accessorKey: "CLASS",
+    header: "CLASS",
+    id: "CLASS",
   },
   {
-    accessorKey: "Training\n/ STC",
-    header: "Training / STC",
-    id: "Training",
+    accessorKey: "ENROUTE SCHEDULE",
+    header: "ENROUTE SCHEDULE",
+    id: "ENROUTE SCHEDULE",
   },
   {
-    accessorKey: "Enroute",
-    header: "Enroute",
-    id: "Enroute",
+    accessorKey: "OPERATE D BY",
+    header: "OPERATE D BY",
+    id: "OPERATE D BY",
   },
   {
-    accessorKey: "BTC",
-    header: "BTC",
-    id: "BTC",
-  },
-  {
-    accessorKey: "PRIVATE HIRE",
-    header: "Private Hire",
-    id: "PRIVATE HIRE",
-  },
-  {
-    accessorKey: "TOTAL",
-    header: "Total",
-    id: "TOTAL",
+    accessorKey: "REG NO",
+    header: "REG NO",
+    id: "REG NO",
   },
 ];
 
-export default function ReportPage() {
+const ReportEnrouteBuses = () => {
   const [tableData, setTableData] = useState<any>([]);
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -81,7 +71,7 @@ export default function ReportPage() {
 
   const handleTableData = async (date?: string) => {
     try {
-      const busData = await getBusPosition();
+      const busData = await getEnrouteBusses();
 
       if (date) {
         const startDateTime = new Date(`${date}T08:00:00`);
@@ -137,10 +127,12 @@ export default function ReportPage() {
         <ReportDataTable
           data={tableData}
           columns={columns}
-          searchKey="CLASS OF BUS"
+          searchKey="BONNET NO"
           tableLabel={tableLabel}
         />
       )}
     </div>
   );
-}
+};
+
+export default ReportEnrouteBuses;
