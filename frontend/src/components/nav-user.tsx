@@ -27,6 +27,8 @@ import {
   SidebarMenuItem,
 
 } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
+
 
 export function NavUser({
   user,
@@ -37,7 +39,15 @@ export function NavUser({
     avatar: string
   }
 }) {
+  const router = useRouter()
 
+  const handleLogout = () => {
+    // Clear any auth tokens or user state here
+    localStorage.clear() // or remove specific keys like localStorage.removeItem("token")
+
+
+    router.push("/") // Adjust path as needed
+  }
 
   return (
     <SidebarMenu>
@@ -93,7 +103,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-[11px]">
+            <DropdownMenuItem className="text-[11px]" onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

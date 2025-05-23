@@ -1,6 +1,6 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
+import { CalendarDays } from "lucide-react"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
 import {
@@ -18,35 +18,34 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart"
 
-// New fuel efficiency data (example values)
+// Sample maintenance prediction data
 const chartData = [
-    { month: "January", bus: 3.5, car: 12.2 },
-    { month: "February", bus: 3.8, car: 11.8 },
-    { month: "March", bus: 3.2, car: 12.0 },
-    { month: "April", bus: 3.9, car: 13.1 },
-    { month: "May", bus: 4.1, car: 13.4 },
-    { month: "June", bus: 3.7, car: 12.7 },
+    { month: "January", predicted: 22 },
+    { month: "February", predicted: 34 },
+    { month: "March", predicted: 29 },
+    { month: "April", predicted: 40 },
+    { month: "May", predicted: 35 },
+    { month: "June", predicted: 46 },
 ]
 
-// Config to style each line
+// Config for styling the chart
 const chartConfig = {
-    bus: {
-        label: "Bus (km/l)",
+    predicted: {
+        label: "Predicted Maintenance Cases",
         color: "hsl(var(--chart-1))",
-    }
+    },
 } satisfies ChartConfig
 
 export function DotLineChart() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Fuel Efficiency Trends</CardTitle>
-                <CardDescription>January - May 2025</CardDescription>
+                <CardTitle>Upcoming Predicted Maintenance</CardTitle>
+                <CardDescription>Forecast for the next 6 months</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
                     <LineChart
-                        accessibilityLayer
                         data={chartData}
                         margin={{
                             left: 12,
@@ -66,23 +65,22 @@ export function DotLineChart() {
                             content={<ChartTooltipContent hideLabel />}
                         />
                         <Line
-                            dataKey="bus"
-                            type="natural"
-                            stroke="var(--themeGreen)"
+                            dataKey="predicted"
+                            type="monotone"
+                            stroke="var(--themeBlue)"
                             strokeWidth={2}
-                            dot={{ fill: "var(--themeGreen)" }}
+                            dot={{ fill: "var(--themeBlue)" }}
                             activeDot={{ r: 6 }}
                         />
-
                     </LineChart>
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
                 <div className="flex gap-2 font-medium leading-none">
-                    Fuel efficiency up by 4.1% <TrendingUp className="h-4 w-4" />
+                    Surge expected in June <CalendarDays className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                    Showing average fuel efficiency (km/l) for the last 5 months
+                    Use this forecast to prepare spares and technician availability.
                 </div>
             </CardFooter>
         </Card>

@@ -10,8 +10,8 @@ import {
   BarChart2,
   Package,
   BarChart,
-  TouchpadOff,
   LucideIcon,
+  Wrench,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -55,8 +55,6 @@ const defaultNavItems: NavItem[] = [
     items: [
       { title: "Income", url: "#" },
       { title: "Expense", url: "#" },
-      { title: "Balance Sheet", url: "#" },
-      { title: "Purchase Order", url: "#" },
     ],
   },
   {
@@ -67,6 +65,16 @@ const defaultNavItems: NavItem[] = [
       { title: "Add Schedule", url: "#" },
       { title: "Delete Schedule", url: "#" },
       { title: "Update Schedule", url: "#" },
+    ],
+  },
+  {
+    title: "Dock Management",
+    url: "#",
+    icon: Layers,
+    items: [
+      { title: "Report Dock", url: "/Dock_Management/Report_Dock" },
+      { title: "Release Dock", url: "#" },
+      { title: "View Docked Buses", url: "#" },
     ],
   },
   {
@@ -142,15 +150,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: LayoutDashboard,
           isActive: true,
           items: [
-            { title: "Workshop Overview", url: "#" },
-            { title: "Vehicle Status", url: "#" },
-            { title: "Spare Parts Inventory", url: "#" },
+            { title: "Maintenance Overview", url: "/Predictive_Maintenance_System/Overview" },
           ],
         },
         {
           title: "Maintenance",
           url: "#",
-          icon: TouchpadOff,
+          icon: Wrench,
           items: [
             { title: "Scheduled Maintenance", url: "#" },
             { title: "Breakdown Reports", url: "#" },

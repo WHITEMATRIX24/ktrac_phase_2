@@ -8,7 +8,7 @@ export default function Home() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
   const users = [
     {
       username: "Admin",
@@ -40,7 +40,7 @@ export default function Home() {
       } else if (user.role === "Finance") {
         router.replace("/Finance/Transactions");
       } else if (user.role === "Maintenance") {
-        router.replace("/Predictive_Maintenance_System/Inventory");
+        router.replace("/Predictive_Maintenance_System/Overview");
       }
     } else {
       alert("Invalid username or password");
@@ -91,7 +91,7 @@ export default function Home() {
             <div className="flex flex-col gap-1 mt-2">
               <label className="pl-1">Password</label>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-transparent placeholder:text-themeBlue/20 text-themeBlue text-sm border border-themeBlue/10 rounded-md px-3 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
@@ -104,6 +104,8 @@ export default function Home() {
                   id="auth-show-pass"
                   type="checkbox"
                   className="cursor-pointer"
+                  checked={showPassword}
+                  onChange={(e) => setShowPassword(e.target.checked)}
                 />
                 <label
                   htmlFor="auth-show-pass"
