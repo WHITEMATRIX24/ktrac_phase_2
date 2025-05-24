@@ -40,11 +40,11 @@ const defaultNavItems: NavItem[] = [
     items: [
       { title: "Revenue", url: "/Dashboard/Revenue" },
       { title: "Bus Position", url: "/Dashboard/Bus_Position" },
-      {
-        title: "Unit wise bus allotment",
-        url: "/Dashboard/Unit_Wise_Bus_Allotment",
-      },
-            { title: "Bus Attendance", url: "/Dashboard/Bus_Attendance" },
+      // {
+      //   title: "Unit wise bus allotment",
+      //   url: "/Dashboard/Unit_Wise_Bus_Allotment",
+      // },
+      { title: "Bus Attendance", url: "/Dashboard/Bus_Attendance" },
 
       { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
       { title: "Dockyard", url: "/Dashboard/Dockyard" },
@@ -65,7 +65,6 @@ const defaultNavItems: NavItem[] = [
     icon: Layers,
     items: [
       { title: "Add Schedule", url: "#" },
-      { title: "Delete Schedule", url: "#" },
       { title: "Update Schedule", url: "#" },
     ],
   },
@@ -76,7 +75,7 @@ const defaultNavItems: NavItem[] = [
     items: [
       { title: "Report Dock", url: "/Dock_Management/Report_Dock" },
       { title: "Release Dock", url: "#" },
-      { title: "View Docked Buses", url: "#" },
+
     ],
   },
   {

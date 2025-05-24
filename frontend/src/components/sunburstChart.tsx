@@ -11,7 +11,6 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  CardAction,
 } from "@/components/ui/card";
 import {
   Select,
@@ -21,10 +20,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-// Dynamically import Plotly for client-side rendering
-const Plot = dynamic(() => import("react-plotly.js"),);
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Dummy depot groups
 const depotGroups: Record<string, string[]> = {
   ALL: [],
   TVM: ["Thiruvananthapuram", "EMT", "KKD", "TDY"],
@@ -44,58 +41,18 @@ type BusData = {
   "Idle Buses": string | number | null;
   "No. of Buses Transfers Between Depots": string | number | null;
   "Spare buses used for 2 nd Spell & Non operted Jn Ac Buses": string | number | null;
-  "created_at":string | number |null;
-  "updated_at":string | number | null;
+  "created_at": string | number | null;
+  "updated_at": string | number | null;
 };
 
-// Dummy data
-/* const rawData: RevenueRecord[] = [
-  {
-    date: "2024-01-10",
-    depot: "Thiruvananthapuram",
-    revenue: 120000,
-    busType: "ordinary",
-  },
-  {
-    date: "2024-01-10",
-    depot: "Thiruvananthapuram",
-    revenue: 90000,
-    busType: "superFast",
-  },
-  {
-    date: "2024-01-10",
-    depot: "Kozhikode",
-    revenue: 80000,
-    busType: "fastPassenger",
-  },
-  {
-    date: "2024-01-10",
-    depot: "ETP",
-    revenue: 60000,
-    busType: "swift",
-  },
-  {
-    date: "2024-01-10",
-    depot: "TDY",
-    revenue: 70000,
-    busType: "ordinary",
-  },
-  {
-    date: "2024-01-10",
-    depot: "Thrissur",
-    revenue: 95000,
-    busType: "superFast",
-  },
-]; */
 type Props = {
   data: unknown[];
 };
 
 export function SunburstRevenueChart({ data }: Props) {
-      if (!data) return;
-      
-        const rawData = data as BusData[]
-      
+  if (!data) return null;
+
+  const rawData = data as BusData[];
 
   const [selectedDepot, setSelectedDepot] = React.useState("ALL");
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(new Date());
@@ -106,39 +63,34 @@ export function SunburstRevenueChart({ data }: Props) {
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  // Create a list of unique depot names
-const depotList = React.useMemo(() => {
-  const depots = new Set<string>();
-  rawData.forEach((item) => {
-    if (item["Unit Name"]) depots.add(item["Unit Name"]);
-  });
-  return Array.from(depots);
-}, [rawData]);
+  const depotList = React.useMemo(() => {
+    const depots = new Set<string>();
+    rawData.forEach((item) => {
+      if (item["Unit Name"]) depots.add(item["Unit Name"]);
+    });
+    return Array.from(depots);
+  }, [rawData]);
 
   const filteredData = React.useMemo(() => {
-  if (!selectedDate) return [];
+    if (!selectedDate) return [];
+    return rawData.filter((item) => {
+      const itemDate = typeof item.created_at === "string"
+        ? parseISO(item.created_at)
+        : new Date(item.created_at || "");
 
-  return rawData.filter((item) => {
-    const itemDate = typeof item.created_at === "string"
-      ? parseISO(item.created_at)
-      : new Date(item.created_at || "");
+      const isSame = isSameDay(itemDate, selectedDate);
+      const matchesDepot = selectedDepot === "ALL" || item["Unit Name"] === selectedDepot;
 
-    const isSame = isSameDay(itemDate, selectedDate);
-    const matchesDepot = selectedDepot === "ALL" || item["Unit Name"] === selectedDepot;
-
-    return isSame && matchesDepot;
-  });
-}, [selectedDate, selectedDepot, rawData]);
+      return isSame && matchesDepot;
+    });
+  }, [selectedDate, selectedDepot, rawData]);
 
   const labels = ["All"];
   const parents = [""];
   const values = [0];
-
   let totalAll = 0;
 
   filteredData.forEach((unit) => {
-   // console.log(unit);
-    
     const depot = unit["Unit Name"];
     labels.push(depot);
     parents.push("All");
@@ -146,63 +98,48 @@ const depotList = React.useMemo(() => {
     let depotTotal = 0;
 
     const groupTotals: Record<string, number> = {
-      "OperationalBus": 0,
-      "EnrouteBus":0,
-      "Idle": 0,
-      "SpareBus":0,
-      "Btc":0,
-      "Others": 0,
-      "Dock":0,
-      "Schedules":0,
-      "1for2":0,
-      "Total":0
+      OperationalBus: 0,
+      EnrouteBus: 0,
+      Idle: 0,
+      SpareBus: 0,
+      Btc: 0,
+      Others: 0,
+      Dock: 0,
+      Schedules: 0,
+      "1for2": 0,
+      Total: 0,
     };
 
     const categories = [
       {
         label: "Total Bus Operated",
         group: "OperationalBus",
-        value: toNumber(unit["Total Bus Operated"] || 0),
+        value: toNumber(unit["Total Bus Operated"]),
       },
-       {
+      {
         label: "Schedules Operated",
         group: "Total",
         value: toNumber(unit["Total Schedules Operated in unit"]),
-      }, 
+      },
       {
         label: "Private Hire / Training / etc",
         group: "Others",
-        value: toNumber(unit["Private Hire / Training / Test / Airport Services, etc"] || 0),
+        value: toNumber(unit["Private Hire / Training / Test / Airport Services, etc"]),
       },
       {
         label: "Dock & Police Custody",
         group: "Dock",
-        value: toNumber(unit["Buses in Dock & Police Custody"] || 0),
+        value: toNumber(unit["Buses in Dock & Police Custody"]),
       },
       {
         label: "Idle Buses",
         group: "Idle",
-        value: toNumber(unit["Idle Buses"] || 0),
+        value: toNumber(unit["Idle Buses"]),
       },
-      /* {
-        label: "Spare Buses (2nd Spell / AC)",
-        group: "Spare",
-        value: toNumber(unit["Spare buses used for 2 nd Spell & Non operted Jn Ac Buses"]|| 0),
-      }, */
-      /* {
-        label: "Transfers Between Depots",
-        group: "Transfers & Other",
-        value: toNumber(unit["No. of Buses Transfers Between Depots"]),
-      },
-      {
-        label: "Transfer Bus Details",
-        group: "Transfers & Other",
-        value: toNumber(unit["Transfer Bus Details"]),
-      }, */
       {
         label: "Enroute Buses (Special)",
         group: "EnrouteBus",
-        value: toNumber(unit["Enroute buses including Pamba Special Services"] || 0),
+        value: toNumber(unit["Enroute buses including Pamba Special Services"]),
       },
     ];
 
@@ -224,7 +161,6 @@ const depotList = React.useMemo(() => {
       depotTotal += value;
     });
 
-    // Push group totals
     groupKeys.forEach((group) => {
       const groupLabel = `${depot} - ${group}`;
       values.push(groupTotals[group]);
@@ -236,62 +172,75 @@ const depotList = React.useMemo(() => {
 
   values[0] = totalAll;
 
-  //console.log(labels, values, parents);
-  
   const chartData: Plotly.Data = {
     type: "sunburst",
     labels,
     parents,
     values,
-/*     branchvalues: "total",
- */    hovertemplate: "%{label}<br><b>%{value} buses</b><extra></extra>",
+    hovertemplate: "%{label}<br><b>%{value} buses</b><extra></extra>",
   };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = new Date(e.target.value);
+    if (!isNaN(newDate.getTime())) {
+      setSelectedDate(newDate);
+    }
+  };
+
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>KSRTC Unit Wise Bus Allotment View</CardTitle>
-        <CardDescription> Bus Allotment on {selectedDate?.toLocaleDateString("en-IN")}</CardDescription>
-        <div className="flex gap-5 mt-4">
-            <div className="mt-4 me-5">
-      <label className="text-sm font-medium mb-1 block">Select Date</label>
-
-      <CalendarDropdown selected={selectedDate} onSelect={setSelectedDate} />
-    </div>
-    <div className="mt-4 ms-5">
-      <label className="text-sm font-medium mb-1 block">Select Depot</label>
-      <Select value={selectedDepot} onValueChange={setSelectedDepot}>
-        <SelectTrigger className="w-[300px] p-5">
-          <SelectValue placeholder="Select Depot" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem key="ALL" value="ALL">All Depots</SelectItem>
-          {depotList.map((depot) => (
-            <SelectItem key={depot} value={depot}>
-              {depot}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-col gap-1">
+            <CardTitle>KSRTC Unit Wise Bus Allotment View</CardTitle>
+            <CardDescription>
+              Bus Allotment on {selectedDate?.toLocaleDateString("en-IN")}
+            </CardDescription>
+          </div>
+          <div className="flex gap-2 ">
+            <div className=" me-5">
+              <label className="text-[12px] mb-1 block">Select Date</label>
+              <input
+                type="date"
+                value={selectedDate?.toISOString().split("T")[0]}
+                onChange={handleDateChange}
+                className="border px-2 text-[12px] py-2 rounded"
+              />
+            </div>
+            <div className=" ms-5">
+              <label className="text-[12px] mb-1 block">Select Depot</label>
+              <Select value={selectedDepot} onValueChange={setSelectedDepot}>
+                <SelectTrigger className="text-[12px] p-1 px-2">
+                  <SelectValue placeholder="Select Depot" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Depots</SelectItem>
+                  {depotList.map((depot) => (
+                    <SelectItem key={depot} value={depot}>
+                      {depot}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="h-[500px] flex items-center justify-center">
-  {filteredData.length === 0 ? (
-    <p className="text-center text-gray-500 text-lg">
-      No bus allotment data available for the selected date.
-    </p>
-  ) : (
-    <Plot
-      data={[chartData]}
-      layout={{
-        margin: { t: 10, l: 10, r: 10, b: 10 },
-        /* sunburstcolorway: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
-        extendsunburstcolorway: true, */
-      }}
-      style={{ width: "100%", height: "100%" }}
-    />
-  )}
-</CardContent>
+        {filteredData.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg">
+            No bus allotment data available for the selected date.
+          </p>
+        ) : (
+          <Plot
+            data={[chartData]}
+            layout={{
+              margin: { t: 10, l: 10, r: 10, b: 10 },
+            }}
+            style={{ width: "100%", height: "100%" }}
+          />
+        )}
+      </CardContent>
     </Card>
   );
 }

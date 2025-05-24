@@ -26,3 +26,4 @@ export async function getUnitwiseBusDeployment() {
   const stmt = db.prepare("SELECT * FROM unitwise_bus_deployment");
   return stmt.all();
 }
+

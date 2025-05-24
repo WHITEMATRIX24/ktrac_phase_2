@@ -20,11 +20,29 @@ const dummyVehicles: Vehicle[] = [
     {
         BUSNO: 'RPC200',
         NAME: 'LL',
-        REGNO: 'KL15A7845',
+        REGNO: 'KL15A0645',
         BODYTYPE: 'ETX',
         SCHEDULE: '48',
-        CLASS: 'Deluxe',
+        CLASS: 'ORD',
         DEPOT: 'KKD'
+    },
+    {
+        BUSNO: 'RPC292',
+        NAME: 'LL',
+        REGNO: 'KL15A0845',
+        BODYTYPE: 'ETX',
+        SCHEDULE: '48',
+        CLASS: 'SFP',
+        DEPOT: 'KTM'
+    },
+    {
+        BUSNO: 'RPC202',
+        NAME: 'LL',
+        REGNO: 'KL15A0845',
+        BODYTYPE: 'ETX',
+        SCHEDULE: '48',
+        CLASS: 'SFP',
+        DEPOT: 'CGR'
     }
 ];
 
@@ -57,10 +75,40 @@ const ReportBusDock: React.FC = () => {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log({ selectedVehicle, dockForm });
+
+        if (!selectedVehicle) return;
+
+        const payload = {
+            slNo: Number(dockForm.slNo),
+            bonnetNo: selectedVehicle.BUSNO,
+            dockReason: dockForm.dockReason,
+            todayStatus: dockForm.todayStatus,
+            reportedBy: dockForm.reportedBy,
+            vehicle: selectedVehicle,
+        };
+
+        try {
+            const res = await fetch('/api/report-dock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+            if (res.ok) {
+                alert('Dock information submitted successfully!');
+                handleCancel();
+            } else {
+                alert(result.error || 'Error occurred.');
+            }
+        } catch (error) {
+            alert('Something went wrong.');
+            console.error(error);
+        }
     };
+
 
     return (
         <div>

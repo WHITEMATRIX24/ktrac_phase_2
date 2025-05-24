@@ -32,7 +32,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
 import { Ellipsis } from "lucide-react";
-
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -92,6 +93,10 @@ export function ReportDataTable<TData, TValue>({
     XLSX.utils.book_append_sheet(wb, ws, "Report");
     XLSX.writeFile(wb, "report.xlsx");
   };
+
+
+
+
 
   return (
     <div>
@@ -168,9 +173,9 @@ export function ReportDataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}
@@ -183,9 +188,8 @@ export function ReportDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-200"
-                    }`}
+                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-200"
+                      }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
