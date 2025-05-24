@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { SunburstRevenueChart } from "@/components/sunburstChart";
 import { SectionCards } from "@/components/section-cards";
 import { Bus, StopCircle, TrendingUp, WalletCards } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function Page() {
   const [selectedDepo, setSelectedDepo] = useState("All");
@@ -20,6 +21,16 @@ export default function Page() {
     { bonnetNo: "ETP545", class: "A/C", status: "Training/STC", dockReason: "", depo: "ETP", dateModified: "2025-05-23" },
     { bonnetNo: "ETP548", class: "A/C", status: "BTC", dockReason: "", depo: "ETP", dateModified: "2025-05-23" },
     { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
+
+
   ];
 
   const depotList = React.useMemo(() => {
@@ -55,47 +66,51 @@ export default function Page() {
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
           <SectionCards data={dummyData} />
 
-          <div className="pl-4 lg:pl-6">
-            <div className="my-6">
-              <h2 className="text-lg font-semibold mb-4">Bus Attendance Details</h2>
+          <div className="pl-4 lg:pl-4">
+            <div className="">
+              <div className="flex">
+                <h2 className="text-lg mx-4 font-semibold ">Bus Attendance Details</h2>
 
-              {/* Filters */}
-              <div className="flex flex-wrap gap-4 mb-4">
-                <select value={selectedDepo} onChange={(e) => setSelectedDepo(e.target.value)} className="border px-3 py-2 rounded">
-                  <option value="All">All Depos</option>
-                  {depotList.map((depot) => (
-                    <option key={depot} value={depot}>{depot}</option>
-                  ))}
-                </select>
+                {/* Filters */}
+                <div className="flex flex-wrap gap-4 mb-0 me-5 ms-auto">
+                  <select value={selectedDepo} onChange={(e) => setSelectedDepo(e.target.value)} className="border px-3 py-2 rounded text-[12px]">
+                    <option value="All">All Depos</option>
+                    {depotList.map((depot) => (
+                      <option key={depot} value={depot}>{depot}</option>
+                    ))}
+                  </select>
 
-                <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="border px-3 py-2 rounded" />
+                  <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="border px-3 py-2 rounded text-[12px]" />
+                </div>
               </div>
 
               {/* Table */}
-              <div className="overflow-auto me-5">
-                <table className="min-w-full border-collapse border border-gray-200">
-                  <thead>
-                    <tr className="bg-gray-100 text-left">
-                      <th className="border px-4 py-2">Bonnet No</th>
-                      <th className="border px-4 py-2">Class</th>
-                      <th className="border px-4 py-2">Status</th>
-                      <th className="border px-4 py-2">Depo</th>
-                      <th className="border px-4 py-2">Date Modified</th>
-                      <th className="border px-4 py-2">Reason (if Dock)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+              <div className="overflow-auto m-1 p-2">
+                <Table className="rounded-[5px]">
+                  <TableHeader className=" sticky top-0 rounded-[5px]">
+                    <TableRow className="bg-sidebar hover:bg-sidebar">
+                      <TableHead className="border px-4 py-1 text-white">Bonnet No</TableHead>
+                      <TableHead className="border px-4 py-1 text-white">Class</TableHead>
+                      <TableHead className="border px-4 py-1 text-white">Status</TableHead>
+                      <TableHead className="border px-4 py-1 text-white">Depo</TableHead>
+                      <TableHead className="border px-4 py-1 text-white">Date Modified</TableHead>
+                      <TableHead className="border px-4 py-1 text-white">Reason (if Dock)</TableHead>
+                    </TableRow>
+
+                  </TableHeader>
+                  <TableBody className="h-full overflow-y-scroll">
                     {paginatedData.map((item, idx) => (
-                      <tr key={idx}>
-                        <td className="border px-4 py-2">{item.bonnetNo}</td>
-                        <td className="border px-4 py-2">{item.class}</td>
-                        <td className="border px-4 py-2">{item.status}</td>
-                        <td className="border px-4 py-2">{item.depo}</td>
-                        <td className="border px-4 py-2">{item.dateModified}</td>
-                        <td className="border px-4 py-2">
+                      <TableRow key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-200"
+                        }`}>
+                        <TableCell className="border px-4 py-2 text-[12px]">{item.bonnetNo}</TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">{item.class}</TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">{item.status}</TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">{item.depo}</TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">{item.dateModified}</TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">
                           {item.status === "Dock" ? item.dockReason : "-"}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
                     {paginatedData.length === 0 && (
                       <tr>
@@ -104,12 +119,12 @@ export default function Page() {
                         </td>
                       </tr>
                     )}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
 
               {/* Pagination Controls */}
-              <div className="flex justify-center items-center mt-4">
+              <div className="flex justify-start items-center mt-4">
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   className="px-4 py-2 border rounded disabled:opacity-50"
