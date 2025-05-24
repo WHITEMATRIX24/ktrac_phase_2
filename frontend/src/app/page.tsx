@@ -25,6 +25,11 @@ export default function Home() {
       password: "Maintenance@ktrac#",
       role: "Maintenance",
     },
+    {
+      username: "HR Unit",
+      password: "HR@ktrac#",
+      role: "Employee",
+    },
   ];
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,6 +46,8 @@ export default function Home() {
         router.replace("/Finance/Overview");
       } else if (user.role === "Maintenance") {
         router.replace("/Predictive_Maintenance_System/Overview");
+      } else if (user.role === "Employee") {
+        router.replace("/Employee_Management/Overview");
       }
     } else {
       alert("Invalid username or password");

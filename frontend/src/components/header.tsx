@@ -52,6 +52,13 @@ export default function Header() {
         avatar: "/Captureuseravathar.PNG",
       };
     }
+    else if (role === "Employee") {
+      userData = {
+        name: "HR Unit",
+        email: "Supervisor",
+        avatar: "/Captureuseravathar.PNG",
+      };
+    }
 
     setUser(userData);
   }, []);

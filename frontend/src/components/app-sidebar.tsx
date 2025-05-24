@@ -12,6 +12,7 @@ import {
   BarChart,
   LucideIcon,
   Wrench,
+  User2,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -183,6 +184,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             { title: "Parts Usage", url: "#" },
           ],
         },
+      ];
+    }
+    else if (role === "Employee") {
+      computedNavItems = [
+        {
+          title: "Dashboard",
+          url: "#",
+          icon: LayoutDashboard,
+          items: [
+            { title: "Overview", url: "/Employee_Management/Overview" },
+
+          ],
+        },
+        {
+          title: "Employee Management",
+          url: "#",
+          icon: User2,
+          items: [
+            { title: "All Employees", url: "/Employee_Management/All_Employees" },
+            { title: "Add Employee", url: "/Employee_Management/Add_Employee" },
+            { title: "Attendance", url: "/Employee_Management/Attendance" },
+            { title: "Leave Requests", url: "/Employee_Management/Leave_Requests" },
+            { title: "Payroll", url: "/Employee_Management/Payroll" },
+          ],
+        }
+
       ];
     } else {
       computedNavItems = defaultNavItems;
