@@ -33,7 +33,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
 import { Ellipsis } from "lucide-react";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { autoTable } from "jspdf-autotable";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -45,6 +45,10 @@ interface DataTableProps<TData, TValue> {
   endDateSetter: Dispatch<SetStateAction<string>>;
   isLoading: boolean;
 }
+
+type RowData = {
+  [key: string]: string | number;
+};
 
 export function ReportDataTable<TData, TValue>({
   columns,
@@ -94,9 +98,20 @@ export function ReportDataTable<TData, TValue>({
     XLSX.writeFile(wb, "report.xlsx");
   };
 
+  // export pdf
+  const exportPdfHandler = async () => {
+    const doc = new jsPDF();
+    const header: string[] = columns.map((val) => val.id as string).splice(1);
 
+    const pdfData: RowData[] = data.map((val) => val as RowData);
+    const body = pdfData.map((row) => header.map((col) => row[col] || "nill"));
 
-
+    autoTable(doc, {
+      head: [header],
+      body,
+    });
+    doc.save(tableLabel);
+  };
 
   return (
     <div>
@@ -143,7 +158,10 @@ export function ReportDataTable<TData, TValue>({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-60 flex flex-col gap-3">
-              <button className="bg-sidebar px-3 py-1 rounded-md text-sm text-white">
+              <button
+                onClick={exportPdfHandler}
+                className="bg-sidebar px-3 py-1 rounded-md text-sm text-white"
+              >
                 Export to pdf
               </button>
               <button
@@ -173,9 +191,9 @@ export function ReportDataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                       </TableHead>
                     );
                   })}
@@ -188,8 +206,9 @@ export function ReportDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-200"
-                      }`}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-200"
+                    }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
