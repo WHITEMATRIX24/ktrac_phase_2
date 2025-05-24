@@ -28,10 +28,10 @@ export function CalendarDropdown({ selected, onSelect }: CalendarDropdownProps) 
   }, []);
 
   return (
-    <div className="relative inline-block" ref={ref}>
+    <div className="relative inline-block"  ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center px-4 py-2 border rounded bg-white shadow-sm hover:bg-gray-100"
+        className="flex items-center px-4 py-1 border rounded bg-white shadow-sm hover:bg-gray-100"
       >
         <span>
           {selected ? format(selected, "PPP") : "Select a date"}

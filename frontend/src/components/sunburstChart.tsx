@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 
 // Dynamically import Plotly for client-side rendering
-const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+const Plot = dynamic(() => import("react-plotly.js"),);
 
 // Dummy depot groups
 const depotGroups: Record<string, string[]> = {
@@ -106,6 +106,15 @@ export function SunburstRevenueChart({ data }: Props) {
     return isNaN(parsed) ? 0 : parsed;
   };
 
+  // Create a list of unique depot names
+const depotList = React.useMemo(() => {
+  const depots = new Set<string>();
+  rawData.forEach((item) => {
+    if (item["Unit Name"]) depots.add(item["Unit Name"]);
+  });
+  return Array.from(depots);
+}, [rawData]);
+
   const filteredData = React.useMemo(() => {
   if (!selectedDate) return [];
 
@@ -114,9 +123,12 @@ export function SunburstRevenueChart({ data }: Props) {
       ? parseISO(item.created_at)
       : new Date(item.created_at || "");
 
-    return isSameDay(itemDate, selectedDate);
+    const isSame = isSameDay(itemDate, selectedDate);
+    const matchesDepot = selectedDepot === "ALL" || item["Unit Name"] === selectedDepot;
+
+    return isSame && matchesDepot;
   });
-}, [selectedDate, rawData]);
+}, [selectedDate, selectedDepot, rawData]);
 
   const labels = ["All"];
   const parents = [""];
@@ -239,21 +251,47 @@ export function SunburstRevenueChart({ data }: Props) {
       <CardHeader>
         <CardTitle>KSRTC Unit Wise Bus Allotment View</CardTitle>
         <CardDescription> Bus Allotment on {selectedDate?.toLocaleDateString("en-IN")}</CardDescription>
-        <div className="mt-4">
-  <CalendarDropdown selected={selectedDate} onSelect={setSelectedDate} />
-</div>
+        <div className="flex gap-5 mt-4">
+            <div className="mt-4 me-5">
+      <label className="text-sm font-medium mb-1 block">Select Date</label>
+
+      <CalendarDropdown selected={selectedDate} onSelect={setSelectedDate} />
+    </div>
+    <div className="mt-4 ms-5">
+      <label className="text-sm font-medium mb-1 block">Select Depot</label>
+      <Select value={selectedDepot} onValueChange={setSelectedDepot}>
+        <SelectTrigger className="w-[300px] p-5">
+          <SelectValue placeholder="Select Depot" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem key="ALL" value="ALL">All Depots</SelectItem>
+          {depotList.map((depot) => (
+            <SelectItem key={depot} value={depot}>
+              {depot}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+        </div>
       </CardHeader>
-      <CardContent className="h-[500px]">
-        <Plot
-          data={[chartData]}
-          layout={{
-            margin: { t: 10, l: 10, r: 10, b: 10 },
-            /* sunburstcolorway: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
-            extendsunburstcolorway: true, */
-          }}
-          style={{ width: "100%", height: "100%" }}
-        />
-      </CardContent>
+      <CardContent className="h-[500px] flex items-center justify-center">
+  {filteredData.length === 0 ? (
+    <p className="text-center text-gray-500 text-lg">
+      No bus allotment data available for the selected date.
+    </p>
+  ) : (
+    <Plot
+      data={[chartData]}
+      layout={{
+        margin: { t: 10, l: 10, r: 10, b: 10 },
+        /* sunburstcolorway: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
+        extendsunburstcolorway: true, */
+      }}
+      style={{ width: "100%", height: "100%" }}
+    />
+  )}
+</CardContent>
     </Card>
   );
 }

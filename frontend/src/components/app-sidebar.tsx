@@ -44,6 +44,8 @@ const defaultNavItems: NavItem[] = [
         title: "Unit wise bus allotment",
         url: "/Dashboard/Unit_Wise_Bus_Allotment",
       },
+            { title: "Bus Attendance", url: "/Dashboard/Bus_Attendance" },
+
       { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
       { title: "Dockyard", url: "/Dashboard/Dockyard" },
     ],

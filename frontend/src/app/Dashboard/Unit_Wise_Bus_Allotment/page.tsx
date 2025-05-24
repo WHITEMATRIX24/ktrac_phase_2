@@ -1,14 +1,7 @@
-
-import { RevenueAnalysisChart } from "@/components/revenue-chart";
 import { SunburstRevenueChart } from "@/components/sunburstChart";
-
-import { RevenueBarchartComponent } from "@/components/revenue_Barchart";
-import { RevenueCustomBarchart } from "@/components/revenue_c_barchart";
-import { RevenuePieChart } from "@/components/revenue_piechart";
 import { SectionCards } from "@/components/section-cards";
-import { getBusPosition, getUnitwiseBusDeployment } from "@/lib/sql_query";
-import { Bus, Fuel, StopCircle, TrendingUp, Users, WalletCards } from "lucide-react";
-import { log } from "console";
+import { getUnitwiseBusDeployment } from "@/lib/sql_query";
+import { Bus, StopCircle, TrendingUp, Users, WalletCards } from "lucide-react";
 
 
 export default async function Page() {
@@ -27,9 +20,6 @@ export default async function Page() {
 
   const busAllotmentData1 = (await getUnitwiseBusDeployment()) as BusAllotmentUnit[];
 
-  console.log('data');
-
-  console.log(busAllotmentData1);
 
 
   // Helper to safely parse numbers
@@ -87,15 +77,6 @@ export default async function Page() {
             <div className="pl-4 lg:pl-6">
               <SunburstRevenueChart data={busAllotmentData} />
             </div>
-            {/*  <div className="pr-4 lg:pr-6">
-              <RevenueBarchartComponent chartData={barChartData} />
-            </div>
-            <div className="pl-4 lg:pl-6">
-              <RevenuePieChart />
-            </div>
-            <div className="pr-4 lg:pr-6">
-              <RevenueCustomBarchart />
-            </div> */}
           </div>
         </div>
       </div>
