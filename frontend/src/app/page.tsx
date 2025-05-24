@@ -38,7 +38,7 @@ export default function Home() {
       if (user.role === "Admin") {
         router.replace("/Dashboard/Revenue");
       } else if (user.role === "Finance") {
-        router.replace("/Finance/Transactions");
+        router.replace("/Finance/Overview");
       } else if (user.role === "Maintenance") {
         router.replace("/Predictive_Maintenance_System/Overview");
       }
