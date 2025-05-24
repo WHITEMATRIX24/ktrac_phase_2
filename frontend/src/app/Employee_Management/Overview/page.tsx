@@ -1,33 +1,32 @@
-
 import { SectionCards } from "@/components/section-cards";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Banknote, Clock, UserCheck, Wallet } from "lucide-react";
-import { VendorPaymentTable } from "@/components/finance/vendorPayementTable";
-import { BudgetComparisonChart } from "@/components/finance/budgetComparisonChart";
-import { RevenueExpenseChart } from "@/components/finance/revenueChart";
-import { TicketingTrendChart } from "@/components/finance/ticketingTrends";
+import {  User,  UserCheck, UserLock, UserPen } from "lucide-react";
 
+// New imports for surrender duty-related charts
+import { SurrenderDutyTrendChart } from "@/components/employee/SurrenderDutyTrendChart";
+import { MonthlySurrenderSummaryChart } from "@/components/employee/MonthlySurrenderSummaryChart";
+import { KsrtcStaffBarChart } from "@/components/employee/KsrtcStaffBarChart";
+ 
 export default function Page() {
-    const financeData = [
+    const StaffData = [
         {
-            title: "Monthly Revenue",
-            value: 1294500,
-            icon: <Wallet className="w-15 h-15 text-white opacity-70" />,
+            title: "Total Staff",
+            value: 12945,
+            icon: <User className="w-15 h-15 text-white opacity-70" />,
         },
         {
-            title: "Total Expenses",
-            value: 9458000,
-            icon: <Banknote className="w-15 h-15 text-white opacity-70" />,
-        },
-        {
-            title: "Vendor Payments Pending",
-            value: 2148000,
-            icon: <Clock className="w-15 h-15 text-white opacity-70" />,
-        },
-        {
-            title: "Salary Disbursed",
-            value: 3458000,
+            title: "On Duty",
+            value: 9458,
             icon: <UserCheck className="w-15 h-15 text-white opacity-70" />,
+        },
+        {
+            title: "On Leave",
+            value: 3487,
+            icon: <UserLock className="w-15 h-15 text-white opacity-70" />,
+        },
+        {
+            title: "Temporary Staff",
+            value: 3458,
+            icon: <UserPen className="w-15 h-15 text-white opacity-70" />,
         },
     ];
 
@@ -35,15 +34,19 @@ export default function Page() {
         <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    <SectionCards data={financeData} />
+                    <SectionCards data={StaffData} />
 
+                    
 
+                    {/* Employee Surrender Duty charts */}
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mx-6">
-                        <TicketingTrendChart />
-                        <BudgetComparisonChart />
-                        <RevenueExpenseChart />
+                        <SurrenderDutyTrendChart />
+                        <KsrtcStaffBarChart/>
+                        <MonthlySurrenderSummaryChart /> 
                     </div>
-                    <div className="grid grid-cols-1 gap-4 mx-4">
+
+                    {/* Vendor Payment Section */}
+                    {/* <div className="grid grid-cols-1 gap-4 mx-4">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Vendor Payment Status</CardTitle>
@@ -55,8 +58,7 @@ export default function Page() {
                                 <VendorPaymentTable />
                             </div>
                         </Card>
-                    </div>
-
+                    </div> */}
                 </div>
             </div>
         </div>
