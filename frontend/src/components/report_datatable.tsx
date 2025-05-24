@@ -118,7 +118,7 @@ export function ReportDataTable<TData, TValue>({
       <div className="flex items-center justify-between py-4">
         <div className="flex gap-5">
           <div className="flex gap-1 items-center">
-            <h6 className="font-medium">Date:</h6>
+            <h6 className="font-medium text-[14px] text-grey-300">From :</h6>
             <div className="flex items-center border rounded-md p-2 w-fit">
               <input
                 type="date"
@@ -129,7 +129,7 @@ export function ReportDataTable<TData, TValue>({
             </div>
           </div>
           <div className="flex gap-1 items-center">
-            <h6 className="font-medium">To Date:</h6>
+            <h6 className="font-medium">To:</h6>
             <div className="flex items-center border rounded-md p-2 w-fit">
               <input
                 type="date"
@@ -191,9 +191,9 @@ export function ReportDataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}
@@ -206,9 +206,8 @@ export function ReportDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-200"
-                    }`}
+                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                      }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

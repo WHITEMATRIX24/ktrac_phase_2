@@ -34,7 +34,7 @@ export function KsrtcStaffBarChart() {
             {
                 label: "Field Staff",
                 data: [180, 200, 250], // Drivers, Conductors, Mechanics, etc.
-                backgroundColor:"#235789",
+                backgroundColor: "#235789",
             },
         ],
     };
@@ -42,40 +42,40 @@ export function KsrtcStaffBarChart() {
     const options = {
         responsive: true,
         layout: {
-        padding: {
-            top: 20,      // Space between legend and chart area
-        },
-    },
-        plugins: {
-            legend: {
-            position: "top" as const,
-            labels: {
-                boxWidth: 20,
-                padding: 20, // Space between heading and legend
-            }
-        },
-            title: {
-            display: true,
-            text: "KSRTC Staff Distribution by Department and Level",
             padding: {
-                top: 0,
-                bottom:0, // Space between title and legend
+                top: 20,      // Space between legend and chart area
             },
         },
+        plugins: {
+            legend: {
+                position: "top" as const,
+                labels: {
+                    boxWidth: 20,
+                    padding: 20, // Space between heading and legend
+                }
+            },
+            title: {
+                display: true,
+                text: "KSRTC Staff Distribution by Department and Level",
+                padding: {
+                    top: 0,
+                    bottom: 0, // Space between title and legend
+                },
+            },
         },
-        
+
     };
 
     return (
 
         <Card>
-      <CardHeader>
-        <CardTitle>Staff Distribution Summary</CardTitle>
-        <CardDescription>Zone Level Staff Distribution </CardDescription>
-      </CardHeader>
-      <div className="px-4 pb-6">
-            <Bar className="mt-5" options={options} data={data} />
-      </div>
-    </Card>
+            <CardHeader>
+                <CardTitle>Staff Distribution Summary</CardTitle>
+                <CardDescription>Zone Level Staff Distribution </CardDescription>
+            </CardHeader>
+            <div className="min-h-[350px]">
+                <Bar className="mt-5" options={options} data={data} />
+            </div>
+        </Card>
     );
 }

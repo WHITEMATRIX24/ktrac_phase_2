@@ -65,7 +65,7 @@ export function SurrenderDutyTrendChart() {
         <CardTitle>Surrender Duty Trend</CardTitle>
         <CardDescription>Monthly surrender activity by employees</CardDescription>
       </CardHeader>
-      <div className="px-4 pb-6">
+      <div className="p-0 min-h-[350px]">
         <Line data={data} options={options} />
       </div>
     </Card>

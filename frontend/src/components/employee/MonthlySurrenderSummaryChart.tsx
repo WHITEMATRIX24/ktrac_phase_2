@@ -47,7 +47,7 @@ export function MonthlySurrenderSummaryChart() {
         <CardTitle>Monthly Surrender Summary</CardTitle>
         <CardDescription>Breakdown by reason or category</CardDescription>
       </CardHeader>
-      <div className="px-4 pb-6">
+      <div className="min-h-[350px]">
         <Bar data={data} options={options} />
       </div>
     </Card>

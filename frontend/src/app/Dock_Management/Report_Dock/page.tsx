@@ -119,13 +119,13 @@ const ReportBusDock: React.FC = () => {
                         <div className="bg-white shadow rounded-lg border-0 p-6">
                             <div className="flex items-center mb-4">
                                 <Bus className="w-5 h-5 text-blue-600 mr-2" />
-                                <h2 className="text-sm font-semibold">Report Bus Dock</h2>
+                                <h2 className="text-[14px] font-semibold">Report Bus Dock</h2>
                             </div>
                             <hr className="mb-4" />
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-4">
                                     <div className="w-full md:w-1/2">
-                                        <label className="block font-semibold mb-2">Select Vehicle No</label>
+                                        <label className="block font-semibold mb-2 text-[12px]">Select Vehicle No</label>
                                         <Autocomplete
                                             size="small"
                                             options={dummyVehicles}
@@ -135,7 +135,7 @@ const ReportBusDock: React.FC = () => {
                                                 <TextField
                                                     {...params}
                                                     variant="outlined"
-                                                    className="text-xs"
+                                                    className="text-[12px]"
                                                     InputProps={{
                                                         ...params.InputProps,
                                                         className: "h-9 text-xs"
@@ -225,7 +225,7 @@ const ReportBusDock: React.FC = () => {
                                             </button>
                                             <button
                                                 type="submit"
-                                                className="px-4 py-2 text-sm bg-green-500 text-white rounded"
+                                                className="px-4 py-2 text-sm bg-[var(--sidebar)] text-white rounded"
                                             >
                                                 Submit
                                             </button>
