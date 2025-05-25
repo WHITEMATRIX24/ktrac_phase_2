@@ -4,7 +4,14 @@ import React, { useState } from "react";
 import { SunburstRevenueChart } from "@/components/sunburstChart";
 import { SectionCards } from "@/components/section-cards";
 import { Bus, StopCircle, TrendingUp, WalletCards } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function Page() {
   const [selectedDepo, setSelectedDepo] = useState("All");
@@ -13,24 +20,132 @@ export default function Page() {
   const rowsPerPage = 10;
 
   const dummyTableData = [
-    { bonnetNo: "ADR1234", class: "A/C", status: "Enroute", depo: "ADR", dateModified: "2025-05-22" },
-    { bonnetNo: "EKM5678", class: "Non A/C", status: "Idle", depo: "EKM", dateModified: "2025-05-22" },
-    { bonnetNo: "ALY9012", class: "Sleeper", status: "Dock", dockReason: "Under maintenance", depo: "ALY", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM3456", class: "A/C", status: "Dock", dockReason: "Tyre replacement", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "ALY345", class: "A/C", status: "Service", dockReason: "", depo: "ALY", dateModified: "2025-05-23" },
-    { bonnetNo: "ETP545", class: "A/C", status: "Training/STC", dockReason: "", depo: "ETP", dateModified: "2025-05-23" },
-    { bonnetNo: "ETP548", class: "A/C", status: "BTC", dockReason: "", depo: "ETP", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-    { bonnetNo: "TVM308", class: "A/C", status: "Private Hire", dockReason: "", depo: "TVM", dateModified: "2025-05-23" },
-
-
+    {
+      bonnetNo: "ADR1234",
+      class: "A/C",
+      status: "Enroute",
+      depo: "ADR",
+      dateModified: "2025-05-22",
+    },
+    {
+      bonnetNo: "EKM5678",
+      class: "Non A/C",
+      status: "Idle",
+      depo: "EKM",
+      dateModified: "2025-05-22",
+    },
+    {
+      bonnetNo: "ALY9012",
+      class: "Sleeper",
+      status: "Dock",
+      dockReason: "Under maintenance",
+      depo: "ALY",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM3456",
+      class: "A/C",
+      status: "Dock",
+      dockReason: "Tyre replacement",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "ALY345",
+      class: "A/C",
+      status: "Service",
+      dockReason: "",
+      depo: "ALY",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "ETP545",
+      class: "A/C",
+      status: "Training/STC",
+      dockReason: "",
+      depo: "ETP",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "ETP548",
+      class: "A/C",
+      status: "BTC",
+      dockReason: "",
+      depo: "ETP",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
+    {
+      bonnetNo: "TVM308",
+      class: "A/C",
+      status: "Private Hire",
+      dockReason: "",
+      depo: "TVM",
+      dateModified: "2025-05-23",
+    },
   ];
 
   const depotList = React.useMemo(() => {
@@ -50,14 +165,36 @@ export default function Page() {
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+  const paginatedData = filteredData.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   const dummyData = [
-    { title: "Idle Buses", value: 10, change:'0', icon: <TrendingUp className="w-12 h-12 text-grey opacity-70" /> },
-    { title: "In Service", value: 105,change:'0', icon: <Bus className="w-12 h-12 text-grey opacity-70" /> },
-    { title: "Dock", value: 95, change:'0', icon: <StopCircle className="w-12 h-12 text-grey opacity-70" /> },
-    { title: "Enroute", value: 120, change:'0', icon: <WalletCards className="w-12 h-12 text-grey opacity-70" /> },
-
+    {
+      title: "Idle Buses",
+      value: 10,
+      change: "0",
+      icon: <TrendingUp className="w-12 h-12 text-grey opacity-40" />,
+    },
+    {
+      title: "In Service",
+      value: 105,
+      change: "0",
+      icon: <Bus className="w-12 h-12 text-grey opacity-40" />,
+    },
+    {
+      title: "Dock",
+      value: 95,
+      change: "0",
+      icon: <StopCircle className="w-12 h-12 text-grey opacity-40" />,
+    },
+    {
+      title: "Enroute",
+      value: 120,
+      change: "0",
+      icon: <WalletCards className="w-12 h-12 text-grey opacity-40" />,
+    },
   ];
 
   return (
@@ -69,18 +206,31 @@ export default function Page() {
           <div className="pl-4 lg:pl-4">
             <div className="">
               <div className="flex">
-                <h2 className="text-lg mx-4 font-semibold ">Bus Attendance Details</h2>
+                <h2 className="text-lg mx-4 font-semibold ">
+                  Bus Attendance Details
+                </h2>
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-4 mb-0 me-5 ms-auto">
-                  <select value={selectedDepo} onChange={(e) => setSelectedDepo(e.target.value)} className="border px-3 py-2 rounded text-[12px]">
+                  <select
+                    value={selectedDepo}
+                    onChange={(e) => setSelectedDepo(e.target.value)}
+                    className="border px-3 py-2 rounded text-[12px]"
+                  >
                     <option value="All">All Depos</option>
                     {depotList.map((depot) => (
-                      <option key={depot} value={depot}>{depot}</option>
+                      <option key={depot} value={depot}>
+                        {depot}
+                      </option>
                     ))}
                   </select>
 
-                  <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="border px-3 py-2 rounded text-[12px]" />
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="border px-3 py-2 rounded text-[12px]"
+                  />
                 </div>
               </div>
 
@@ -89,24 +239,49 @@ export default function Page() {
                 <Table className="rounded-[5px]">
                   <TableHeader className=" sticky top-0 rounded-[5px]">
                     <TableRow className="bg-sidebar hover:bg-sidebar">
-                      <TableHead className="border px-4 py-1 text-white">Bonnet No</TableHead>
-                      <TableHead className="border px-4 py-1 text-white">Class</TableHead>
-                      <TableHead className="border px-4 py-1 text-white">Status</TableHead>
-                      <TableHead className="border px-4 py-1 text-white">Depo</TableHead>
-                      <TableHead className="border px-4 py-1 text-white">Date Modified</TableHead>
-                      <TableHead className="border px-4 py-1 text-white">Reason (if Dock)</TableHead>
+                      <TableHead className="border px-4 py-1 text-white">
+                        Bonnet No
+                      </TableHead>
+                      <TableHead className="border px-4 py-1 text-white">
+                        Class
+                      </TableHead>
+                      <TableHead className="border px-4 py-1 text-white">
+                        Status
+                      </TableHead>
+                      <TableHead className="border px-4 py-1 text-white">
+                        Depo
+                      </TableHead>
+                      <TableHead className="border px-4 py-1 text-white">
+                        Date Modified
+                      </TableHead>
+                      <TableHead className="border px-4 py-1 text-white">
+                        Reason (if Dock)
+                      </TableHead>
                     </TableRow>
-
                   </TableHeader>
                   <TableBody className="h-full overflow-y-scroll">
                     {paginatedData.map((item, idx) => (
-                      <TableRow key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-200"
-                        }`}>
-                        <TableCell className="border px-4 py-2 text-[12px]">{item.bonnetNo}</TableCell>
-                        <TableCell className="border px-4 py-2 text-[12px]">{item.class}</TableCell>
-                        <TableCell className="border px-4 py-2 text-[12px]">{item.status}</TableCell>
-                        <TableCell className="border px-4 py-2 text-[12px]">{item.depo}</TableCell>
-                        <TableCell className="border px-4 py-2 text-[12px]">{item.dateModified}</TableCell>
+                      <TableRow
+                        key={idx}
+                        className={`${
+                          idx % 2 === 0 ? "bg-white" : "bg-gray-200"
+                        }`}
+                      >
+                        <TableCell className="border px-4 py-2 text-[12px]">
+                          {item.bonnetNo}
+                        </TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">
+                          {item.class}
+                        </TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">
+                          {item.status}
+                        </TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">
+                          {item.depo}
+                        </TableCell>
+                        <TableCell className="border px-4 py-2 text-[12px]">
+                          {item.dateModified}
+                        </TableCell>
                         <TableCell className="border px-4 py-2 text-[12px]">
                           {item.status === "Dock" ? item.dockReason : "-"}
                         </TableCell>
@@ -114,7 +289,10 @@ export default function Page() {
                     ))}
                     {paginatedData.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="text-center py-4 text-gray-500">
+                        <td
+                          colSpan={6}
+                          className="text-center py-4 text-gray-500"
+                        >
                           No data found.
                         </td>
                       </tr>
@@ -126,7 +304,9 @@ export default function Page() {
               {/* Pagination Controls */}
               <div className="flex justify-start items-center mt-4">
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   className="px-4 py-2 border rounded disabled:opacity-50"
                   disabled={currentPage === 1}
                 >
@@ -136,14 +316,15 @@ export default function Page() {
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   className="px-4 py-2 border rounded disabled:opacity-50"
                   disabled={currentPage === totalPages}
                 >
                   Next
                 </button>
               </div>
-
             </div>
           </div>
         </div>

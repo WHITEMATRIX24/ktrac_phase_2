@@ -31,7 +31,7 @@ import {
 } from "./ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Label } from "./ui/label";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, EllipsisVertical } from "lucide-react";
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 interface DataTableProps<TData, TValue> {
@@ -153,8 +153,8 @@ export function ReportDataTable<TData, TValue>({
           />
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="cursor-pointer">
-                <Ellipsis />
+              <Button className="cursor-pointer bg-transparent hover:bg-transparent shadow-none">
+                <EllipsisVertical color="black" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-60 flex flex-col gap-3">
@@ -174,7 +174,7 @@ export function ReportDataTable<TData, TValue>({
           </Popover>
         </div>
       </div>
-      <div className="rounded-md border w-full overflow-x-auto h-96">
+      <div className="rounded-md border w-full overflow-x-auto h-[28rem]">
         {isLoading ? (
           <p>Loading...</p>
         ) : (
@@ -191,9 +191,9 @@ export function ReportDataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                       </TableHead>
                     );
                   })}
@@ -206,8 +206,9 @@ export function ReportDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                      }`}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                    }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

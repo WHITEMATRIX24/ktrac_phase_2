@@ -11,26 +11,26 @@ export default function Page() {
     {
       title: "Yesterday's Collection",
       value: 135230,
-      change:'+2.2%',
-      icon: <WalletCards className="w-12 h-12 text-grey opacity-70" />,
+      change: "+2.2%",
+      icon: <WalletCards className="w-12 h-12 text-grey opacity-40" />,
     },
     {
       title: "Revenue",
       value: 87990,
-      change:'+1.2%',
-      icon: <TrendingUp className="w-12 h-12 text-grey opacity-70" />,
+      change: "+1.2%",
+      icon: <TrendingUp className="w-12 h-12 text-grey opacity-40" />,
     },
     {
       title: "Fuel Expenses",
       value: 47240,
-      change:'0',
-      icon: <Fuel className="w-12 h-12 text-grey opacity-70" />,
+      change: "0",
+      icon: <Fuel className="w-12 h-12 text-grey opacity-40" />,
     },
     {
       title: "Total Passengers",
       value: 53340,
-      change:'0',
-      icon: <Users className="w-12 h-12 text-grey opacity-70" />,
+      change: "0",
+      icon: <Users className="w-12 h-12 text-grey opacity-40" />,
     },
   ];
 

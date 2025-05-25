@@ -35,14 +35,20 @@ type BusData = {
   "Total Buses": number;
   "Total Schedules Operated in unit": number;
   "Transfer Bus Details": string | number | null;
-  "Private Hire / Training / Test / Airport Services, etc": string | number | null;
+  "Private Hire / Training / Test / Airport Services, etc":
+    | string
+    | number
+    | null;
   "Buses in Dock & Police Custody": number | null;
   "Enroute buses including Pamba Special Services": string | number | null;
   "Idle Buses": string | number | null;
   "No. of Buses Transfers Between Depots": string | number | null;
-  "Spare buses used for 2 nd Spell & Non operted Jn Ac Buses": string | number | null;
-  "created_at": string | number | null;
-  "updated_at": string | number | null;
+  "Spare buses used for 2 nd Spell & Non operted Jn Ac Buses":
+    | string
+    | number
+    | null;
+  created_at: string | number | null;
+  updated_at: string | number | null;
 };
 
 type Props = {
@@ -55,7 +61,9 @@ export function SunburstRevenueChart({ data }: Props) {
   const rawData = data as BusData[];
 
   const [selectedDepot, setSelectedDepot] = React.useState("ALL");
-  const [selectedDate, setSelectedDate] = React.useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(
+    new Date()
+  );
 
   const toNumber = (value: unknown): number => {
     if (value === null || value === undefined || value === "") return 0;
@@ -74,12 +82,14 @@ export function SunburstRevenueChart({ data }: Props) {
   const filteredData = React.useMemo(() => {
     if (!selectedDate) return [];
     return rawData.filter((item) => {
-      const itemDate = typeof item.created_at === "string"
-        ? parseISO(item.created_at)
-        : new Date(item.created_at || "");
+      const itemDate =
+        typeof item.created_at === "string"
+          ? parseISO(item.created_at)
+          : new Date(item.created_at || "");
 
       const isSame = isSameDay(itemDate, selectedDate);
-      const matchesDepot = selectedDepot === "ALL" || item["Unit Name"] === selectedDepot;
+      const matchesDepot =
+        selectedDepot === "ALL" || item["Unit Name"] === selectedDepot;
 
       return isSame && matchesDepot;
     });
@@ -124,7 +134,9 @@ export function SunburstRevenueChart({ data }: Props) {
       {
         label: "Private Hire / Training / etc",
         group: "Others",
-        value: toNumber(unit["Private Hire / Training / Test / Airport Services, etc"]),
+        value: toNumber(
+          unit["Private Hire / Training / Test / Airport Services, etc"]
+        ),
       },
       {
         label: "Dock & Police Custody",

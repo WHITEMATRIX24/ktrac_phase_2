@@ -12,30 +12,30 @@ const BusAllotment = async () => {
     {
       title: "Bus Allotment",
       value: 5470,
-      change:'0',
-      icon: <BusFront className="w-15 h-10 text-black opacity-70" />,
+      change: "0",
+      icon: <BusFront className="w-15 h-10 text-black opacity-40" />,
     },
     {
       title: "Daily Run",
       value: 178600,
-      change:'0',
-      icon: <Bus className="w-15 h-10 text-grey opacity-70" />,
+      change: "0",
+      icon: <Bus className="w-15 h-10 text-grey opacity-40" />,
     },
     {
       title: "Schedules Alloted",
       value: 4500,
-      change:'0',
-      icon: <ClipboardList className="w-15 h-10 text-grey opacity-70" />,
+      change: "0",
+      icon: <ClipboardList className="w-15 h-10 text-grey opacity-40" />,
     },
     {
       title: "Cancelled",
       value: 199,
-      change:'0',
-      icon: <CalendarOff className="w-15 h-10 text-grey opacity-70" />,
+      change: "0",
+      icon: <CalendarOff className="w-15 h-10 text-grey opacity-40" />,
     },
   ];
 
-  const busAllotmentData = await getUnitwiseBusDeployment()
+  const busAllotmentData = await getUnitwiseBusDeployment();
 
   return (
     <div className="flex flex-1 flex-col">
