@@ -53,10 +53,10 @@ export default function Page() {
   const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
 
   const dummyData = [
-    { title: "Idle Buses", value: 10, icon: <TrendingUp className="w-15 h-15 text-white opacity-70" /> },
-    { title: "In Service", value: 105, icon: <Bus className="w-15 h-15 text-white opacity-70" /> },
-    { title: "Dock", value: 95, icon: <StopCircle className="w-15 h-15 text-white opacity-70" /> },
-    { title: "Enroute", value: 120, icon: <WalletCards className="w-15 h-15 text-white opacity-70" /> },
+    { title: "Idle Buses", value: 10, change:'0', icon: <TrendingUp className="w-12 h-12 text-grey opacity-70" /> },
+    { title: "In Service", value: 105,change:'0', icon: <Bus className="w-12 h-12 text-grey opacity-70" /> },
+    { title: "Dock", value: 95, change:'0', icon: <StopCircle className="w-12 h-12 text-grey opacity-70" /> },
+    { title: "Enroute", value: 120, change:'0', icon: <WalletCards className="w-12 h-12 text-grey opacity-70" /> },
 
   ];
 

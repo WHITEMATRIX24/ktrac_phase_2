@@ -11,22 +11,26 @@ export default function Page() {
         {
             title: "Total Staff",
             value: 12945,
-            icon: <User className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <User className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "On Duty",
             value: 9458,
-            icon: <UserCheck className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <UserCheck className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "On Leave",
             value: 3487,
-            icon: <UserLock className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <UserLock className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "Temporary Staff",
             value: 3458,
-            icon: <UserPen className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <UserPen className="w-12 h-12 text-grey opacity-70" />,
         },
     ];
 

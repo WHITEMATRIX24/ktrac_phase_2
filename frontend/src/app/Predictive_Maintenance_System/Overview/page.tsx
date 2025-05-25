@@ -12,22 +12,26 @@ export default function Page() {
         {
             title: "Total No. of Buses",
             value: 5450,
-            icon: <BusFront className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <BusFront className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "Buses Under Maintenance",
             value: 383,
-            icon: <Wrench className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <Wrench className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "High Risk Alerts",
             value: 124,
-            icon: <TriangleAlert className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <TriangleAlert className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "Upcoming Services",
             value: 340,
-            icon: <CalendarClock className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <CalendarClock className="w-12 h-12 text-grey opacity-70" />,
         },
     ];
     return (

@@ -46,22 +46,26 @@ export default async function Page() {
     {
       title: "Total Schedules Operated",
       value: totalSchedulesOperated,
-      icon: <WalletCards className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <WalletCards className="w-15 h-15 text-grey opacity-70" />,
     },
     {
       title: "Total Bus Operated",
       value: totalBusOperated,
-      icon: <TrendingUp className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <TrendingUp className="w-15 h-15 text-grey opacity-70" />,
     },
     {
       title: "Idle Buses",
       value: idleBuses,
-      icon: <StopCircle className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <StopCircle className="w-12 h-12 text-grey opacity-70" />,
     },
     {
       title: "Total Buses",
       value: totalBuses,
-      icon: <Bus className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <Bus className="w-12 h-12 text-grey opacity-70" />,
     },
   ];
 

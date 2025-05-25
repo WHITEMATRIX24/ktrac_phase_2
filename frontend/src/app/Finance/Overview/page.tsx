@@ -12,22 +12,26 @@ export default function Page() {
         {
             title: "Monthly Revenue",
             value: 1294500,
-            icon: <Wallet className="w-15 h-15 text-white opacity-70" />,
+            change:'+2.2%',
+            icon: <Wallet className="w-15 h-15 text-grey opacity-70" />,
         },
         {
             title: "Total Expenses",
             value: 9458000,
-            icon: <Banknote className="w-15 h-15 text-white opacity-70" />,
+            change:'+1.2%',
+            icon: <Banknote className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "Vendor Payments Pending",
             value: 2148000,
-            icon: <Clock className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <Clock className="w-12 h-12 text-grey opacity-70" />,
         },
         {
             title: "Salary Disbursed",
             value: 3458000,
-            icon: <UserCheck className="w-15 h-15 text-white opacity-70" />,
+            change:'0',
+            icon: <UserCheck className="w-12 h-12 text-grey opacity-70" />,
         },
     ];
 

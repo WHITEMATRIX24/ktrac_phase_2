@@ -8,22 +8,26 @@ const DockYardPage = () => {
     {
       title: "No of Docked",
       value: 52,
-      icon: <Wrench className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <Wrench className="w-12 h-12 text-grey opacity-70" />,
     },
     {
       title: "Daily Run",
       value: 5432,
-      icon: <Bus className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <Bus className="w-12 h-12 text-grey opacity-70" />,
     },
     {
       title: "Maintanance Scheduled",
       value: 199,
-      icon: <ClipboardList className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <ClipboardList className="w-12 h-12 text-grey opacity-70" />,
     },
     {
       title: "Repaired",
       value: 1989,
-      icon: <RefreshCcw className="w-15 h-15 text-white opacity-70" />,
+      change:'0',
+      icon: <RefreshCcw className="w-12 h-12 text-grey opacity-70" />,
     },
   ];
 
