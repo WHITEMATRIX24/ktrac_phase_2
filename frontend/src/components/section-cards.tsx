@@ -25,33 +25,49 @@ export function SectionCards({ data }: Props) {
         style={{ borderLeft: "8px solid #4e5166" }}
       >
         <CardHeader className="flex flex-col gap-0">
-          <CardTitle className="text-[14px] font-semibold tabular-nums text-black drop-shadow-md">
+          <CardTitle className="text-[14px] tabular-nums text-black font-medium">
             {data[0].title}
           </CardTitle>
 
-          <CardDescription className="text-[38px] text-center font-bold tabular-nums text-Black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-Black drop-shadow-md">
             {data[0].value}
             {data[0].change != "0" && (
-              <p className="text-[14px] font-semibold tabular-nums text-grey drop-shadow-md">
+              <p
+                className={`${
+                  data[0].change?.indexOf("+") !== -1
+                    ? "text-green-800"
+                    : data[0].change?.indexOf("-") !== -1
+                    ? "text-red-800"
+                    : ""
+                } text-[14px] text-start font-semibold tabular-nums text-grey drop-shadow-md`}
+              >
                 {data[0].change}
               </p>
             )}
           </CardDescription>
         </CardHeader>
-        <div className="absolute top-9 right-3">{data[0].icon}</div>
+        <div className="absolute top-5 right-3">{data[0].icon}</div>
       </Card>
       <Card
         className="@container/card bg-white border-gray relative shadow-md h-[130px]"
         style={{ borderLeft: "8px solid green" }}
       >
         <CardHeader className="flex flex-col gap-0">
-          <CardTitle className="text-[14px] font-semibold tabular-nums text-black">
+          <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {data[1].title}
           </CardTitle>
-          <CardDescription className="text-[38px] text-center font-bold tabular-nums text-black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-black drop-shadow-md">
             {data[1].value}
             {data[1].change != "0" && (
-              <p className="text-[14px] font-semibold tabular-nums text-grey drop-shadow-md pb-2">
+              <p
+                className={`${
+                  data[0].change?.indexOf("+") !== -1
+                    ? "text-green-800"
+                    : data[0].change?.indexOf("-") !== -1
+                    ? "text-red-800"
+                    : ""
+                } text-[14px] text-start font-semibold tabular-nums text-grey drop-shadow-md`}
+              >
                 {data[1].change}
               </p>
             )}
@@ -66,10 +82,10 @@ export function SectionCards({ data }: Props) {
         style={{ borderLeft: "8px solid #C1292E" }}
       >
         <CardHeader className="flex flex-col gap-0">
-          <CardTitle className="text-[14px] font-semibold tabular-nums text-black">
+          <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {data[2].title}
           </CardTitle>
-          <CardDescription className="text-[38px] text-center font-bold tabular-nums text-black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center tabular-nums text-black drop-shadow-md">
             {data[2].value}
           </CardDescription>
         </CardHeader>
@@ -80,10 +96,10 @@ export function SectionCards({ data }: Props) {
         style={{ borderLeft: "8px solid #610345" }}
       >
         <CardHeader className="flex flex-col gap-0">
-          <CardTitle className="text-[14px] font-semibold tabular-nums text-black">
+          <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {data[3].title}
           </CardTitle>
-          <CardDescription className="text-[38px] text-center font-bold tabular-nums text-black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center tabular-nums text-black drop-shadow-md">
             {data[3].value}
           </CardDescription>
         </CardHeader>

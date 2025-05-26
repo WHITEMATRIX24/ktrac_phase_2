@@ -13,19 +13,22 @@ export default function Home() {
       ETA: String;
     }[]
   >();
+  const [startPlace, setStartPlace] = useState<string>("");
+  const [desPlace, setDesPlace] = useState<string>("");
 
   const handleSearch = () => {
+    if (desPlace !== "kovalam beach") return;
     const data = [
       {
-        startPlace: "kottayam",
+        startPlace: "Thiruvanathapuram",
         ETD: " 26-May-25 12:00pm",
-        endPlace: "Changanacherry",
+        endPlace: "Paravoor",
         ETA: "26-May-25 01:00pm",
       },
       {
-        startPlace: "Ernakulam",
+        startPlace: "Thiruvanathapuram",
         ETD: " 26-May-25 12:00pm",
-        endPlace: "Thiruvanathapuram",
+        endPlace: "Parashala",
         ETA: "26-May-25 01:00pm",
       },
     ];
@@ -33,7 +36,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative grid grid-cols-10 h-dvh">
+    <div className="grid grid-cols-1 md:grid-cols-10 md:h-dvh">
       <div className="col-span-3 bg-gray-200 h-full flex flex-col gap-5 p-4 justify-between">
         <div className="flex flex-col gap-5">
           <div className="flex gap-3 items-center">
@@ -46,8 +49,8 @@ export default function Home() {
                 <input
                   type="text"
                   className="w-full px-3 py-2 outline-none border bg-white border-gray-300 rounded-md"
-                  placeholder="enter the place"
-                  value="kottayam"
+                  placeholder="enter the location"
+                  value={startPlace}
                   readOnly
                 />
 
@@ -55,6 +58,8 @@ export default function Home() {
                   type="text"
                   className="w-full px-3 py-2 outline-none border bg-white border-gray-300 rounded-md"
                   placeholder="search destination"
+                  value={desPlace}
+                  onChange={(e) => setDesPlace(e.target.value)}
                 />
               </div>
               <div className="flex flex-col justify-evenly">
@@ -120,16 +125,31 @@ export default function Home() {
             </button>
           </div>
         </div>
+        {busRoute && busRoute?.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <h6 className="fo">Nearest Bus Stop</h6>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1 bg-white px-3 py-2 rounded-md">
+                <h6>Tambanoor Bus Depot</h6>
+                <p className="font-extralight">2 km from here</p>
+              </div>
+              <div className="flex flex-col gap-1 bg-white px-3 py-2 rounded-md">
+                <h6>East Fort Bus Stop</h6>
+                <p className="font-extralight">1 km from here</p>
+              </div>
+            </div>
+          </div>
+        )}
         <p className="text-center text-gray-400 text-sm">
           Managed by whitematrix
         </p>
       </div>
-      <div className="col-span-7 h-full w-full flex flex-col gap-3 px-3">
+      <div className="col-span-7 h-full w-full flex flex-col gap-3 px-3 pb-3">
         <h6 className="w-full px-5 py-4 text-2xl font-semibold">Bus Lists</h6>
         {busRoute?.map((route, index) => (
           <div
             key={index}
-            className="w-full border border-gray-200 rounded-xl flex justify-between px-8 py-5 bg-gray-50 items-center"
+            className="w-full border border-gray-200 rounded-xl flex flex-col gap-3 sm:flex-row justify-between px-8 py-5 bg-gray-50 items-center"
           >
             <div className="flex flex-col gap-1">
               <h6 className="text-xl font-semibold italic">
@@ -161,7 +181,7 @@ export default function Home() {
         ))}
       </div>
       {!locationAccess && (
-        <div className="absolute top-0 left-0 w-full h-full bg-gray-500/50 flex justify-center items-center">
+        <div className="absolute px-2 top-0 left-0 w-full h-full bg-gray-500/50 flex justify-center items-center">
           <div className="w-95 h-52 bg-white rounded-xl flex flex-col justify-center items-center gap-5">
             <div className="text-center">
               <h6 className="text-xl font-semibold">Location Access</h6>
@@ -174,7 +194,10 @@ export default function Home() {
                 reject
               </button>
               <button
-                onClick={() => setLocationAccess(true)}
+                onClick={() => {
+                  setLocationAccess(true);
+                  setStartPlace("Aristo Junction");
+                }}
                 className="px-5 py-2 rounded-md bg-green-800 text-white cursor-pointer"
               >
                 Allow

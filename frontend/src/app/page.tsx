@@ -86,7 +86,7 @@ export default function Home() {
           </div>
           <form onSubmit={handleLogin} className="flex flex-col gap-3 w-full">
             <div className="flex flex-col gap-1 ">
-              <label className="pl-1">User Name</label>
+              <label className="pl-1">Username</label>
               <input
                 type="text"
                 value={username}
@@ -98,7 +98,7 @@ export default function Home() {
             <div className="flex flex-col gap-1 mt-2">
               <label className="pl-1">Password</label>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-transparent placeholder:text-themeBlue/20 text-themeBlue text-sm border border-themeBlue/10 rounded-md px-3 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
