@@ -87,6 +87,19 @@ export function SectionCards({ data }: Props) {
           </CardTitle>
           <CardDescription className="text-[38px] text-center tabular-nums text-black drop-shadow-md">
             {data[2].value}
+            {data[2].change != "0" && (
+              <p
+                className={`${
+                  data[2].change?.indexOf("+") !== -1
+                    ? "text-green-800"
+                    : data[2].change?.indexOf("-") !== -1
+                    ? "text-red-800"
+                    : ""
+                } text-[14px] text-start font-semibold tabular-nums text-grey drop-shadow-md`}
+              >
+                {data[2].change}
+              </p>
+            )}
           </CardDescription>
         </CardHeader>
         <div className="absolute top-9 right-3">{data[2].icon}</div>
@@ -101,6 +114,19 @@ export function SectionCards({ data }: Props) {
           </CardTitle>
           <CardDescription className="text-[38px] text-center tabular-nums text-black drop-shadow-md">
             {data[3].value}
+            {data[3].change != "0" && (
+              <p
+                className={`${
+                  data[3].change?.indexOf("+") !== -1
+                    ? "text-green-800"
+                    : data[3].change?.indexOf("-") !== -1
+                    ? "text-red-800"
+                    : ""
+                } text-[14px] text-start font-semibold tabular-nums text-grey drop-shadow-md`}
+              >
+                {data[3].change}
+              </p>
+            )}
           </CardDescription>
         </CardHeader>
         <div className="absolute top-9 right-3">{data[3].icon}</div>
