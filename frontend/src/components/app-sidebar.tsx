@@ -50,6 +50,10 @@ const defaultNavItems: NavItem[] = [
       { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
       { title: "Dockyard", url: "/Dashboard/Dockyard" },
       {
+        title: "Predictive Revenue",
+        url: "/Dashboard/Predictive_Revenue",
+      },
+      {
         title: "Predictive Expense",
         url: "/Dashboard/Predictive_Expense",
       },

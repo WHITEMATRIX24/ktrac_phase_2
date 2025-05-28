@@ -21,10 +21,10 @@ export function SectionCards({ data }: Props) {
     // <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-b *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
     <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card
-        className="@container/card bg-white border-gray relative shadow-md h-[130px]"
+        className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid #4e5166" }}
       >
-        <CardHeader className="flex flex-col gap-0">
+        <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] tabular-nums text-black font-medium">
             {data[0].title}
           </CardTitle>
@@ -49,10 +49,10 @@ export function SectionCards({ data }: Props) {
         <div className="absolute top-5 right-3">{data[0].icon}</div>
       </Card>
       <Card
-        className="@container/card bg-white border-gray relative shadow-md h-[130px]"
+        className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid green" }}
       >
-        <CardHeader className="flex flex-col gap-0">
+        <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {data[1].title}
           </CardTitle>
@@ -73,15 +73,15 @@ export function SectionCards({ data }: Props) {
             )}
           </CardDescription>
         </CardHeader>
-        <div className="absolute border-black top-9  right-3">
+        <div className="absolute border-black top-5  right-3">
           {data[1].icon}
         </div>
       </Card>
       <Card
-        className="@container/card bg-white border-gray relative shadow-md h-[130px]"
+        className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid #C1292E" }}
       >
-        <CardHeader className="flex flex-col gap-0">
+        <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {data[2].title}
           </CardTitle>
@@ -102,13 +102,13 @@ export function SectionCards({ data }: Props) {
             )}
           </CardDescription>
         </CardHeader>
-        <div className="absolute top-9 right-3">{data[2].icon}</div>
+        <div className="absolute top-5 right-3">{data[2].icon}</div>
       </Card>
       <Card
-        className="@container/card bg-white border-gray relative shadow-md h-[130px]"
+        className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid #610345" }}
       >
-        <CardHeader className="flex flex-col gap-0">
+        <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {data[3].title}
           </CardTitle>
@@ -129,7 +129,7 @@ export function SectionCards({ data }: Props) {
             )}
           </CardDescription>
         </CardHeader>
-        <div className="absolute top-9 right-3">{data[3].icon}</div>
+        <div className="absolute top-5 right-3">{data[3].icon}</div>
       </Card>
     </div>
   );
