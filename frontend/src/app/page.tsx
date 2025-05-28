@@ -11,23 +11,23 @@ export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
   const users = [
     {
-      username: "Admin",
-      password: "Admin@ktrac#",
+      username: "admin",
+      password: "admin@ktrac#",
       role: "Admin",
     },
     {
-      username: "Finance Unit",
-      password: "Finance@ktrac#",
+      username: "financeunit",
+      password: "finance@ktrac#",
       role: "Finance",
     },
     {
-      username: "Maintenance Unit",
-      password: "Maintenance@ktrac#",
+      username: "maintenanceunit",
+      password: "maintenance@ktrac#",
       role: "Maintenance",
     },
     {
-      username: "HR Unit",
-      password: "HR@ktrac#",
+      username: "hrunit",
+      password: "hr@ktrac#",
       role: "Employee",
     },
   ];
