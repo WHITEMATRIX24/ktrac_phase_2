@@ -49,6 +49,14 @@ const defaultNavItems: NavItem[] = [
 
       { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
       { title: "Dockyard", url: "/Dashboard/Dockyard" },
+      {
+        title: "Predictive Expense",
+        url: "/Dashboard/Predictive_Expense",
+      },
+      {
+        title: "Predictive Maintenance",
+        url: "/Dashboard/Predictive_Maintenance",
+      },
     ],
   },
   {
@@ -76,7 +84,6 @@ const defaultNavItems: NavItem[] = [
     items: [
       { title: "Report Dock", url: "/Dock_Management/Report_Dock" },
       { title: "Release Dock", url: "#" },
-
     ],
   },
   {
@@ -152,7 +159,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: LayoutDashboard,
           isActive: true,
           items: [
-            { title: "Maintenance Overview", url: "/Predictive_Maintenance_System/Overview" },
+            {
+              title: "Maintenance Overview",
+              url: "/Predictive_Maintenance_System/Overview",
+            },
           ],
         },
         {
@@ -185,31 +195,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ],
         },
       ];
-    }
-    else if (role === "Employee") {
+    } else if (role === "Employee") {
       computedNavItems = [
         {
           title: "Dashboard",
           url: "#",
           icon: LayoutDashboard,
-          items: [
-            { title: "Overview", url: "/Employee_Management/Overview" },
-
-          ],
+          items: [{ title: "Overview", url: "/Employee_Management/Overview" }],
         },
         {
           title: "Employee Management",
           url: "#",
           icon: User2,
           items: [
-            { title: "All Employees", url: "/Employee_Management/All_Employees" },
+            {
+              title: "All Employees",
+              url: "/Employee_Management/All_Employees",
+            },
             { title: "Add Employee", url: "/Employee_Management/Add_Employee" },
             { title: "Attendance", url: "/Employee_Management/Attendance" },
-            { title: "Leave Requests", url: "/Employee_Management/Leave_Requests" },
+            {
+              title: "Leave Requests",
+              url: "/Employee_Management/Leave_Requests",
+            },
             { title: "Payroll", url: "/Employee_Management/Payroll" },
           ],
-        }
-
+        },
       ];
     } else {
       computedNavItems = defaultNavItems;

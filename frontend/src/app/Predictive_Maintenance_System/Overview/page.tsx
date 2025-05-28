@@ -11,7 +11,7 @@ import { BusFront, CalendarClock, TriangleAlert, Wrench } from "lucide-react";
 import { LowStockPartsTable } from "@/components/maintenance/parts_low_table";
 import { BreakdownTrendChart } from "@/components/maintenance/breakdown_report";
 
-export default function Page() {
+export default function PredictiveMaintenanceOverview() {
   const dummyData = [
     {
       title: "Total No. of Buses",
@@ -56,11 +56,11 @@ export default function Page() {
               </div>
             </Card>
 
-            <div className="pl-4 lg:pl-6">
+            <div className="pl-2">
               <DotLineChart />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 mx-6 ">
+          <div className="grid grid-cols-2 gap-2 mx-6">
             <Card>
               <CardHeader>
                 <CardTitle>Predictive Stock Requirement Table</CardTitle>
@@ -73,7 +73,7 @@ export default function Page() {
               </div>
             </Card>
 
-            <div className="pl-4 lg:pl-6">
+            <div className="pl-2">
               <BreakdownTrendChart />
             </div>
           </div>
