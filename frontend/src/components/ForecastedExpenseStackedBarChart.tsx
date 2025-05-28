@@ -41,7 +41,7 @@ type ForecastCategoryData = {
 
 
 const categoryColors: Record<string, string> = {
-  Fuel: "#caf0f8",
+  Fuel: "#cbf1ff",
   Maintenance: "#90e0ef",
   Salaries: "#00b4d8",
   Insurance: "#0077b6",
@@ -130,8 +130,12 @@ const grouped: Record<string, ForecastDataByDate> = {};
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={processedData} onClick={handleBarClick}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis tickFormatter={(v) => `₹${v / 1000}k`} />
+                <XAxis dataKey="date"
+                  tick={{ fontSize: 12 }}
+ />
+                <YAxis tickFormatter={(v) => `₹${v / 1000}k`}
+                  tick={{ fontSize: 12 }}
+ />
                 <Tooltip formatter={(value: any) => `₹${value.toLocaleString()}`} />
                 <Legend />
                 {allCategories.map((category) => (

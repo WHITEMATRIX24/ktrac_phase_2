@@ -46,7 +46,7 @@ type ChartDataItem = {
 };
 
 const rangeOptions = [
-    { label: "All Time", value: "all" }, 
+  { label: "All Time", value: "all" },
   { label: "Last 1 Month", value: "last-1-month" },
   { label: "Last 3 Months", value: "last-3-months" },
   { label: "Next 1 Month", value: "next-1-month" },
@@ -76,7 +76,6 @@ function CustomTooltip({
         <TableHeader>
           <TableRow>
             <TableHead>Depot</TableHead>
-            <TableHead>Actual</TableHead>
             <TableHead>Forecast</TableHead>
             <TableHead>Budget</TableHead>
           </TableRow>
@@ -85,7 +84,6 @@ function CustomTooltip({
           {dataForDate.map((item) => (
             <TableRow key={`${item.depot}-${item.date}`}>
               <TableCell>{item.depot}</TableCell>
-              <TableCell>₹{item.actual.toLocaleString()}</TableCell>
               <TableCell>₹{item.forecast.toLocaleString()}</TableCell>
               <TableCell>₹{item.budget.toLocaleString()}</TableCell>
             </TableRow>
@@ -102,43 +100,43 @@ export function ExpenditureLineChartComponent({
   chartData: ChartDataItem[];
 }) {
   const [selectedDepot, setSelectedDepot] = useState<string>("all");
-const [selectedRange, setSelectedRange] = useState<string>("all");
+  const [selectedRange, setSelectedRange] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const depots = Array.from(new Set(chartData.map((item) => item.depot)));
 
   const getDateRangeFilter = (range: string): [Date, Date] => {
-  const today = new Date();
-  let start = new Date(today);
-  let end = new Date(today);
+    const today = new Date();
+    let start = new Date(today);
+    let end = new Date(today);
 
-  switch (range) {
-    case "last-1-month":
-      start.setMonth(today.getMonth() - 1);
-      break;
-    case "last-3-months":
-      start.setMonth(today.getMonth() - 3);
-      break;
-    case "next-1-month":
-      end.setMonth(today.getMonth() + 1);
-      break;
-    case "next-3-months":
-      end.setMonth(today.getMonth() + 3);
-      break;
-    case "month-snapshot":
-      start.setMonth(today.getMonth() - 1);
-      end.setMonth(today.getMonth() + 1);
-      break;
-    case "all":
-    default:
-      // Set to a wide range to include all data
-      start = new Date("2000-01-01");
-      end = new Date("2100-12-31");
-      break;
-  }
+    switch (range) {
+      case "last-1-month":
+        start.setMonth(today.getMonth() - 1);
+        break;
+      case "last-3-months":
+        start.setMonth(today.getMonth() - 3);
+        break;
+      case "next-1-month":
+        end.setMonth(today.getMonth() + 1);
+        break;
+      case "next-3-months":
+        end.setMonth(today.getMonth() + 3);
+        break;
+      case "month-snapshot":
+        start.setMonth(today.getMonth() - 1);
+        end.setMonth(today.getMonth() + 1);
+        break;
+      case "all":
+      default:
+        // Set to a wide range to include all data
+        start = new Date("2000-01-01");
+        end = new Date("2100-12-31");
+        break;
+    }
 
-  return [start, end];
-};
+    return [start, end];
+  };
 
 
   const filteredChartData = useMemo(() => {
@@ -182,21 +180,39 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
   }, [chartData, selectedDepot, selectedRange]);
 
   const detailData = useMemo(() => {
-    if (!selectedDate) return [];
-    return chartData.filter((item) => item.date === selectedDate);
-  }, [chartData, selectedDate]);
+  if (!selectedDate) return [];
+  return chartData.filter((item) => {
+    const matchDate = item.date === selectedDate;
+    const matchDepot = selectedDepot === "all" || item.depot === selectedDepot;
+    return matchDate && matchDepot;
+  });
+}, [chartData, selectedDate, selectedDepot]);
+
+
+  const totalValues = useMemo(() => {
+    const forecast = detailData.reduce((sum, item) => sum + item.forecast, 0);
+    const budget = detailData.reduce((sum, item) => sum + item.budget, 0);
+    const variance = budget !== 0 ? ((forecast - budget) / budget) * 100 : 0;
+    const status =
+      forecast > budget
+        ? "Over Budget"
+        : forecast < budget
+          ? "Under Budget"
+          : "On Budget";
+    return { forecast, budget, variance, status };
+  }, [detailData]);
 
   // Auto-select first date from current month
   useEffect(() => {
     if (!selectedDate) {
       const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
       const match = chartData.find((item) => {
         const date = new Date(item.date);
         return (
-          date.getMonth() === currentMonth && date.getFullYear() === currentYear
+          date.getMonth() === nextMonth.getMonth() &&
+          date.getFullYear() === nextMonth.getFullYear()
         );
       });
 
@@ -205,6 +221,7 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
       }
     }
   }, [chartData, selectedDate]);
+
 
   return (
     <Card className="h-full">
@@ -248,7 +265,7 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
         {/* Chart and Table Side by Side */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Chart Area */}
-          <div className="lg:w-2/5 w-full">
+          <div className="lg:w-3/6 w-full">
             <ResponsiveContainer width="100%" height={320}>
               <LineChart
                 data={filteredChartData}
@@ -259,8 +276,21 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis tickFormatter={(value) => `₹${value / 1000}k`} />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12 }}
+                  axisLine={{ stroke: '#000' }}
+                  tickLine={{ stroke: '#000' }}
+                />
+                <YAxis
+                  tick={{ fontSize: 10 }}
+                  tickFormatter={(value) => (value === 0 ? "" : `₹${value / 1000}k`)}
+                  domain={[0, 'auto']}
+                  axisLine={{ stroke: '#000' }}
+                  tickLine={{ stroke: '#000' }}
+                />
+
+
                 <Tooltip
                   content={<CustomTooltip chartData={chartData} />}
                   cursor={{ stroke: "#8884d8", strokeWidth: 2 }}
@@ -295,24 +325,41 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
           </div>
 
           {/* Detail Table */}
-          <div className="lg:w-3/5 w-full bg-white border p-5 m-5 rounded shadow h-fit">
-            <div className="flex justify-between items-center mb-4 m-5">
-              <h4 className="text-lg font-semibold">
-  {selectedDate
-    ? `Detailed View for: ${new Date(selectedDate).toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      })}`
-    : "Select a date from chart"}
-</h4>
-              
+          <div className="lg:w-2/6 ms-auto w-full bg-white border p-5 mx-5 rounded shadow h-fit">
+            <div className=" justify-between items-center mb-4 m-5">
+              <h4 className="text-lg font-semibold mb-3">
+                {selectedDate
+                  ? `Detailed View for  ${new Date(selectedDate).toLocaleDateString("en-US", {
+                    month: "long",
+                    year: "numeric",
+                  })}`
+                  : "Select a date from chart"}
+              </h4>
+              {selectedDate && (
+                <div className="text-md font-medium ">
+                  <h5 className="mt-4">Total Forecast: ₹{totalValues.forecast.toLocaleString()} </h5>
+                  <h5 className="mt-4">Total Budget: ₹{totalValues.budget.toLocaleString()}</h5>
+                   <h5 className="mt-4">Variance: {totalValues.variance.toFixed(2)}% {" "}</h5>
+                  <h5
+                    className={
+                      totalValues.status === "Over Budget"
+                        ? "text-red-600 mt-5 font-semibold "
+                        : totalValues.status === "Under Budget"
+                          ? "text-green-600 mt-3 font-semibold"
+                          : "text-gray-600 mt-5 font-semibold"
+                    }
+                  >
+                    {totalValues.status}
+                  </h5>
+                </div>
+              )}
+
             </div>
 
-            <Table>
+            {/* <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Depot</TableHead>
-                  <TableHead>Actual</TableHead>
                   <TableHead>Forecast</TableHead>
                   <TableHead>Budget</TableHead>
                 </TableRow>
@@ -322,7 +369,6 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
                   detailData.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell>{item.depot}</TableCell>
-                      <TableCell>₹{item.actual.toLocaleString()}</TableCell>
                       <TableCell>₹{item.forecast.toLocaleString()}</TableCell>
                       <TableCell>₹{item.budget.toLocaleString()}</TableCell>
                     </TableRow>
@@ -335,7 +381,7 @@ const [selectedRange, setSelectedRange] = useState<string>("all");
                   </TableRow>
                 )}
               </TableBody>
-            </Table>
+            </Table> */}
           </div>
         </div>
       </CardContent>

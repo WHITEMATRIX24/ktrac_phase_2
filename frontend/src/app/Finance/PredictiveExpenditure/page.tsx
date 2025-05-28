@@ -143,7 +143,7 @@ export default function PredictiveExpensePage() {
     // Add more months...
   ];
 
-  // Sample data (you can place this outside the component if desired)
+  //sample data
   const forecastCategoryData = [
     {
       date: "2025-04",
