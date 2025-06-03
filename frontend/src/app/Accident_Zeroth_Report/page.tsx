@@ -5,6 +5,7 @@ import { AlertTriangle, Clock, User, MapPin, Camera, Video, X, LogOut } from 'lu
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/navigation';
+import { Input } from '@mui/material';
 
 interface Vehicle {
     BUSNO: string;
@@ -196,14 +197,6 @@ const ZerothReportForm: React.FC = () => {
                                                     readOnly
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="block font-medium mb-1 text-xs">Registration No.</label>
-                                                <input
-                                                    value={selectedVehicle.REGNO}
-                                                    className="w-full p-2 border rounded text-xs bg-gray-100"
-                                                    readOnly
-                                                />
-                                            </div>
 
                                             <div>
                                                 <label className="block font-medium mb-1 text-xs">Severity</label>
@@ -214,11 +207,26 @@ const ZerothReportForm: React.FC = () => {
                                                     className="w-full p-2 border rounded text-xs"
                                                     required
                                                 >
-                                                    <option value="">Select severity</option>
+                                                    <option value="">Select Severity</option>
                                                     <option value="Minor">Minor</option>
                                                     <option value="Major">Major</option>
                                                     <option value="Severe">Severe</option>
                                                     <option value="Fatal">Fatal</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block font-medium mb-1 text-xs">Vehicle Towed Status</label>
+                                                <select
+                                                    name="severity"
+                                                    value={formData.severity}
+                                                    onChange={handleChange}
+                                                    className="w-full p-2 border rounded text-xs"
+                                                    required
+                                                >
+                                                    <option value="">Select Status</option>
+                                                    <option value="Minor">Yes</option>
+                                                    <option value="Major">No</option>
+
                                                 </select>
                                             </div>
                                         </div>
@@ -379,6 +387,7 @@ const ZerothReportForm: React.FC = () => {
                                         ))}
                                     </div>
                                 </div>
+
 
                                 <div className="mt-6 flex justify-end gap-3">
                                     <button
