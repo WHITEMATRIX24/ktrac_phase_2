@@ -30,7 +30,7 @@ const AccedentWorkshop = () => {
         <div className="grid grid-cols-4 gap-10 items-end pb-5 mt-8">
           {/* 1st row */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Accident Reference Number</label>
+            <label className="text-[12px]">Accident Reference Number</label>
             <Autocomplete
               size="small"
               options={dummyData}
@@ -46,7 +46,7 @@ const AccedentWorkshop = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Date Of Accident</label>
+            <label className="text-[12px]">Date Of Accident</label>
             <Input
               placeholder="Date"
               value={
@@ -56,14 +56,14 @@ const AccedentWorkshop = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Bus No</label>
+            <label className="text-[12px]">Bus No</label>
             <Input
               value={selectedAccedentData ? selectedAccedentData.bus_no : ""}
               onChange={() => console.log("clicked")}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">
+            <label className="text-[12px]">
               Repair Work Done At Workshop/ Depot (Yes/No)
             </label>
             <div className="flex items-center justify-evenly">
@@ -76,58 +76,58 @@ const AccedentWorkshop = () => {
           {/* 2nd row */}
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Work Shop/ Depot Name</label>
+            <label className="text-[12px]">Work Shop/ Depot Name</label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Date Of Entry(DD-MM-YYYY)</label>
+            <label className="text-[12px]">Date Of Entry(DD-MM-YYYY)</label>
             <Input type="date" />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Date Of Work Start</label>
+            <label className="text-[12px]">Date Of Work Start</label>
             <Input type="date" />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Date Of Released (DD-MM-YYYY)</label>
+            <label className="text-[12px]">Date Of Released (DD-MM-YYYY)</label>
             <Input type="date" />
           </div>
           {/* 3rd row */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm">No Of Days At W/S / Depot</label>
+            <label className="text-[12px]">No Of Days At W/S / Depot</label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Insurance Surveyor Name</label>
+            <label className="text-[12px]">Insurance Surveyor Name</label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Insurance Surveyor Phone No.</label>
+            <label className="text-[12px]">Insurance Surveyor Phone No.</label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Damage To The Bus</label>
+            <label className="text-[12px]">Damage To The Bus</label>
             <Input type="text" />
           </div>
           {/* 4th row */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Spare Part Cost</label>
+            <label className="text-[12px]">Spare Part Cost</label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Labour Cost </label>
+            <label className="text-[12px]">Labour Cost </label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Total Bill Amount</label>
+            <label className="text-[12px]">Total Bill Amount</label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">Cost Of Damage</label>
+            <label className="text-[12px]">Cost Of Damage</label>
             <Input />
           </div>
           {/* 5th row */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm">COD Recovered (Yes/No)</label>
+            <label className="text-[12px]">COD Recovered (Yes/No)</label>
             <div className="flex items-center justify-evenly">
               <label htmlFor="#is_cod_recovered">Yes</label>
               <Input type="radio" name="is_cod_recovered" className="w-5" />
@@ -136,7 +136,7 @@ const AccedentWorkshop = () => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm">towed (y/n)</label>
+            <label className="text-[12px]">towed (y/n)</label>
             <div className="flex items-center justify-evenly">
               <label htmlFor="#is_towed">Yes</label>
               <Input type="radio" name="is_towed" className="w-5" />
@@ -157,13 +157,13 @@ const AccedentWorkshop = () => {
         <div className="flex gap-2 justify-end">
           <button
             type="button"
-            className="px-4 py-2 text-sm border rounded flex items-center"
+            className="px-4 py-2 text-[12px] border rounded flex items-center"
           >
             <X className="w-4 h-4 mr-1" /> Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-sm bg-[var(--sidebar)] text-white rounded"
+            className="px-4 py-2 text-[12px] bg-[var(--sidebar)] text-white rounded"
           >
             Submit Report
           </button>
