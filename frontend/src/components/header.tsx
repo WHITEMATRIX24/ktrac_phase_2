@@ -59,6 +59,13 @@ export default function Header() {
         avatar: "/Captureuseravathar.PNG",
       };
     }
+    else if (role === "Accident_Management") {
+      userData = {
+        name: "Accident Managemet",
+        email: "Supervisor",
+        avatar: "/Captureuseravathar.PNG",
+      };
+    }
 
     setUser(userData);
   }, []);

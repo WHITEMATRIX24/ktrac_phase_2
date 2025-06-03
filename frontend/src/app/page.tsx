@@ -30,6 +30,16 @@ export default function Home() {
       password: "hr@ktrac#",
       role: "Employee",
     },
+    {
+      username: "accident",
+      password: "accident@ktrac#",
+      role: "Accident_Management",
+    },
+    {
+      username: "accidentreport",
+      password: "accidentreport@ktrac#",
+      role: "Accident_Report",
+    },
   ];
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,6 +58,10 @@ export default function Home() {
         router.replace("/Predictive_Maintenance_System/Overview");
       } else if (user.role === "Employee") {
         router.replace("/Employee_Management/Overview");
+      } else if (user.role == "Accident_Management") {
+        router.replace("/Accident_Management/Accident_Report");
+      } else if (user.role == "Accident_Report") {
+        router.replace("/Accident_Zeroth_Report");
       }
     } else {
       alert("Invalid username or password");

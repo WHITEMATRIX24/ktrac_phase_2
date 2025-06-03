@@ -226,7 +226,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ],
         },
       ];
-    } else if (role === "Accedent_Management") {
+    } else if (role === "Accident_Management") {
       computedNavItems = [
         {
           title: "Accedent management",
@@ -234,14 +234,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: User2,
           items: [
             {
-              title: "Primary",
-              url: "#",
+              title: "Primary Record",
+              url: "/Accident_Management/Accident_Report",
             },
             {
               title: "inspector Record",
-              url: "/Accedent_Management/Inspector",
+              url: "/Accident_Management/Inspector",
             },
-            { title: "Work Shop", url: "/Accedent_Management/Work_Shop" },
+            { title: "Work Shop", url: "/Accident_Management/Work_Shop" },
+          ],
+        },
+        {
+          title: "Report",
+          url: "#",
+          icon: User2,
+          items: [
+            {
+              title: "Accident Report",
+              url: "/Accident_Management/Accident_Report",
+            },
           ],
         },
       ];

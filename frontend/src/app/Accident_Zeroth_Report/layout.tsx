@@ -11,12 +11,9 @@ export default async function Layout({
 }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
       <main className="w-full ml-[0px] mt-[0px]">
-        <Header />
         {children}
         <Footer />
-        <ChatBot />
       </main>
     </SidebarProvider>
   );
