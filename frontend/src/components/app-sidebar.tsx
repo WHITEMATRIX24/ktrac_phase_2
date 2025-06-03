@@ -238,10 +238,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               url: "/Accident_Management/Accident_Report",
             },
             {
-              title: "inspector Record",
+              title: "Inspector Record",
               url: "/Accident_Management/Inspector",
             },
-            { title: "Work Shop", url: "/Accident_Management/Work_Shop" },
+            { title: "Workshop Update", url: "/Accident_Management/Work_Shop" },
           ],
         },
         {

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Bus, Car, X, Upload, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Bus, Car, X, Upload, AlertTriangle, ChevronLeft, ChevronRight, Clipboard, TriangleAlert, Wrench } from 'lucide-react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
@@ -198,10 +198,10 @@ const PrimaryAccidentReport: React.FC = () => {
     //     Number(formData.minorInjuriesPassengers || 0) +
     //     Number(formData.minorInjuriesThirdParty || 0);
     const tabLabels = [
-        { label: "Primary Details", icon: <Car className="w-4 h-4 mr-1" /> },
-        { label: "Damages", icon: <Car className="w-4 h-4 mr-1" /> },
+        { label: "Primary Details", icon: <Clipboard className="w-4 h-4 mr-1" /> },
+        { label: "Damages", icon: <TriangleAlert className="w-4 h-4 mr-1" /> },
         { label: "Service Details", icon: <Bus className="w-4 h-4 mr-1" /> },
-        { label: "Recovery", icon: <Bus className="w-4 h-4 mr-1" /> },
+        { label: "Recovery", icon: <Wrench className="w-4 h-4 mr-1" /> },
     ];
 
     return (
