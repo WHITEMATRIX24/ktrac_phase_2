@@ -226,6 +226,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ],
         },
       ];
+    } else if (role === "Accedent_Management") {
+      computedNavItems = [
+        {
+          title: "Accedent management",
+          url: "#",
+          icon: User2,
+          items: [
+            {
+              title: "Primary",
+              url: "#",
+            },
+            {
+              title: "inspector Record",
+              url: "/Accedent_Management/Inspector",
+            },
+            { title: "Work Shop", url: "/Accedent_Management/Work_Shop" },
+          ],
+        },
+      ];
     } else {
       computedNavItems = defaultNavItems;
     }
