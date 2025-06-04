@@ -24,7 +24,9 @@ const AccedentWorkshop = () => {
       <div className="bg-white shadow h-[80vh] overflow-scroll rounded-lg border-0 p-6">
         <div className="flex items-center mb-4">
           <Wrench className="w-5 h-5 text-red-600 mr-2" />
-          <h2 className="text-[14px] font-semibold">Workshop Update On Accidents</h2>
+          <h2 className="text-[14px] font-semibold">
+            Workshop Update On Accidents
+          </h2>
         </div>
         <hr className="mb-4" />
         <div className="grid grid-cols-4 gap-10 items-end pb-5 mt-8">
@@ -64,13 +66,17 @@ const AccedentWorkshop = () => {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-[12px]">
-              Repair Work Done At Workshop/ Depot (Yes/No)
+              Repair Work Done At Workshop/ Depot
             </label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#is_repair_done">Yes</label>
-              <Input type="radio" name="is_repair_done" className="w-5" />
-              <label htmlFor="#isFir">No</label>
-              <Input type="radio" name="is_repair_done" className="w-5" />
+              <label htmlFor="#is_repair_done" className="text-[12px]">
+                Yes
+              </label>
+              <Input type="radio" name="is_repair_done" className="w-4" />
+              <label htmlFor="#isFir" className="text-[12px]">
+                No
+              </label>
+              <Input type="radio" name="is_repair_done" className="w-4" />
             </div>
           </div>
           {/* 2nd row */}
@@ -127,29 +133,35 @@ const AccedentWorkshop = () => {
           </div>
           {/* 5th row */}
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">COD Recovered (Yes/No)</label>
+            <label className="text-[12px]">COD Recovered</label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#is_cod_recovered">Yes</label>
-              <Input type="radio" name="is_cod_recovered" className="w-5" />
-              <label htmlFor="#isFir">No</label>
-              <Input type="radio" name="is_cod_recovered" className="w-5" />
+              <label htmlFor="#is_cod_recovered" className="text-[12px]">
+                Yes
+              </label>
+              <Input type="radio" name="is_cod_recovered" className="w-4" />
+              <label htmlFor="#isFir" className="text-[12px]">
+                No
+              </label>
+              <Input type="radio" name="is_cod_recovered" className="w-4" />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">towed (y/n)</label>
+            <label className="text-[12px]">Towed</label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#is_towed">Yes</label>
-              <Input type="radio" name="is_towed" className="w-5" />
-              <label htmlFor="#isFir">No</label>
-              <Input type="radio" name="is_towed" className="w-5" />
+              <label htmlFor="#is_towed" className="text-[12px]">
+                Yes
+              </label>
+              <Input type="radio" name="is_towed" className="w-4" />
+              <label htmlFor="#isFir" className="text-[12px]">
+                No
+              </label>
+              <Input type="radio" name="is_towed" className="w-4" />
             </div>
           </div>
         </div>
         <div className="md:col-span-2">
           <label className="block font-medium mb-1 text-xs">Remarks</label>
           <textarea
-
-
             className="w-full mb-2 p-2 border rounded text-xs"
             rows={3}
           />

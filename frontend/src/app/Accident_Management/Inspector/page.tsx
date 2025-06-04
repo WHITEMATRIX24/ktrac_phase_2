@@ -24,7 +24,9 @@ const AccedentInspectorForm = () => {
       <div className="bg-white shadow h-[80vh] overflow-scroll rounded-lg border-0 p-6">
         <div className="flex items-center mb-4">
           <User2 className="w-5 h-5 text-red-600 mr-2" />
-          <h2 className="text-[14px] font-semibold">Inspector Report On Accidents</h2>
+          <h2 className="text-[14px] font-semibold">
+            Inspector Report On Accidents
+          </h2>
         </div>
         <hr className="mb-4" />
         <div className="grid grid-cols-4 gap-10 items-end pb-5 mt-8">
@@ -68,12 +70,16 @@ const AccedentInspectorForm = () => {
           </div>
           {/* 2nd row */}
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">FIR Registered (Yes/ No)</label>
+            <label className="text-[12px]">FIR Registered</label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#isFir">Yes</label>
-              <Input type="radio" name="isFir" className="w-5" />
-              <label htmlFor="#isFir">No</label>
-              <Input type="radio" name="isFir" className="w-5" />
+              <label htmlFor="#isFir" className="text-[12px]">
+                Yes
+              </label>
+              <Input type="radio" name="isFir" className="w-4" />
+              <label htmlFor="#isFir" className="text-[12px]">
+                No
+              </label>
+              <Input type="radio" name="isFir" className="w-4" />
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -85,17 +91,23 @@ const AccedentInspectorForm = () => {
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Accused in the Accident In FIR</label>
+            <label className="text-[12px]">
+              Accused in the Accident In FIR
+            </label>
             <Input />
           </div>
           {/* 3rd row */}
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">FIR Case Against KSRTC (Yes/No)</label>
+            <label className="text-[12px]">FIR Case Against KSRTC</label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#isfiragainstksrtc">Yes</label>
-              <Input type="radio" name="isfiragainstksrtc" className="w-5" />
-              <label htmlFor="#isfiragainstksrtc">No</label>
-              <Input type="radio" name="isfiragainstksrtc" className="w-5" />
+              <label htmlFor="#isfiragainstksrtc" className="text-[12px]">
+                Yes
+              </label>
+              <Input type="radio" name="isfiragainstksrtc" className="w-4" />
+              <label htmlFor="#isfiragainstksrtc" className="text-[12px]">
+                No
+              </label>
+              <Input type="radio" name="isfiragainstksrtc" className="w-4" />
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -142,8 +154,8 @@ const AccedentInspectorForm = () => {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-[12px]">
-              Whether FIR IS MODIFIED OR NOT. Responisbilty Changed From KSRTC As
-              Per Evidence Submitted
+              Whether FIR IS MODIFIED OR NOT. Responisbilty Changed From KSRTC
+              As Per Evidence Submitted
             </label>
             <Input />
           </div>
@@ -154,17 +166,21 @@ const AccedentInspectorForm = () => {
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Revenue Loss Due To Dock Of Bus</label>
+            <label className="text-[12px]">
+              Revenue Loss Due To Dock Of Bus
+            </label>
             <Input />
           </div>
           {/* 6th row */}
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Inspector Report Additional Details</label>
+            <label className="text-[12px]">
+              Inspector Report Additional Details
+            </label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-[12px]">
-              Whether The Bus Have VALID Insurance Or Not{" "}
+              Whether The Bus Have VALID Insurance Or Not
             </label>
             <Input placeholder="Date" />
           </div>
@@ -173,19 +189,23 @@ const AccedentInspectorForm = () => {
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Insurance Claim Applied (Yes/No)</label>
+            <label className="text-[12px]">Insurance Claim Applied</label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#isinsuranceclaimapplied">Yes</label>
+              <label htmlFor="#isinsuranceclaimapplied" className="text-[12px]">
+                Yes
+              </label>
               <Input
                 type="radio"
                 name="isinsuranceclaimapplied"
-                className="w-5"
+                className="w-4"
               />
-              <label htmlFor="#isinsuranceclaimapplied">No</label>
+              <label htmlFor="#isinsuranceclaimapplied" className="text-[12px]">
+                No
+              </label>
               <Input
                 type="radio"
                 name="isinsuranceclaimapplied"
-                className="w-5"
+                className="w-4"
               />
             </div>
           </div>
@@ -203,7 +223,9 @@ const AccedentInspectorForm = () => {
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Date Of Insurance Claim Applied</label>
+            <label className="text-[12px]">
+              Date Of Insurance Claim Applied
+            </label>
             <Input />
           </div>
           {/* 8th row */}
@@ -217,34 +239,51 @@ const AccedentInspectorForm = () => {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-[12px]">
-              Final Bill Submitted Insurance Co. (Y/N)
+              Final Bill Submitted Insurance Co
             </label>
             <div className="flex items-center justify-evenly">
-              <label htmlFor="#is_insurance_submit_final_bill">Yes</label>
+              <label
+                htmlFor="#is_insurance_submit_final_bill"
+                className="text-[12px]"
+              >
+                Yes
+              </label>
               <Input
                 type="radio"
                 name="is_insurance_submit_final_bill"
-                className="w-5"
+                className="w-4"
               />
-              <label htmlFor="#is_insurance_submit_final_bill">No</label>
+              <label
+                htmlFor="#is_insurance_submit_final_bill"
+                className="text-[12px]"
+              >
+                No
+              </label>
               <Input
                 type="radio"
                 name="is_insurance_submit_final_bill"
-                className="w-5"
+                className="w-4"
               />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Final Bill Amount by KSRTC (Rs.)</label>
+            <label className="text-[12px]">
+              Final Bill Amount by KSRTC (Rs.)
+            </label>
             <Input />
           </div>
           {/* 9th row */}
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]"> Approved Amount By Insurance Co.</label>
+            <label className="text-[12px]">
+              {" "}
+              Approved Amount By Insurance Co.
+            </label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[12px]">Admitted Amount By Insurance Co.</label>
+            <label className="text-[12px]">
+              Admitted Amount By Insurance Co.
+            </label>
             <Input />
           </div>
           <div className="flex flex-col gap-2">
@@ -256,13 +295,10 @@ const AccedentInspectorForm = () => {
             <Input />
           </div>
           {/* 10th row */}
-
         </div>
         <div className="md:col-span-2">
           <label className="block font-medium mb-1 text-xs">Remarks</label>
           <textarea
-
-
             className="w-full mb-2 p-2 border rounded text-xs"
             rows={3}
           />
