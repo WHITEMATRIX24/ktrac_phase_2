@@ -234,11 +234,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: User2,
           items: [
             {
-              title: "Primary Record",
+              title: "Primary Report",
               url: "/Accident_Management/Accident_Report",
             },
             {
-              title: "Inspector Record",
+              title: "Inspector Report",
               url: "/Accident_Management/Inspector",
             },
             { title: "Workshop Update", url: "/Accident_Management/Work_Shop" },

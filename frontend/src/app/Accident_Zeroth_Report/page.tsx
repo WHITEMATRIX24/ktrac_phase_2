@@ -1,416 +1,757 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { AlertTriangle, Clock, User, MapPin, Camera, Video, X, LogOut } from 'lucide-react';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import { useRouter } from 'next/navigation';
-import { Input } from '@mui/material';
+import React, { useState, useEffect, useRef, ChangeEvent, DragEvent, FormEvent } from 'react';
+import { AlertTriangle, LogOut, Camera, Video, X, MapPin, Clock, User, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import AddNewAccidentModal from '@/components/accident_management/add_new_accident';
+
+type MediaFile = {
+    id: string;
+    url: string;
+    type: 'image' | 'video';
+    file: File;
+};
 
 interface Vehicle {
+    id: number;
     BUSNO: string;
-    NAME: string;
-    REGNO: string;
-    DEPOT: string;
+    accidentDate: string;
+    timeOfAccident: string;
 }
 
-const dummyVehicles: Vehicle[] = [
-    {
-        BUSNO: 'RPC200',
-        NAME: 'LL',
-        REGNO: 'KL15A0645',
-        DEPOT: 'KKD'
-    },
-    {
-        BUSNO: 'RPC292',
-        NAME: 'LL',
-        REGNO: 'KL15A0845',
-        DEPOT: 'KTM'
-    },
-    {
-        BUSNO: 'RPC202',
-        NAME: 'LL',
-        REGNO: 'KL15A0845',
-        DEPOT: 'CGR'
-    }
-];
+interface Driver {
+    id: number;
+    gNumber: string;
+    name: string;
+    phone: string;
+}
 
-const ZerothReportForm: React.FC = () => {
-    const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null);
-    const router = useRouter();
-    const [formData, setFormData] = React.useState({
+interface Conductor {
+    id: number;
+    gNumber: string;
+    name: string;
+    phone: string;
+}
+
+const ZerothReport = () => {
+    const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+    const [isVehicleModalSearch, setIsVehicleModalSearch] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
+    const [locationPermission, setLocationPermission] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const [locationData, setLocationData] = useState({
+        address: '',
+        place: '',
+        district: '',
+        state: '',
+        latitude: '',
+        longitude: '',
+        policeStation: '',
+    });
+
+    const [formData, setFormData] = useState({
         timeOfAccident: '',
-        severity: '',
+        dateOfAccident: '',
+        homeDepot: 'Main Depot',
+        operatedDepot: 'City Center Depot',
+        scheduleNumber: '',
+        description: '',
         driverName: '',
         driverPhone: '',
         conductorName: '',
         conductorPhone: '',
-        accidentState: '',
-        accidentDistrict: '',
-        accidentPlace: '',
+        severity: '',
+        vehicleTowed: '',
     });
 
-    const [files, setFiles] = React.useState({
-        frontView: null as File | null,
-        rearView: null as File | null,
-        sideView: null as File | null,
-        damageCloseUp: null as File | null,
-        video: null as File | null,
-    });
+    const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
-    const handleVehicleSelect = (event: any, value: Vehicle | null) => {
-        setSelectedVehicle(value);
+    const tabLabels = [
+        { label: "Location Details" },
+        { label: "Accident & Crew" },
+        { label: "Documentation" }
+    ];
+
+    const dummyDrivers: Driver[] = [
+        { id: 1, gNumber: "G12345", name: "Raj Kumar", phone: "9876543210" },
+        { id: 2, gNumber: "G23456", name: "Vijay Singh", phone: "9876543211" },
+        { id: 3, gNumber: "G34567", name: "Manoj Patel", phone: "9876543212" },
+    ];
+
+    const dummyConductors: Conductor[] = [
+        { id: 1, gNumber: "C12345", name: "Suresh Kumar", phone: "9876543220" },
+        { id: 2, gNumber: "C23456", name: "Ramesh Singh", phone: "9876543221" },
+        { id: 3, gNumber: "C34567", name: "Kumar Patel", phone: "9876543222" },
+    ];
+
+    const [driverSearchTerm, setDriverSearchTerm] = useState('');
+    const [conductorSearchTerm, setConductorSearchTerm] = useState('');
+    const [showDriverDropdown, setShowDriverDropdown] = useState(false);
+    const [showConductorDropdown, setShowConductorDropdown] = useState(false);
+    const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>(dummyDrivers);
+    const [filteredConductors, setFilteredConductors] = useState<Conductor[]>(dummyConductors);
+
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setLocationPermission(true);
+                    setLocationData({
+                        address: '123 Main Street, City Center',
+                        place: 'City Center',
+                        district: 'Central District',
+                        state: 'Tamil Nadu',
+                        latitude: position.coords.latitude.toFixed(6),
+                        longitude: position.coords.longitude.toFixed(6),
+                        policeStation: 'City Central Police Station',
+                    });
+                },
+                (error) => {
+                    console.error('Location permission denied:', error);
+                    setLocationPermission(false);
+                }
+            );
+        } else {
+            console.log('Geolocation not supported');
+        }
+    }, []);
+
+    const handleVehicleSelect = (vehicle: Vehicle) => {
+        setSelectedVehicle(vehicle);
+        setIsVehicleModalSearch(false);
     };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleVehicleModalClose = () => {
+        setIsVehicleModalSearch(false);
+    }
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof files) => {
-        if (e.target.files && e.target.files[0]) {
-            setFiles(prev => ({ ...prev, [field]: e.target.files![0] }));
-        }
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
+        const newFiles: MediaFile[] = Array.from(e.target.files).map(file => ({
+            id: `${file.name}-${Date.now()}`,
+            file,
+            type: file.type.startsWith('video') ? 'video' : 'image',
+            url: URL.createObjectURL(file),
+        }));
+        setMediaFiles(prev => [...prev, ...newFiles]);
     };
 
-    const handleRemoveFile = (field: keyof typeof files) => {
-        setFiles(prev => ({ ...prev, [field]: null }));
+    const handleRemoveFile = (id: string) => {
+        setMediaFiles(prev => prev.filter(file => file.id !== id));
+    };
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragging(false);
+        if (!e.dataTransfer.files) return;
+
+        const newFiles: MediaFile[] = Array.from(e.dataTransfer.files).map(file => ({
+            id: `${file.name}-${Date.now()}`,
+            file,
+            type: file.type.startsWith('video') ? 'video' : 'image',
+            url: URL.createObjectURL(file),
+        }));
+        setMediaFiles(prev => [...prev, ...newFiles]);
+    };
+
+    const handleDriverSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        const term = e.target.value;
+        setDriverSearchTerm(term);
+        setFilteredDrivers(
+            dummyDrivers.filter(driver =>
+                driver.gNumber.toLowerCase().includes(term.toLowerCase()) ||
+                driver.name.toLowerCase().includes(term.toLowerCase())
+            )
+        );
+        setShowDriverDropdown(term.length > 0);
+    };
+
+    const handleDriverSelect = (driver: Driver) => {
+        setFormData(prev => ({
+            ...prev,
+            driverName: driver.name,
+            driverPhone: driver.phone,
+        }));
+        setDriverSearchTerm('');
+        setShowDriverDropdown(false);
+    };
+
+    const handleConductorSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        const term = e.target.value;
+        setConductorSearchTerm(term);
+        setFilteredConductors(
+            dummyConductors.filter(conductor =>
+                conductor.gNumber.toLowerCase().includes(term.toLowerCase()) ||
+                conductor.name.toLowerCase().includes(term.toLowerCase())
+            )
+        );
+        setShowConductorDropdown(term.length > 0);
+    };
+
+    const handleConductorSelect = (conductor: Conductor) => {
+        setFormData(prev => ({
+            ...prev,
+            conductorName: conductor.name,
+            conductorPhone: conductor.phone,
+        }));
+        setConductorSearchTerm('');
+        setShowConductorDropdown(false);
+    };
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        console.log('Form submitted:', { ...formData, ...locationData, mediaFiles });
+        alert('Zeroth Report submitted successfully!');
+    };
+
+    const handleLogout = () => {
+        alert('Logout successful!');
     };
 
     const handleCancel = () => {
         setSelectedVehicle(null);
         setFormData({
             timeOfAccident: '',
-            severity: '',
+            dateOfAccident: '',
+            homeDepot: 'Main Depot',
+            operatedDepot: 'City Center Depot',
+            scheduleNumber: '',
+            description: '',
             driverName: '',
             driverPhone: '',
             conductorName: '',
             conductorPhone: '',
-            accidentState: '',
-            accidentDistrict: '',
-            accidentPlace: '',
+            severity: '',
+            vehicleTowed: '',
         });
-        setFiles({
-            frontView: null,
-            rearView: null,
-            sideView: null,
-            damageCloseUp: null,
-            video: null,
-        });
+        setMediaFiles([]);
     };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!selectedVehicle) {
-            alert("Please select a vehicle");
-            return;
-        }
-
-        // Form submission logic would go here
-        console.log('Zeroth report submitted:', { ...formData, ...files, vehicle: selectedVehicle });
-        alert('Zeroth report submitted successfully!');
-        handleCancel();
-    };
-    const handleLogout = () => {
-        // You can also clear localStorage/cookies here if needed
-        router.push('/')
-    }
-
     return (
-        <div className="m-4 text-xs">
-            <div className="flex flex-row justify-between m-4">
-                <div className="flex items-center mb-2 sm:mb-0">
-                    <AlertTriangle className="w-7 h-7 text-red-600 mr-2" />
-                    <h2 className="text-[20px] sm:text-[24px] font-semibold">
-                        Zeroth Accident Report
-                    </h2>
+        <div className="min-h-screen bg-gray-50 text-xs flex flex-col">
+            {/* Top Bar */}
+            <div className="flex flex-row justify-between items-center p-4 bg-white shadow-sm">
+                <div className="flex items-center">
+                    <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
+                    <h2 className="text-[16px] font-semibold">Accident Spot Report</h2>
                 </div>
                 <button
                     onClick={handleLogout}
-                    className="flex items-center px-3 py-1 text-red-600 hover:bg-grey-300 rounded-md text-sm sm:text-base cursor-pointer"
+                    className="flex items-center px-3 py-1 text-red-600 hover:bg-gray-100 rounded-md text-sm cursor-pointer"
                 >
                     <LogOut className="w-4 h-4 mr-1 text-red-600" />
                     Logout
                 </button>
             </div>
-            <div className="flex flex-wrap">
 
-                <div className="w-full px-2">
-                    <div className="bg-white shadow rounded-lg border-0 p-6">
+            {/* Vehicle Search Bar */}
+            <div className="p-3 border-b border-grey-300 mt-1">
+                <div className="flex items-center gap-3">
+                    <h6 className="font-[500] text-[12px]">
+                        Vehicle Number <span className="text-red-600">*</span>
+                    </h6>
+                    <input
+                        type="text"
+                        value={selectedVehicle ? selectedVehicle.BUSNO : ""}
+                        placeholder="Search and select bus number"
+                        readOnly
+                        className="w-[70%] md:w-[83%] py-1 px-2.5 text-xs bg-white border border-gray-300 rounded-[3px]"
+                    />
 
-                        {/* <hr className="mb-4" /> */}
+                    <button
+                        onClick={() => setIsVehicleModalSearch(true)}
+                        className="px-3 py-1 text-white cursor-pointer bg-[var(--sidebar)] rounded text-xs whitespace-nowrap"
+                    >
+                        Select Vehicle
+                    </button>
+                </div>
+            </div>
 
-                        <div className="mb-6">
-                            <div className="w-full md:w-1/2">
-                                <label className="block font-semibold mb-2 text-[12px]">Select Vehicle</label>
-                                <Autocomplete
-                                    size="small"
-                                    options={dummyVehicles}
-                                    getOptionLabel={(option) => option.BUSNO}
-                                    onChange={handleVehicleSelect}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            className="text-[12px]"
-                                            placeholder="Search by Bonnet No."
-                                            InputProps={{
-                                                ...params.InputProps,
-                                                className: "h-9 text-xs"
-                                            }}
-                                        />
-                                    )}
+            {/* Vehicle Selection Modal */}
+            {isVehicleModalSearch && (
+                <AddNewAccidentModal
+                    closeHandler={handleVehicleModalClose}
+                    caseSelectHandler={handleVehicleSelect}
+                />
+            )}
+
+            {/* Main Form Content */}
+            {selectedVehicle && (
+                <div className="flex flex-col flex-1 mt-2">
+                    <div className="flex flex-col flex-1">
+                        {/* Tabs */}
+                        <div className='flex flex-col'>
+                            <div className="flex border-b border-t border-gray-200 bg-white overflow-x-auto flex-shrink-0">
+                                {tabLabels.map((tab, index) => (
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        className={`flex items-center px-4 py-2.5 text-[12px] font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
+                          ${activeTab === index
+                                                ? 'text-[var(--sidebar)] border-[var(--sidebar)] bg-white'
+                                                : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
+                                        onClick={() => setActiveTab(index)}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="h-0.5 bg-gray-200 flex-shrink-0">
+                                <div
+                                    className="h-full bg-[var(--sidebar)] transition-all duration-300 ease-in-out"
+                                    style={{
+                                        width: `${((activeTab + 1) / tabLabels.length) * 100}%`
+                                    }}
                                 />
                             </div>
                         </div>
 
-                        {selectedVehicle && (
-                            <form onSubmit={handleSubmit}>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div className=" p-3 rounded-lg">
-                                        <div className="flex items-center mb-2">
-                                            <div className="bg-blue-100 p-2 rounded-full mr-3">
-                                                <Clock className="w-4 h-4 text-blue-600" />
-                                            </div>
-                                            <h3 className="font-medium text-sm">Accident Details</h3>
+                        {/* Tab Content */}
+                        <div className="flex-1 overflow-auto p-4">
+                            {/* Location Details Tab */}
+                            {activeTab === 0 && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                                    <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh]">
+                                        <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
+                                            Location Information
+                                        </h3>
+
+                                        <div className="mb-3">
+                                            <label className="text-[12px] font-[600] text-gray-700 mb-1">Address</label>
+                                            <textarea
+                                                value={locationData.address}
+                                                readOnly
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                                rows={3}
+                                            />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-3 ">
+                                        <div className="mb-3">
+                                            <label className="text-[12px] font-[600] text-gray-700 mb-1">Accident Place</label>
+                                            <input
+                                                value={locationData.place}
+                                                readOnly
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                             <div>
-                                                <label className="block font-medium mb-1 text-xs">Time of Accident</label>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">District</label>
                                                 <input
-                                                    type="time"
-                                                    name="timeOfAccident"
-                                                    value={formData.timeOfAccident}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
+                                                    value={locationData.district}
+                                                    readOnly
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
                                                 />
+                                            </div>
+                                            <div>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">State</label>
+                                                <input
+                                                    value={locationData.state}
+                                                    readOnly
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
+                                        <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
+                                            Geolocation
+                                        </h3>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                            <div>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Latitude</label>
+                                                <input
+                                                    value={locationData.latitude}
+                                                    readOnly
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Longitude</label>
+                                                <input
+                                                    value={locationData.longitude}
+                                                    readOnly
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="text-[12px] font-[600] text-gray-700 mb-1">Nearest Police Station</label>
+                                            <input
+                                                value={locationData.policeStation}
+                                                readOnly
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                            />
+                                        </div>
+
+                                        <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+                                            <p className="text-[11px] text-blue-800">
+                                                {locationPermission
+                                                    ? "Location data fetched successfully. This information is prefilled based on your current location."
+                                                    : "Location permission not granted. Please enable location services for accurate reporting."}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Accident & Crew Tab */}
+                            {activeTab === 1 && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full ">
+                                    {/* Accident Details */}
+                                    <div className="bg-white border border-gray-200 rounded p-4 overflow-auto h-full md:min-h-[65vh]">
+                                        <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Accident Details</h3>
+
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Time of Accident</label>
+                                                    <input
+                                                        type="time"
+                                                        name="timeOfAccident"
+                                                        value={selectedVehicle.timeOfAccident}
+                                                        readOnly
+                                                        className="w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded text-xs"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Date of Accident</label>
+                                                    <input
+                                                        type="date"
+                                                        name="dateOfAccident"
+                                                        value={selectedVehicle.accidentDate}
+                                                        readOnly
+                                                        className="w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded text-xs"
+                                                    />
+                                                </div>
                                             </div>
 
                                             <div>
-                                                <label className="block font-medium mb-1 text-xs">Bonnet No.</label>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Home Depot</label>
                                                 <input
-                                                    value={selectedVehicle.BUSNO}
-                                                    className="w-full p-2 border rounded text-xs bg-gray-100"
+                                                    name="homeDepot"
+                                                    value={formData.homeDepot}
+                                                    onChange={handleChange}
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
                                                     readOnly
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block font-medium mb-1 text-xs">Severity</label>
-                                                <select
-                                                    name="severity"
-                                                    value={formData.severity}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
-                                                >
-                                                    <option value="">Select Severity</option>
-                                                    <option value="Minor">Minor</option>
-                                                    <option value="Major">Major</option>
-                                                    <option value="Severe">Severe</option>
-                                                    <option value="Fatal">Fatal</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block font-medium mb-1 text-xs">Vehicle Towed Status</label>
-                                                <select
-                                                    name="severity"
-                                                    value={formData.severity}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
-                                                >
-                                                    <option value="">Select Status</option>
-                                                    <option value="Minor">Yes</option>
-                                                    <option value="Major">No</option>
-
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className=" p-3 rounded-lg">
-                                        <div className="flex items-center mb-2">
-                                            <div className="bg-green-100 p-2 rounded-full mr-3">
-                                                <User className="w-4 h-4 text-green-600" />
-                                            </div>
-                                            <h3 className="font-medium text-sm">Crew Information</h3>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 gap-3">
-                                            <div>
-                                                <label className="block font-medium mb-1 text-xs">Driver Name</label>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Operated Depot</label>
                                                 <input
-                                                    name="driverName"
-                                                    value={formData.driverName}
+                                                    name="operatedDepot"
+                                                    value={formData.operatedDepot}
                                                     onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
+                                                    readOnly
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block font-medium mb-1 text-xs">Driver Phone No.</label>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Schedule Number</label>
                                                 <input
-                                                    type="tel"
-                                                    name="driverPhone"
-                                                    value={formData.driverPhone}
+                                                    name="scheduleNumber"
+                                                    placeholder="Enter Schedule Number"
+                                                    value={formData.scheduleNumber}
                                                     onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
                                                 />
                                             </div>
 
                                             <div>
-                                                <label className="block font-medium mb-1 text-xs">Conductor Name</label>
-                                                <input
-                                                    name="conductorName"
-                                                    value={formData.conductorName}
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Description</label>
+                                                <textarea
+                                                    name="description"
+                                                    value={formData.description}
                                                     onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block font-medium mb-1 text-xs">Conductor Phone No.</label>
-                                                <input
-                                                    type="tel"
-                                                    name="conductorPhone"
-                                                    value={formData.conductorPhone}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    rows={3}
                                                 />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className=" p-3 rounded-lg md:col-span-2">
-                                        <div className="flex items-center mb-2">
-                                            <div className="bg-purple-100 p-2 rounded-full mr-3">
-                                                <MapPin className="w-4 h-4 text-purple-600" />
-                                            </div>
-                                            <h3 className="font-medium text-sm">Accident Location</h3>
-                                        </div>
+                                    {/* Crew Information */}
+                                    <div className="bg-white border border-gray-200 rounded p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
+                                        <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Crew Information</h3>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-4">
                                             <div>
-                                                <label className="block font-medium mb-1 text-xs">Accident State</label>
-                                                <input
-                                                    name="accidentState"
-                                                    value={formData.accidentState}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block font-medium mb-1 text-xs">Accident District</label>
-                                                <input
-                                                    name="accidentDistrict"
-                                                    value={formData.accidentDistrict}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block font-medium mb-1 text-xs">Accident Place</label>
-                                                <input
-                                                    name="accidentPlace"
-                                                    value={formData.accidentPlace}
-                                                    onChange={handleChange}
-                                                    className="w-full p-2 border rounded text-xs"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mb-6">
-                                    <div className="flex items-center mb-4">
-                                        <div className="bg-orange-100 p-2 rounded-full mr-3">
-                                            <Camera className="w-4 h-4 text-orange-600" />
-                                        </div>
-                                        <h3 className="font-medium text-sm">Accident Documentation</h3>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                                        {[
-                                            { id: 'frontView', label: 'Front View', icon: <Camera className="w-4 h-4 mr-2" /> },
-                                            { id: 'rearView', label: 'Rear View', icon: <Camera className="w-4 h-4 mr-2" /> },
-                                            { id: 'sideView', label: 'Side View', icon: <Camera className="w-4 h-4 mr-2" /> },
-                                            { id: 'damageCloseUp', label: 'Damage Close-up', icon: <Camera className="w-4 h-4 mr-2" /> },
-                                            { id: 'video', label: 'Video', icon: <Video className="w-4 h-4 mr-2" /> },
-                                        ].map((item) => (
-                                            <div key={item.id} className="border rounded-lg p-3 flex flex-col">
-                                                <label className="flex items-center font-medium mb-2 text-xs text-gray-700">
-                                                    {item.icon}
-                                                    {item.label}
-                                                </label>
-
-                                                {files[item.id as keyof typeof files] ? (
-                                                    <div className="flex items-center justify-between bg-gray-50 p-2 rounded text-xs mt-auto">
-                                                        <span className="truncate">{files[item.id as keyof typeof files]?.name}</span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveFile(item.id as keyof typeof files)}
-                                                            className="text-red-500 ml-2"
-                                                        >
-                                                            <X size={16} />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 cursor-pointer text-center h-full">
-                                                        <span className="text-gray-400 text-xs mb-1">Click to upload</span>
-                                                        <input
-                                                            type="file"
-                                                            accept={item.id === 'video' ? 'video/*' : 'image/*'}
-                                                            onChange={(e) => handleFileChange(e, item.id as keyof typeof files)}
-                                                            className="hidden"
-                                                        />
-                                                        <div className="bg-gray-100 p-2 rounded-full">
-                                                            {item.id === 'video' ? (
-                                                                <Video className="w-5 h-5 text-gray-400" />
-                                                            ) : (
-                                                                <Camera className="w-5 h-5 text-gray-400" />
-                                                            )}
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Driver G Number</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Enter G Number"
+                                                        value={driverSearchTerm}
+                                                        onChange={handleDriverSearch}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    />
+                                                    {showDriverDropdown && filteredDrivers.length > 0 && (
+                                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                                            {filteredDrivers.map((driver) => (
+                                                                <div
+                                                                    key={driver.id}
+                                                                    className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer"
+                                                                    onClick={() => handleDriverSelect(driver)}
+                                                                >
+                                                                    {driver.gNumber} - {driver.name}
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    </label>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
-                                        ))}
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Driver Name</label>
+                                                    <input
+                                                        name="driverName"
+                                                        value={formData.driverName}
+                                                        onChange={handleChange}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Driver Phone</label>
+                                                    <input
+                                                        type="tel"
+                                                        name="driverPhone"
+                                                        value={formData.driverPhone}
+                                                        onChange={handleChange}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor G Number</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Enter G Number"
+                                                        value={conductorSearchTerm}
+                                                        onChange={handleConductorSearch}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    />
+                                                    {showConductorDropdown && filteredConductors.length > 0 && (
+                                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                                            {filteredConductors.map((conductor) => (
+                                                                <div
+                                                                    key={conductor.id}
+                                                                    className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer"
+                                                                    onClick={() => handleConductorSelect(conductor)}
+                                                                >
+                                                                    {conductor.gNumber} - {conductor.name}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor Name</label>
+                                                    <input
+                                                        name="conductorName"
+                                                        value={formData.conductorName}
+                                                        onChange={handleChange}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor Phone</label>
+                                                    <input
+                                                        type="tel"
+                                                        name="conductorPhone"
+                                                        value={formData.conductorPhone}
+                                                        onChange={handleChange}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Documentation Tab */}
+                            {activeTab === 2 && (
+                                <div className="flex flex-col lg:flex-row gap-[6px]">
+                                    {/* Left Section - Upload Form */}
+                                    <div className="w-full lg:w-1/2 h-full bg-white border border-gray-300 rounded-[4px] p-[16px] overflow-auto md:min-h-[65vh] sm:min-h-[50vh]">
+                                        <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
+                                            Accident Documentation
+                                        </h3>
+
+                                        <div
+                                            className={`flex-1 border-2 ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-dashed border-gray-300'} 
+                rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer`}
+                                            onDragOver={handleDragOver}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={handleDrop}
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <input
+                                                type="file"
+                                                multiple
+                                                onChange={handleFileChange}
+                                                className="hidden"
+                                                ref={fileInputRef}
+                                            />
+                                            <div className="text-center">
+                                                <div className="bg-gray-100 p-3 rounded-full inline-block mb-3">
+                                                    <Camera className="w-6 h-6 text-gray-500" />
+                                                </div>
+                                                <p className="text-sm font-medium text-gray-700">
+                                                    {isDragging ? 'Drop files here' : 'Click or drag files to upload'}
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    Upload images or videos of the accident scene
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200">
+                                            <h4 className="text-xs font-semibold mb-2">Upload Guidelines</h4>
+                                            <ul className="text-xs text-gray-600 space-y-1">
+                                                <li>• Upload clear photos showing the accident from multiple angles</li>
+                                                <li>• Include close-up shots of any vehicle damage</li>
+                                                <li>• Maximum file size: 5MB per image, 20MB for video</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    {/* Right Section - Uploaded Images */}
+                                    <div className="w-full lg:w-1/2 bg-white border border-gray-300 rounded-[4px] p-[16px] overflow-auto min-h-[50vh] md:min-h-[65vh] mb-[50px] md:mb-2">
+                                        <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
+                                            Uploaded Images
+                                        </h3>
+
+                                        {mediaFiles.length > 0 ? (
+                                            <div className="mb-4">
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                                    {mediaFiles.map((media) => (
+                                                        <div key={media.id} className="relative border rounded-lg overflow-hidden h-32">
+                                                            {media.type === 'video' ? (
+                                                                <video src={media.url} className="w-full h-full object-cover" controls />
+                                                            ) : (
+                                                                <img src={media.url} alt="Uploaded media" className="w-full h-full object-cover" />
+                                                            )}
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleRemoveFile(media.id);
+                                                                }}
+                                                                className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-red-100"
+                                                            >
+                                                                <X size={14} className="text-gray-600" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-gray-500">No images are uploaded.</p>
+                                        )}
                                     </div>
                                 </div>
 
+                            )}
+                        </div>
+                    </div>
 
-                                <div className="mt-6 flex justify-end gap-3">
+                    {/* Form Actions - Fixed at bottom */}
+
+
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
+                        <div className="flex justify-between items-center">
+
+                            {/* Left Buttons */}
+                            <div className="flex gap-3">
+                                {activeTab > 0 && (
                                     <button
                                         type="button"
-                                        onClick={handleCancel}
-                                        className="px-4 py-2 text-sm border rounded flex items-center"
+                                        onClick={() => setActiveTab(activeTab - 1)}
+                                        className="flex items-center justify-center px-5 py-1 text-[12px] font-medium bg-green-500 text-white rounded hover:bg-green-600 transition-all
+                     sm:px-5 sm:py-1 sm:text-base"
+                                        aria-label="Previous"
                                     >
-                                        <X className="w-4 h-4 mr-1" /> Cancel
+                                        <ChevronLeft className="w-4 h-4 sm:mr-2" />
+                                        <span className="hidden sm:inline text-[12px]">Previous</span>
                                     </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 text-sm bg-[var(--sidebar)] text-white rounded flex items-center"
-                                    >
-                                        Submit Zeroth Report
-                                    </button>
-                                </div>
-                            </form>
-                        )}
+                                )}
+
+                                {activeTab < tabLabels.length - 1 &&
+                                    !(formData.severity === "Insignificant" && activeTab === 2) && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveTab(activeTab + 1)}
+                                            className="flex items-center justify-center px-5 py-1 text-sm font-medium bg-[var(--sidebar)] text-white rounded hover:bg-[#001670] transition-all
+                       sm:px-5 sm:py-1 sm:text-base"
+                                            aria-label="Next"
+                                        >
+                                            <span className="hidden sm:inline text-[12px]">Next</span>
+                                            <ChevronRight className="w-4 h-4 sm:ml-2 text-[12px]" />
+                                        </button>
+                                    )}
+                            </div>
+
+                            {/* Right Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="flex items-center justify-center px-5 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 transition-all
+                   sm:px-5 sm:py-1 sm:text-base"
+                                    aria-label="Cancel"
+                                >
+                                    <X className="w-4 h-4 sm:mr-2" />
+                                    <span className="hidden sm:inline text-[12px]">Cancel</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleSubmit}
+                                    className="flex items-center justify-center px-5 py-1 text-sm font-medium bg-[var(--sidebar)] text-white rounded hover:bg-[#001670] transition-all
+                   sm:px-5 sm:py-1 sm:text-base"
+                                    aria-label="Submit Report"
+                                >
+                                    <Check className="w-4 h-4 sm:mr-2" />
+                                    <span className="hidden sm:inline text-[12px]">Submit Report</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+
+
+
                 </div>
-            </div>
+            )}
         </div>
     );
 };
 
-export default ZerothReportForm;
+export default ZerothReport;

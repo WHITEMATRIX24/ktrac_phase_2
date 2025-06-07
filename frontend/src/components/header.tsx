@@ -71,7 +71,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-4 py-2 text-black">
+    <header className="flex items-center justify-between px-4 py-2 text-black border-b border-grey-300">
       <div>
         <h1 className="text-[16px] font-semibold leading-[1.2] mb-0 mt-[10px] uppercase">
           {decodeURIComponent(mainTitle).replace(/[-_]/g, " ")}

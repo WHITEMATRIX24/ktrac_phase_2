@@ -686,7 +686,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                         disabled={isDisabled}
                                                         className={`flex items-center px-4 py-2.5 text-[12px] font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
                                                                 ${activeTab === index
-                                                                ? 'text-[#3182ce] border-[#3182ce] bg-white'
+                                                                ? 'text-[var(--sidebar)] border-[var(--sidebar)] bg-white'
                                                                 : isDisabled
                                                                     ? 'text-gray-400 border-transparent cursor-not-allowed'
                                                                     : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
@@ -704,7 +704,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                         {/* Progress Bar */}
                                         <div className="h-0.5 bg-gray-200 flex-shrink-0">
                                             <div
-                                                className="h-full bg-[#3182ce] transition-all duration-300 ease-in-out"
+                                                className="h-full bg-[var(--sidebar)] transition-all duration-300 ease-in-out"
                                                 style={{
                                                     width: `${((activeTab + 1) / tabLabels.length) * 100}%`
                                                 }}
@@ -722,7 +722,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                 {/* Left Section: Accident Details */}
                                                 <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">
+                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
                                                         Accident Details
                                                     </h3>
                                                     <div className="space-y-4">
@@ -795,7 +795,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* Right Section: Personnel & Location */}
                                                 <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">
+                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
                                                         Crew & Location
                                                     </h4>
                                                     <div className="space-y-4">
@@ -1210,7 +1210,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* LEFT: Basic Details */}
                                                 <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">Basic Details</h3>
+                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">Basic Details</h3>
                                                     <div className="space-y-4">
 
                                                         {/* Date */}
@@ -1290,7 +1290,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* RIGHT: Other Vehicle Involved */}
                                                 <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">Other Vehicle Involved</h4>
+                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">Other Vehicle Involved</h4>
                                                     <div className="space-y-4">
                                                         <div>
                                                             <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Type of Other Vehicle Involved</label>
@@ -1323,7 +1323,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* LEFT: Accident Details */}
                                                 <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">Accident Details</h3>
+                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">Accident Details</h3>
                                                     <div className="space-y-4">
 
                                                         {/* Accident Type */}
@@ -1396,7 +1396,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 </div>
                                                 {/* RIGHT: Injury & Fatality Details */}
                                                 <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">Injury & Fatality Details</h3>
+                                                    <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">Injury & Fatality Details</h3>
 
 
                                                     {formData.severity === "Insignificant" ? (
@@ -1479,7 +1479,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[65vh] sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                 {/* LEFT: Service Information */}
                                                 <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">
+                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
                                                         Service Information
                                                     </h4>
                                                     <div className="space-y-4">
@@ -1588,7 +1588,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* RIGHT: Damage & Inspection */}
                                                 <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">
+                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
                                                         Damage & Inspection
                                                     </h4>
                                                     <div className="space-y-4">
@@ -1672,7 +1672,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                 {/* LEFT: Recovery Details */}
                                                 <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">
+                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
                                                         Recovery Details
                                                     </h4>
                                                     <div className="space-y-4">
@@ -1788,7 +1788,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* RIGHT: Cost & Settlement */}
                                                 <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[#3182ce]">
+                                                    <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
                                                         Cost & Settlement
                                                     </h4>
                                                     <div className="space-y-4">
