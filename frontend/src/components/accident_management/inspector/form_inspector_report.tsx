@@ -4,6 +4,9 @@ import React from "react";
 const FormInspectorReport = () => {
   return (
     <div className="flex flex-col gap-3">
+      <div className="border-b-2 border-sidebar py-2">
+        <h6 className="text-sm font-semibold">Inspector Report</h6>
+      </div>
       <div className="flex flex-col gap-2">
         <label className="text-[12px]">Inspector Name</label>
         <Input />

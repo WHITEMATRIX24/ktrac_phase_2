@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 
 interface Props {
   closeHandler: () => void;
+  caseSelectHandler: (selectedData: any) => void;
 }
 
-const ReferenceNumberSearchModal = ({ closeHandler }: Props) => {
+const dummyData = [
+  {
+    accedent_ref_no: "1563867",
+    accedent_date: "06/05/2025",
+    bus_no: "FA3465",
+  },
+];
+
+const ReferenceNumberSearchModal = ({
+  closeHandler,
+  caseSelectHandler,
+}: Props) => {
   const [searchData, setSearchData] = useState(false);
+
+  // handle case select
+  const handlecaseSelect = (selectedData: any) => {
+    caseSelectHandler(selectedData);
+    closeHandler();
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full h-dvh bg-black/30 flex justify-center items-center">
@@ -37,12 +55,16 @@ const ReferenceNumberSearchModal = ({ closeHandler }: Props) => {
         </div>
         <div className="bg-slate-50 max-h-52 mx-3 rounded-sm overflow-y-scroll text-[12px]">
           {searchData &&
-            [1, 2, 3].map((card) => (
-              <div key={card} className="px-3 py-4 border-b-2">
+            dummyData.map((data) => (
+              <div
+                onClick={() => handlecaseSelect(data)}
+                key={data.accedent_ref_no}
+                className="px-3 py-4 border-b-2"
+              >
                 <h6>
-                  ACC001 - <span>KL0D5412</span>
+                  ACC001 - <span>{data.bus_no}</span>
                 </h6>
-                <p className="text-gray-400">Date | District</p>
+                <p className="text-gray-400">{`${data.accedent_date} | District`}</p>
                 <p className="text-gray-400">Minor collision at palarivattom</p>
               </div>
             ))}

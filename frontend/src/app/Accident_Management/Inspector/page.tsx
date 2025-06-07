@@ -8,14 +8,6 @@ import { Autocomplete, TextField } from "@mui/material";
 import { User2, X } from "lucide-react";
 import React, { useState } from "react";
 
-const dummyData = [
-  {
-    accedent_ref_no: "1563867",
-    accedent_date: "06/05/2025",
-    bus_no: "FA3465",
-  },
-];
-
 const tabs = ["Inspector Report", "Insurrence"];
 
 const AccedentInspectorForm = () => {
@@ -31,6 +23,8 @@ const AccedentInspectorForm = () => {
 
   //modal close handler
   const handleSearchModalClose = () => setIsReferenceModalSearch(false);
+  const handleSearchSelect = (selectedData: any) =>
+    setSelectedAccedentData(selectedData);
 
   return (
     <React.Fragment>
@@ -52,6 +46,7 @@ const AccedentInspectorForm = () => {
             Search
           </button>
         </div>
+        {/* main */}
         <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500 bg-white">
           {tabs.map((tab, index) => (
             <button
@@ -65,8 +60,11 @@ const AccedentInspectorForm = () => {
             </button>
           ))}
         </div>
-        <div className="relative grid grid-cols-2 gap-3 overflow-auto h-full border bg-white mx-3 rounded-m">
-          <div className="px-3 py-2 overflow-y-scroll">
+        <div className="relative grid grid-cols-2 gap-3 overflow-auto h-full mx-3 rounded-m">
+          <div className="p-3 overflow-y-auto bg-white border rounded-sm flex flex-col gap-3">
+            <div className="border-b-2 border-sidebar py-2">
+              <h6 className="text-sm font-semibold">Basic information</h6>
+            </div>
             <div className="flex flex-col gap-2">
               <label className="text-[12px]">Date Of Accident</label>
               <Input
@@ -85,24 +83,43 @@ const AccedentInspectorForm = () => {
               />
             </div>
           </div>
-          <div className="overflow-y-scroll py-3">{tabList[selectedTab]}</div>
+          <div className="overflow-y-auto p-3 bg-white border rounded-sm">
+            {tabList[selectedTab]}
+          </div>
         </div>
-
+        {/* footer */}
         <div className="h-[3vh] flex items-center justify-between px-5 py-6">
-          <div>
-            <button className="bg-sidebar font-semibold text-white px-5 py-1 rounded-xs">
+          <div className="flex gap-3">
+            <button
+              disabled={selectedTab === 0}
+              className="bg-green-600 font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+              onClick={() => setSelectedtab((prevValue) => prevValue - 1)}
+            >
+              Previous
+            </button>
+            <button
+              disabled={selectedTab === tabs.length - 1}
+              className="bg-sidebar font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+              onClick={() => setSelectedtab((prevValue) => prevValue + 1)}
+            >
               Next
             </button>
           </div>
-          <div>
+          <div className="flex gap-3">
             <button className="border font-semibold px-5 py-1 rounded-xs">
               Cancel
+            </button>
+            <button className="border font-semibold px-5 py-1 rounded-xs">
+              Save Draft
             </button>
           </div>
         </div>
       </div>
       {isReferenceModalSearchOpen && (
-        <ReferenceNumberSearchModal closeHandler={handleSearchModalClose} />
+        <ReferenceNumberSearchModal
+          closeHandler={handleSearchModalClose}
+          caseSelectHandler={handleSearchSelect}
+        />
       )}
     </React.Fragment>
   );
