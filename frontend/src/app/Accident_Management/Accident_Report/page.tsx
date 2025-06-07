@@ -1003,7 +1003,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[64vh] sm:gap-6 mb-4">
                                                 {/* Left: Report Details Card */}
                                                 <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto ">
-                                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-blue-600">
+                                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
 
                                                         Accident Spot Report Details
                                                     </h3>
@@ -1101,7 +1101,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                 {/* Right: Images Card */}
                                                 <div className="bg-white border border-gray-300 rounded-[4px] p-4">
-                                                    <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-blue-600">
+                                                    <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
                                                         Uploaded Images
                                                     </h3>
 

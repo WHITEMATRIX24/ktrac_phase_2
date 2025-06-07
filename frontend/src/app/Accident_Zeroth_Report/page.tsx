@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, ChangeEvent, DragEvent, FormEvent } from 'react';
-import { AlertTriangle, LogOut, Camera, Video, X, MapPin, Clock, User, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { AlertTriangle, LogOut, Camera, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import AddNewAccidentModal from '@/components/accident_management/add_new_accident';
 
 type MediaFile = {
@@ -95,27 +95,43 @@ const ZerothReport = () => {
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lon = position.coords.longitude.toFixed(6);
+
                     setLocationPermission(true);
-                    setLocationData({
-                        address: '123 Main Street, City Center',
-                        place: 'City Center',
-                        district: 'Central District',
-                        state: 'Tamil Nadu',
-                        latitude: position.coords.latitude.toFixed(6),
-                        longitude: position.coords.longitude.toFixed(6),
-                        policeStation: 'City Central Police Station',
-                    });
+
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
+                        );
+                        const data = await response.json();
+                        console.log(data)
+                        const address = data.address || {};
+                        console.log("adredd", address)
+                        setLocationData({
+                            address: data.display_name || '',
+                            place: address.hamlet || address.village || '',
+                            district: address.county || address.district || '',
+                            state: address.state || '',
+                            latitude: lat,
+                            longitude: lon,
+                            policeStation: '',
+                        });
+                    } catch (error) {
+                        console.error("Error fetching address:", error);
+                    }
                 },
                 (error) => {
-                    console.error('Location permission denied:', error);
+                    console.error("Location permission denied:", error);
                     setLocationPermission(false);
                 }
             );
         } else {
-            console.log('Geolocation not supported');
+            console.log("Geolocation not supported");
         }
     }, []);
+
 
     const handleVehicleSelect = (vehicle: Vehicle) => {
         setSelectedVehicle(vehicle);
