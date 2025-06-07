@@ -71,9 +71,9 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-6 py-2 text-black">
+    <header className="flex items-center justify-between px-4 py-2 text-black">
       <div>
-        <h1 className="text-[24px] font-semibold leading-[1.2] mb-0 mt-[10px] uppercase">
+        <h1 className="text-[16px] font-semibold leading-[1.2] mb-0 mt-[10px] uppercase">
           {decodeURIComponent(mainTitle).replace(/[-_]/g, " ")}
         </h1>
         <Breadcrumb className="h-[18px] ml-[1px] mt-[5px]">

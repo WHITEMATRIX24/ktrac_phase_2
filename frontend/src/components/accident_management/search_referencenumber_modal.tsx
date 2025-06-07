@@ -7,11 +7,49 @@ interface Props {
 
 const dummyData = [
   {
-    accedent_ref_no: "1563867",
+    accedent_ref_no: "KKD/06/25/01",
     accedent_date: "06/05/2025",
     bus_no: "FA3465",
+    accidentPlace: 'Main Road, Kochi',
+    policeStation: 'Ernakulam South',
+    timeOfAccident: '14:30',
+    homeDepot: 'KKD',
+    operatedDepot: 'KKD',
+    scheduleNumber: '48',
+    driverName: 'Rajesh Kumar',
+    driverPhone: '9876543210',
+    conductorName: 'Suresh Nair',
+    conductorPhone: '9876543211',
+    accidentState: 'Kerala',
+    accidentDistrict: 'Ernakulam',
+    description: 'Collision with private car',
+    accidentLatitude: "9.9312",
+    accidentLongitude: " 76.2673",
+    photos: []
+  },
+  {
+    accedent_ref_no: 'KTM/07/25/05',
+    bus_no: 'RPC292',
+    accidentPlace: 'MG Road, Trivandrum',
+    accedent_date: '2023-07-22',
+    policeStation: 'Thiruvananthapuram East',
+    timeOfAccident: '10:15',
+    homeDepot: 'KTM',
+    operatedDepot: 'KTM',
+    scheduleNumber: '52',
+    driverName: 'Manoj Pillai',
+    driverPhone: '9876543222',
+    conductorName: 'Deepak Kumar',
+    conductorPhone: '9876543223',
+    accidentState: 'Kerala',
+    accidentDistrict: 'Thiruvananthapuram',
+    description: 'Rear-ended by truck',
+    accidentLatitude: "8.5241",
+    accidentLongitude: "76.9366",
+    photos: []
   },
 ];
+
 
 const ReferenceNumberSearchModal = ({
   closeHandler,
@@ -65,7 +103,7 @@ const ReferenceNumberSearchModal = ({
                   ACC001 - <span>{data.bus_no}</span>
                 </h6>
                 <p className="text-gray-400">{`${data.accedent_date} | District`}</p>
-                <p className="text-gray-400">Minor collision at palarivattom</p>
+                <p className="text-gray-400">Accident at {data.accidentPlace}</p>
               </div>
             ))}
         </div>
