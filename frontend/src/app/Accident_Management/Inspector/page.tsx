@@ -60,9 +60,8 @@ const AccedentInspectorForm = () => {
               <button
                 key={index}
                 onClick={() => setSelectedtab(index)}
-                className={`flex items-center px-4 py-2.5 text-[12px] font-medium cursor-pointer ${
-                  selectedTab === index && "border-b-2 border-b-sidebar"
-                }`}
+                className={`flex items-center px-4 py-2.5 text-[12px] font-medium cursor-pointer ${selectedTab === index && "border-b-2 border-b-sidebar"
+                  }`}
               >
                 {tab}
               </button>
@@ -111,7 +110,7 @@ const AccedentInspectorForm = () => {
           <div className="flex gap-3">
             {selectedTab !== 0 && (
               <button
-                className="bg-green-600 font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+                className="bg-green-600 font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
                 onClick={() => setSelectedtab((prevValue) => prevValue - 1)}
               >
                 Previous
@@ -119,7 +118,7 @@ const AccedentInspectorForm = () => {
             )}
             {selectedTab !== tabs.length - 1 && (
               <button
-                className="bg-sidebar font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+                className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
                 onClick={() => setSelectedtab((prevValue) => prevValue + 1)}
               >
                 Next
@@ -127,14 +126,14 @@ const AccedentInspectorForm = () => {
             )}
           </div>
           <div className="flex gap-3">
-            <button className="border font-semibold px-5 py-1 rounded-xs">
+            <button className="border font-[500] px-5 py-1 rounded-xs">
               Cancel
             </button>
-            <button className="border font-semibold px-5 py-1 rounded-xs">
+            <button className="border font-[500] px-5 py-1 rounded-xs">
               Save Draft
             </button>
             {selectedTab === tabs.length - 1 && (
-              <button className="border font-semibold px-5 py-1 rounded-xs bg-sidebar text-white">
+              <button className="border font-[500] px-5 py-1 rounded-xs bg-sidebar text-white">
                 Submit
               </button>
             )}
