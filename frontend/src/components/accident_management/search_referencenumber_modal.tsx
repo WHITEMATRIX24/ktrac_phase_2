@@ -10,52 +10,52 @@ const dummyData = [
     accedent_ref_no: "KKD/06/25/01",
     accedent_date: "06/05/2025",
     bus_no: "FA3465",
-    accidentPlace: 'Main Road, Kochi',
-    policeStation: 'Ernakulam South',
-    timeOfAccident: '14:30',
-    homeDepot: 'KKD',
-    operatedDepot: 'KKD',
-    scheduleNumber: '48',
-    driverName: 'Rajesh Kumar',
-    driverPhone: '9876543210',
-    conductorName: 'Suresh Nair',
-    conductorPhone: '9876543211',
-    accidentState: 'Kerala',
-    accidentDistrict: 'Ernakulam',
-    description: 'Collision with private car',
+    accidentPlace: "Main Road, Kochi",
+    policeStation: "Ernakulam South",
+    timeOfAccident: "14:30",
+    homeDepot: "KKD",
+    operatedDepot: "KKD",
+    scheduleNumber: "48",
+    driverName: "Rajesh Kumar",
+    driverPhone: "9876543210",
+    conductorName: "Suresh Nair",
+    conductorPhone: "9876543211",
+    accidentState: "Kerala",
+    accidentDistrict: "Ernakulam",
+    description: "Collision with private car",
     accidentLatitude: "9.9312",
     accidentLongitude: " 76.2673",
-    photos: []
+    photos: [],
   },
   {
-    accedent_ref_no: 'KTM/07/25/05',
-    bus_no: 'RPC292',
-    accidentPlace: 'MG Road, Trivandrum',
-    accedent_date: '2023-07-22',
-    policeStation: 'Thiruvananthapuram East',
-    timeOfAccident: '10:15',
-    homeDepot: 'KTM',
-    operatedDepot: 'KTM',
-    scheduleNumber: '52',
-    driverName: 'Manoj Pillai',
-    driverPhone: '9876543222',
-    conductorName: 'Deepak Kumar',
-    conductorPhone: '9876543223',
-    accidentState: 'Kerala',
-    accidentDistrict: 'Thiruvananthapuram',
-    description: 'Rear-ended by truck',
+    accedent_ref_no: "KTM/07/25/05",
+    bus_no: "RPC292",
+    accidentPlace: "MG Road, Trivandrum",
+    accedent_date: "2023-07-22",
+    policeStation: "Thiruvananthapuram East",
+    timeOfAccident: "10:15",
+    homeDepot: "KTM",
+    operatedDepot: "KTM",
+    scheduleNumber: "52",
+    driverName: "Manoj Pillai",
+    driverPhone: "9876543222",
+    conductorName: "Deepak Kumar",
+    conductorPhone: "9876543223",
+    accidentState: "Kerala",
+    accidentDistrict: "Thiruvananthapuram",
+    description: "Rear-ended by truck",
     accidentLatitude: "8.5241",
     accidentLongitude: "76.9366",
-    photos: []
+    photos: [],
   },
 ];
-
 
 const ReferenceNumberSearchModal = ({
   closeHandler,
   caseSelectHandler,
 }: Props) => {
   const [searchData, setSearchData] = useState(false);
+  const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
 
   // handle case select
   const handlecaseSelect = (selectedData: any) => {
@@ -75,13 +75,27 @@ const ReferenceNumberSearchModal = ({
             <label>Date</label>
             <input type="date" className="px-3 py-2 border rounded-sm" />
           </div>
-          <div className="flex flex-col">
+          <div className="relative flex flex-col">
             <label>Bonnet No</label>
             <input
               type="text"
               placeholder="search bonnet number"
               className="px-3 py-2 border rounded-sm"
+              onClick={() => setShowBonnetDropDown(true)}
             />
+            {showBonnetDropDown && (
+              <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
+                {dummyData.map((d) => (
+                  <button
+                    onClick={() => handlecaseSelect(d)}
+                    className="py-2 text-start"
+                    key={d.bus_no}
+                  >
+                    {d.bus_no}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex flex-col">
             <label>District</label>
@@ -103,7 +117,9 @@ const ReferenceNumberSearchModal = ({
                   ACC001 - <span>{data.bus_no}</span>
                 </h6>
                 <p className="text-gray-400">{`${data.accedent_date} | District`}</p>
-                <p className="text-gray-400">Accident at {data.accidentPlace}</p>
+                <p className="text-gray-400">
+                  Accident at {data.accidentPlace}
+                </p>
               </div>
             ))}
         </div>

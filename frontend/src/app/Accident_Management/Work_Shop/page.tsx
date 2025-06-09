@@ -3,7 +3,7 @@ import ReferenceNumberSearchModal from "@/components/accident_management/search_
 import { Input } from "@/components/ui/input";
 import { Autocomplete, TextField } from "@mui/material";
 import { Wrench, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const tabs = ["Basic & Workshop", "Insurance & Cost", "Additional info"];
 
@@ -30,6 +30,7 @@ const BasicAndWorkShop = ({
           <Input
             value={selectedAccedentData ? selectedAccedentData.bus_no : ""}
             onChange={() => console.log("clicked")}
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -40,26 +41,38 @@ const BasicAndWorkShop = ({
               selectedAccedentData ? selectedAccedentData.accedent_date : ""
             }
             onChange={() => console.log("clicked")}
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
           />
           <div className="flex flex-col gap-2">
             <label className="text-[12px]">
               Repair Work Done At Workshop/ Depot
             </label>
-            <div className="flex items-center justify-evenly gap-5 w-fit">
+            <div className="flex items-center gap-8">
               <label htmlFor="#is_repair_done" className="text-[12px]">
                 Yes
               </label>
-              <Input type="radio" name="is_repair_done" className="w-4" />
+              <Input
+                type="radio"
+                name="is_repair_done"
+                className="w-[14px] h-[14px]"
+              />
               <label htmlFor="#isFir" className="text-[12px]">
                 No
               </label>
-              <Input type="radio" name="is_repair_done" className="w-4" />
+              <Input
+                type="radio"
+                name="is_repair_done"
+                className="w-[14px] h-[14px]"
+              />
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <label className="text-[12px]">Damage To The Bus</label>
-            <Input type="text" />
+            <Input
+              type="text"
+              className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+            />
           </div>
         </div>
       </div>
@@ -69,23 +82,32 @@ const BasicAndWorkShop = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Work Shop/ Depot Name</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Date Of Entry(DD-MM-YYYY)</label>
-          <Input type="date" />
+          <Input
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+            type="date"
+          />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Date Of Work Start</label>
-          <Input type="date" />
+          <Input
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+            type="date"
+          />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Date Of Released (DD-MM-YYYY)</label>
-          <Input type="date" />
+          <Input
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+            type="date"
+          />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">No Of Days At W/S / Depot</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
       </div>
     </div>
@@ -102,11 +124,11 @@ const InsuranceAndCost = () => {
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Insurance Surveyor Name</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Insurance Surveyor Phone No.</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
       </div>
       <div className="overflow-y-auto p-3 bg-white border rounded-sm flex flex-col gap-3">
@@ -115,19 +137,19 @@ const InsuranceAndCost = () => {
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Spare Part Cost</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Labour Cost </label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Total Bill Amount</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Cost Of Damage</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
       </div>
     </div>
@@ -144,28 +166,36 @@ const AdditionalInfo = () => {
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">COD Recovered</label>
-          <div className="flex items-center justify-evenly w-fit gap-5">
+          <div className="flex items-center gap-8">
             <label htmlFor="#is_cod_recovered" className="text-[12px]">
               Yes
             </label>
-            <Input type="radio" name="is_cod_recovered" className="w-4" />
+            <Input
+              type="radio"
+              name="is_cod_recovered"
+              className="w-[14px] h-[14px]"
+            />
             <label htmlFor="#isFir" className="text-[12px]">
               No
             </label>
-            <Input type="radio" name="is_cod_recovered" className="w-4" />
+            <Input
+              type="radio"
+              name="is_cod_recovered"
+              className="w-[14px] h-[14px]"
+            />
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Towed</label>
-          <div className="flex items-center justify-evenly w-fit gap-5">
+          <div className="flex items-center gap-8">
             <label htmlFor="#is_towed" className="text-[12px]">
               Yes
             </label>
-            <Input type="radio" name="is_towed" className="w-4" />
+            <Input type="radio" name="is_towed" className="w-[14px] h-[14px]" />
             <label htmlFor="#isFir" className="text-[12px]">
               No
             </label>
-            <Input type="radio" name="is_towed" className="w-4" />
+            <Input type="radio" name="is_towed" className="w-[14px] h-[14px]" />
           </div>
         </div>
       </div>
@@ -201,7 +231,7 @@ const AdditionalInfo = () => {
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Additional Notes</label>
-          <Input />
+          <Input className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">Priority Level</label>
@@ -245,11 +275,18 @@ const AccedentWorkshop = () => {
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [isReferenceModalSearchOpen, setIsReferenceModalSearch] =
     useState<boolean>(false);
+  const [progressStatus, setProgressStatus] = useState(0);
 
   //modal close handler
   const handleSearchModalClose = () => setIsReferenceModalSearch(false);
   const handleSearchSelect = (selectedData: any) =>
     setSelectedAccedentData(selectedData);
+
+  // progressbar
+  useEffect(() => {
+    const progressValuePerTab = 100 / tabs.length;
+    setProgressStatus(progressValuePerTab * (selectedTab + 1));
+  }, [selectedTab]);
 
   return (
     <React.Fragment>
@@ -272,18 +309,24 @@ const AccedentWorkshop = () => {
           </button>
         </div>
         {/* main */}
-        <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500 bg-white">
-          {tabs.map((tab, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedtab(index)}
-              className={`h-[7vh] cursor-pointer ${
-                selectedTab === index && "border-b-2 border-b-sidebar"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="flex flex-col bg-white">
+          <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500">
+            {tabs.map((tab, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedtab(index)}
+                className={`h-[7vh] cursor-pointer ${
+                  selectedTab === index && "border-b-2 border-b-sidebar"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <div
+            className={`h-[1px] bg-sidebar`}
+            style={{ width: `${progressStatus}%` }}
+          ></div>
         </div>
         {tabList[selectedTab]}
 

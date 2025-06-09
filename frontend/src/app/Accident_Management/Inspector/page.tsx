@@ -6,9 +6,9 @@ import ReferenceNumberSearchModal from "@/components/accident_management/search_
 import { Input } from "@/components/ui/input";
 import { Autocomplete, TextField } from "@mui/material";
 import { User2, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const tabs = ["Inspector Report", "Insurrence"];
+const tabs = ["Inspector Report", "Insurance"];
 
 const AccedentInspectorForm = () => {
   const [selectedAccedentData, setSelectedAccedentData] = useState<{
@@ -20,11 +20,18 @@ const AccedentInspectorForm = () => {
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [isReferenceModalSearchOpen, setIsReferenceModalSearch] =
     useState<boolean>(false);
+  const [progressStatus, setProgressStatus] = useState(50);
 
   //modal close handler
   const handleSearchModalClose = () => setIsReferenceModalSearch(false);
   const handleSearchSelect = (selectedData: any) =>
     setSelectedAccedentData(selectedData);
+
+  // progressbar
+  useEffect(() => {
+    const progressValuePerTab = 100 / tabs.length;
+    setProgressStatus(progressValuePerTab * (selectedTab + 1));
+  }, [selectedTab]);
 
   return (
     <React.Fragment>
@@ -47,17 +54,24 @@ const AccedentInspectorForm = () => {
           </button>
         </div>
         {/* main */}
-        <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500 bg-white">
-          {tabs.map((tab, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedtab(index)}
-              className={`h-[7vh] cursor-pointer ${selectedTab === index && "border-b-2 border-b-sidebar"
+        <div className="flex flex-col bg-white">
+          <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500 ">
+            {tabs.map((tab, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedtab(index)}
+                className={`h-[7vh] cursor-pointer ${
+                  selectedTab === index && "border-b-2 border-b-sidebar"
                 }`}
-            >
-              {tab}
-            </button>
-          ))}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <div
+            className={`h-[1px] bg-sidebar`}
+            style={{ width: `${progressStatus}%` }}
+          ></div>
         </div>
         <div className="relative grid grid-cols-2 gap-3 overflow-auto h-full mx-3 rounded-m">
           <div className="p-3 overflow-y-auto bg-white border rounded-sm flex flex-col gap-3">
@@ -65,7 +79,9 @@ const AccedentInspectorForm = () => {
               <h6 className="text-sm font-semibold">Basic information</h6>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Date Of Accident</label>
+              <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">
+                Date Of Accident
+              </label>
               <Input
                 placeholder="Date"
                 value={
@@ -76,7 +92,9 @@ const AccedentInspectorForm = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Bus No</label>
+              <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">
+                Bus No
+              </label>
               <Input
                 value={selectedAccedentData ? selectedAccedentData.bus_no : ""}
                 onChange={() => console.log("clicked")}
