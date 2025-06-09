@@ -55,21 +55,20 @@ const AccedentInspectorForm = () => {
         </div>
         {/* main */}
         <div className="flex flex-col bg-white">
-          <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500 ">
+          <div className="flex  gap-3  border-b font-semibold text-slate-500 ">
             {tabs.map((tab, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedtab(index)}
-                className={`h-[7vh] cursor-pointer ${
-                  selectedTab === index && "border-b-2 border-b-sidebar"
-                }`}
+                className={`flex items-center px-4 py-2.5 text-[12px] font-medium cursor-pointer ${selectedTab === index && "border-b-2 border-b-sidebar"
+                  }`}
               >
                 {tab}
               </button>
             ))}
           </div>
           <div
-            className={`h-[1px] bg-sidebar`}
+            className={`h-[2px] bg-sidebar`}
             style={{ width: `${progressStatus}%` }}
           ></div>
         </div>
@@ -111,24 +110,24 @@ const AccedentInspectorForm = () => {
           <div className="flex gap-3">
             <button
               disabled={selectedTab === 0}
-              className="bg-green-600 font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+              className="bg-green-600 font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
               onClick={() => setSelectedtab((prevValue) => prevValue - 1)}
             >
               Previous
             </button>
             <button
               disabled={selectedTab === tabs.length - 1}
-              className="bg-sidebar font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+              className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
               onClick={() => setSelectedtab((prevValue) => prevValue + 1)}
             >
               Next
             </button>
           </div>
           <div className="flex gap-3">
-            <button className="border font-semibold px-5 py-1 rounded-xs">
+            <button className="border font-[500]  px-5 py-1 rounded-xs">
               Cancel
             </button>
-            <button className="border font-semibold px-5 py-1 rounded-xs">
+            <button className="border font-[500]  px-5 py-1 rounded-xs">
               Save Draft
             </button>
           </div>

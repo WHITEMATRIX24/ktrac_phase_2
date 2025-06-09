@@ -293,11 +293,11 @@ const AccedentWorkshop = () => {
       <div className="flex flex-col h-[88vh] pt-1 text-[12px] gap-3">
         <div className="flex items-center gap-3 px-3">
           <h6>
-            Accedent Reference Number <span className="text-red-600">*</span>
+            Accident Reference Number <span className="text-red-600">*</span>
           </h6>
           <input
             type="text"
-            placeholder="Search and select accednt reference"
+            placeholder="Search and select accident reference"
             readOnly
             className="w-[79%] border px-3 py-1 rounded-xs bg-white"
           />
@@ -310,21 +310,20 @@ const AccedentWorkshop = () => {
         </div>
         {/* main */}
         <div className="flex flex-col bg-white">
-          <div className="flex py-1 gap-3 px-3 border-b font-semibold text-slate-500">
+          <div className="flex gap-3 border-b font-semibold text-slate-500">
             {tabs.map((tab, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedtab(index)}
-                className={`h-[7vh] cursor-pointer ${
-                  selectedTab === index && "border-b-2 border-b-sidebar"
-                }`}
+                className={`flex items-center px-4 py-2.5 text-[12px] font-medium cursor-pointer ${selectedTab === index && "border-b-2 border-b-sidebar"
+                  }`}
               >
                 {tab}
               </button>
             ))}
           </div>
           <div
-            className={`h-[1px] bg-sidebar`}
+            className={`h-[2px] bg-sidebar`}
             style={{ width: `${progressStatus}%` }}
           ></div>
         </div>
@@ -335,24 +334,24 @@ const AccedentWorkshop = () => {
           <div className="flex gap-3">
             <button
               disabled={selectedTab === 0}
-              className="bg-green-600 font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+              className="bg-green-600 font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
               onClick={() => setSelectedtab((prevValue) => prevValue - 1)}
             >
               Previous
             </button>
             <button
               disabled={selectedTab === tabs.length - 1}
-              className="bg-sidebar font-semibold text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+              className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
               onClick={() => setSelectedtab((prevValue) => prevValue + 1)}
             >
               Next
             </button>
           </div>
           <div className="flex gap-3">
-            <button className="border font-semibold px-5 py-1 rounded-xs">
+            <button className="border font-[500] px-5 py-1 rounded-xs">
               Cancel
             </button>
-            <button className="border font-semibold px-5 py-1 rounded-xs">
+            <button className="border font-[500] px-5 py-1 rounded-xs">
               Save Draft
             </button>
           </div>
