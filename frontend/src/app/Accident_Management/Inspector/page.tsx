@@ -31,11 +31,11 @@ const AccedentInspectorForm = () => {
       <div className="flex flex-col h-[88vh] pt-1 text-[12px] gap-3">
         <div className="flex items-center gap-3 px-3">
           <h6>
-            Accedent Reference Number <span className="text-red-600">*</span>
+            Accident Reference Number <span className="text-red-600">*</span>
           </h6>
           <input
             type="text"
-            placeholder="Search and select accednt reference"
+            placeholder="Search and select accident reference"
             readOnly
             className="w-[79%] border px-3 py-1 rounded-xs bg-white"
           />
@@ -52,9 +52,8 @@ const AccedentInspectorForm = () => {
             <button
               key={index}
               onClick={() => setSelectedtab(index)}
-              className={`h-[7vh] cursor-pointer ${
-                selectedTab === index && "border-b-2 border-b-sidebar"
-              }`}
+              className={`h-[7vh] cursor-pointer ${selectedTab === index && "border-b-2 border-b-sidebar"
+                }`}
             >
               {tab}
             </button>
@@ -66,20 +65,22 @@ const AccedentInspectorForm = () => {
               <h6 className="text-sm font-semibold">Basic information</h6>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[12px]">Date Of Accident</label>
+              <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Date Of Accident</label>
               <Input
                 placeholder="Date"
                 value={
                   selectedAccedentData ? selectedAccedentData.accedent_date : ""
                 }
                 onChange={() => console.log("clicked")}
+                className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[12px]">Bus No</label>
+              <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Bus No</label>
               <Input
                 value={selectedAccedentData ? selectedAccedentData.bus_no : ""}
                 onChange={() => console.log("clicked")}
+                className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
               />
             </div>
           </div>
