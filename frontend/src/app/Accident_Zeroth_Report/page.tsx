@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, ChangeEvent, DragEvent, FormEvent } from 'react';
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import AddNewAccidentModal from '@/components/accident_management/add_new_accident';
+import AddZerothReportModal from '@/components/accident_management/zerothreport_modal';
 
 type MediaFile = {
     id: string;
@@ -10,13 +10,15 @@ type MediaFile = {
     type: 'image' | 'video';
     file: File;
 };
-
 interface Vehicle {
     id: number;
     BUSNO: string;
     accidentDate: string;
     timeOfAccident: string;
+    driver: Driver;
+    conductor: Conductor;
 }
+
 
 interface Driver {
     id: number;
@@ -39,6 +41,8 @@ const ZerothReport = () => {
     const [locationPermission, setLocationPermission] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+    const [selectedConductor, setSelectedConductor] = useState<Conductor | null>(null);
 
     const [locationData, setLocationData] = useState({
         address: '',
@@ -52,7 +56,7 @@ const ZerothReport = () => {
 
     const [formData, setFormData] = useState({
         timeOfAccident: '',
-        dateOfAccident: '',
+        dateOfAccident: new Date().toISOString().split("T")[0],
         homeDepot: 'Main Depot',
         operatedDepot: 'City Center Depot',
         scheduleNumber: '',
@@ -72,25 +76,6 @@ const ZerothReport = () => {
         { label: "Accident & Crew" },
         { label: "Documentation" }
     ];
-
-    const dummyDrivers: Driver[] = [
-        { id: 1, gNumber: "G12345", name: "Raj Kumar", phone: "9876543210" },
-        { id: 2, gNumber: "G23456", name: "Vijay Singh", phone: "9876543211" },
-        { id: 3, gNumber: "G34567", name: "Manoj Patel", phone: "9876543212" },
-    ];
-
-    const dummyConductors: Conductor[] = [
-        { id: 1, gNumber: "C12345", name: "Suresh Kumar", phone: "9876543220" },
-        { id: 2, gNumber: "C23456", name: "Ramesh Singh", phone: "9876543221" },
-        { id: 3, gNumber: "C34567", name: "Kumar Patel", phone: "9876543222" },
-    ];
-
-    const [driverSearchTerm, setDriverSearchTerm] = useState('');
-    const [conductorSearchTerm, setConductorSearchTerm] = useState('');
-    const [showDriverDropdown, setShowDriverDropdown] = useState(false);
-    const [showConductorDropdown, setShowConductorDropdown] = useState(false);
-    const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>(dummyDrivers);
-    const [filteredConductors, setFilteredConductors] = useState<Conductor[]>(dummyConductors);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -135,11 +120,13 @@ const ZerothReport = () => {
 
     const handleVehicleSelect = (vehicle: Vehicle) => {
         setSelectedVehicle(vehicle);
+        setSelectedDriver(vehicle.driver);
+        setSelectedConductor(vehicle.conductor);
         setIsVehicleModalSearch(false);
+
     };
-    const handleVehicleModalClose = () => {
-        setIsVehicleModalSearch(false);
-    }
+
+
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -183,50 +170,6 @@ const ZerothReport = () => {
         setMediaFiles(prev => [...prev, ...newFiles]);
     };
 
-    const handleDriverSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        const term = e.target.value;
-        setDriverSearchTerm(term);
-        setFilteredDrivers(
-            dummyDrivers.filter(driver =>
-                driver.gNumber.toLowerCase().includes(term.toLowerCase()) ||
-                driver.name.toLowerCase().includes(term.toLowerCase())
-            )
-        );
-        setShowDriverDropdown(term.length > 0);
-    };
-
-    const handleDriverSelect = (driver: Driver) => {
-        setFormData(prev => ({
-            ...prev,
-            driverName: driver.name,
-            driverPhone: driver.phone,
-        }));
-        setDriverSearchTerm('');
-        setShowDriverDropdown(false);
-    };
-
-    const handleConductorSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        const term = e.target.value;
-        setConductorSearchTerm(term);
-        setFilteredConductors(
-            dummyConductors.filter(conductor =>
-                conductor.gNumber.toLowerCase().includes(term.toLowerCase()) ||
-                conductor.name.toLowerCase().includes(term.toLowerCase())
-            )
-        );
-        setShowConductorDropdown(term.length > 0);
-    };
-
-    const handleConductorSelect = (conductor: Conductor) => {
-        setFormData(prev => ({
-            ...prev,
-            conductorName: conductor.name,
-            conductorPhone: conductor.phone,
-        }));
-        setConductorSearchTerm('');
-        setShowConductorDropdown(false);
-    };
-
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         console.log('Form submitted:', { ...formData, ...locationData, mediaFiles });
@@ -242,8 +185,8 @@ const ZerothReport = () => {
         setFormData({
             timeOfAccident: '',
             dateOfAccident: '',
-            homeDepot: 'Main Depot',
-            operatedDepot: 'City Center Depot',
+            homeDepot: 'KKD',
+            operatedDepot: 'KKD',
             scheduleNumber: '',
             description: '',
             driverName: '',
@@ -297,8 +240,8 @@ const ZerothReport = () => {
 
             {/* Vehicle Selection Modal */}
             {isVehicleModalSearch && (
-                <AddNewAccidentModal
-                    closeHandler={handleVehicleModalClose}
+                <AddZerothReportModal
+                    closeHandler={() => setIsVehicleModalSearch(false)}
                     caseSelectHandler={handleVehicleSelect}
                 />
             )}
@@ -437,28 +380,29 @@ const ZerothReport = () => {
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 <div>
-                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Time of Accident</label>
-                                                    <input
-                                                        type="time"
-                                                        name="timeOfAccident"
-                                                        value={selectedVehicle.timeOfAccident}
-                                                        readOnly
-                                                        className="w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded text-xs"
-                                                    />
-                                                </div>
-                                                <div>
                                                     <label className="text-[12px] font-[600] text-gray-700 mb-1">Date of Accident</label>
                                                     <input
                                                         type="date"
                                                         name="dateOfAccident"
-                                                        value={selectedVehicle.accidentDate}
-                                                        readOnly
-                                                        className="w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded text-xs"
+                                                        value={formData.dateOfAccident}
+                                                        onChange={handleChange}
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
                                                     />
                                                 </div>
+                                                <div>
+                                                    <label className="text-[12px] font-[600] text-gray-700 mb-1">Time of Accident</label>
+                                                    <input
+                                                        type="time"
+                                                        name="timeOfAccident"
+                                                        value={formData.timeOfAccident}
+                                                        onChange={handleChange}
+                                                        className="w-full py-2 px-3 border border-gray-300  rounded text-xs"
+                                                    />
+                                                </div>
+
                                             </div>
 
-                                            <div>
+                                            {/* <div>
                                                 <label className="text-[12px] font-[600] text-gray-700 mb-1">Home Depot</label>
                                                 <input
                                                     name="homeDepot"
@@ -467,7 +411,7 @@ const ZerothReport = () => {
                                                     className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
                                                     readOnly
                                                 />
-                                            </div>
+                                            </div> */}
 
                                             <div>
                                                 <label className="text-[12px] font-[600] text-gray-700 mb-1">Operated Depot</label>
@@ -475,8 +419,8 @@ const ZerothReport = () => {
                                                     name="operatedDepot"
                                                     value={formData.operatedDepot}
                                                     onChange={handleChange}
-                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-50"
-                                                    readOnly
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+
                                                 />
                                             </div>
 
@@ -509,41 +453,16 @@ const ZerothReport = () => {
                                         <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Crew Information</h3>
 
                                         <div className="space-y-4">
-                                            <div>
-                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Driver G Number</label>
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Enter G Number"
-                                                        value={driverSearchTerm}
-                                                        onChange={handleDriverSearch}
-                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
-                                                    />
-                                                    {showDriverDropdown && filteredDrivers.length > 0 && (
-                                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                                                            {filteredDrivers.map((driver) => (
-                                                                <div
-                                                                    key={driver.id}
-                                                                    className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer"
-                                                                    onClick={() => handleDriverSelect(driver)}
-                                                                >
-                                                                    {driver.gNumber} - {driver.name}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 <div>
                                                     <label className="text-[12px] font-[600] text-gray-700 mb-1">Driver Name</label>
                                                     <input
                                                         name="driverName"
-                                                        value={formData.driverName}
-                                                        onChange={handleChange}
-                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
-                                                        required
+                                                        value={selectedDriver?.name || ''}
+                                                        readOnly
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
                                                     />
                                                 </div>
 
@@ -552,48 +471,23 @@ const ZerothReport = () => {
                                                     <input
                                                         type="tel"
                                                         name="driverPhone"
-                                                        value={formData.driverPhone}
-                                                        onChange={handleChange}
-                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
-                                                        required
+                                                        value={selectedDriver?.phone || ''}
+                                                        readOnly
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
                                                     />
                                                 </div>
                                             </div>
 
-                                            <div>
-                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor G Number</label>
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Enter G Number"
-                                                        value={conductorSearchTerm}
-                                                        onChange={handleConductorSearch}
-                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
-                                                    />
-                                                    {showConductorDropdown && filteredConductors.length > 0 && (
-                                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                                                            {filteredConductors.map((conductor) => (
-                                                                <div
-                                                                    key={conductor.id}
-                                                                    className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer"
-                                                                    onClick={() => handleConductorSelect(conductor)}
-                                                                >
-                                                                    {conductor.gNumber} - {conductor.name}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 <div>
                                                     <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor Name</label>
                                                     <input
                                                         name="conductorName"
-                                                        value={formData.conductorName}
-                                                        onChange={handleChange}
-                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                        value={selectedConductor?.name || ''}
+                                                        readOnly
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
                                                     />
                                                 </div>
 
@@ -602,9 +496,9 @@ const ZerothReport = () => {
                                                     <input
                                                         type="tel"
                                                         name="conductorPhone"
-                                                        value={formData.conductorPhone}
-                                                        onChange={handleChange}
-                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                        value={selectedConductor?.phone || ''}
+                                                        readOnly
+                                                        className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
                                                     />
                                                 </div>
                                             </div>
