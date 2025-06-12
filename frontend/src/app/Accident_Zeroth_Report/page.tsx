@@ -225,6 +225,7 @@ const ZerothReport = () => {
                         type="text"
                         value={selectedVehicle ? selectedVehicle.BUSNO : ""}
                         placeholder="Search and select bus number"
+                        onClick={() => setIsVehicleModalSearch(true)}
                         readOnly
                         className="w-[70%] md:w-[83%] py-1 px-2.5 text-xs bg-white border border-gray-300 rounded-[3px]"
                     />
