@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, ChangeEvent, DragEvent, FormEvent } from 'react';
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import AddZerothReportModal from '@/components/accident_management/zerothreport_modal';
+import { useRouter } from 'next/navigation';
 
 type MediaFile = {
     id: string;
@@ -175,10 +176,14 @@ const ZerothReport = () => {
         console.log('Form submitted:', { ...formData, ...locationData, mediaFiles });
         alert('Zeroth Report submitted successfully!');
     };
-
+    const router = useRouter()
     const handleLogout = () => {
-        alert('Logout successful!');
-    };
+        // Clear any auth tokens or user state here
+        localStorage.clear() // or remove specific keys like localStorage.removeItem("token")
+
+
+        router.push("/") // Adjust path as needed
+    }
 
     const handleCancel = () => {
         setSelectedVehicle(null);
