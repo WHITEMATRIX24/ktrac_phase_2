@@ -44,7 +44,7 @@ const AddZerothReportModal = ({
             const response = await fetch("https://5xrhx7t63zdswfhc2ztypyyo440spcxl.lambda-url.ap-south-1.on.aws/", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json", // must match what backend allows
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     bonet_no: bonnetNo,
