@@ -7,6 +7,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 import dynamic from 'next/dynamic';
 import ReferenceNumberSearchModal from '@/components/accident_management/search_referencenumber_modal';
 import AddNewAccidentModal from '@/components/accident_management/add_new_accident';
+import AddZerothReportModal from '@/components/accident_management/zerothreport_modal';
+import AccidentReportForm from '@/components/accident_management/zerothReportForm';
 
 const MapComponent = dynamic(
     () => import('@/components/MapComponent'),
@@ -18,17 +20,14 @@ const MapComponent = dynamic(
 
 
 interface Vehicle {
-    BUSNO: string;
-    NAME: string;
-    REGNO: string;
-    BODYTYPE: string;
-    SCHEDULE: string;
-    CLASS: string;
-    DEPOT: string;
-    AGE: number;
-    ZONE: string;
+    id: number;
+    busNumber: string;
     accidentDate: string;
     timeOfAccident: string;
+    driver: Driver;
+    conductor: Conductor;
+    schedule: string;
+    depot: string;
 }
 
 interface AccidentReference {
@@ -139,6 +138,7 @@ interface Conductor {
 
 const PrimaryAccidentReport: React.FC = () => {
     const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null);
+    const [zeroSelectedVehicle, setZeroSelectedVehicle] = React.useState<Vehicle | null>(null);
     const [activeTab, setActiveTab] = React.useState(0);
     const [attachments, setAttachments] = React.useState<File[]>([]);
     const [showSuccessPopup, setShowSuccessPopup] = React.useState(false);
@@ -264,7 +264,7 @@ const PrimaryAccidentReport: React.FC = () => {
             description: selectedData.description,
             photos: selectedData.photos || [],
         };
-
+        setZeroSelectedVehicle(null);
         // Update state with selected data
         setSelectedReference(mappedData);
         setFormData(prev => ({
@@ -302,7 +302,9 @@ const PrimaryAccidentReport: React.FC = () => {
         }));
     };
     const handleVehicleSelect = (value: any) => {
-        setSelectedVehicle(value);
+        setSelectedVehicle(null)
+        setSelectedReference(null);
+        setZeroSelectedVehicle(value);
         if (value) {
             setFormData(prev => ({
                 ...prev,
@@ -1213,17 +1215,11 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
 
                                                 {/* LEFT: Basic Details */}
-                                                <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
+                                                <div className='bg-white border-1 border-grey-600 rounded-[4px] min-h-[65vh] p-[16px] overflow-auto'>
                                                     <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">Basic Details</h3>
                                                     <div className="space-y-4">
 
                                                         {/* Date */}
-                                                        <div>
-                                                            <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Date of Accident</label>
-                                                            <input type="date" name="dateOfAccident" value={formData.dateOfAccident} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
-                                                        </div>
-
-
                                                         <div>
                                                             <label className="text-[12px] font-[600] text-[#374151] mb-[6px]" >Severity</label>
                                                             <select
@@ -1977,7 +1973,14 @@ const PrimaryAccidentReport: React.FC = () => {
 
                             </form>
                         )}
+                        {zeroSelectedVehicle && (
+                            <AccidentReportForm
+                                selectedVehicle={zeroSelectedVehicle}
+
+                            />
+                        )}
                     </div>
+
                 </div>
             </div>
             {isReferenceModalSearchOpen && (
@@ -1987,7 +1990,7 @@ const PrimaryAccidentReport: React.FC = () => {
                 />
             )}
             {isVehicleSearchOpen && (
-                <AddNewAccidentModal
+                <AddZerothReportModal
                     closeHandler={handleVehicleModalClose}
                     caseSelectHandler={handleVehicleSelect}
                 />

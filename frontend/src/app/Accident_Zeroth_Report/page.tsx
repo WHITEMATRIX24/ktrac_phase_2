@@ -13,11 +13,13 @@ type MediaFile = {
 };
 interface Vehicle {
     id: number;
-    BUSNO: string;
+    busNumber: string;
     accidentDate: string;
     timeOfAccident: string;
     driver: Driver;
     conductor: Conductor;
+    schedule: string;
+    depot: string;
 }
 
 
@@ -44,6 +46,11 @@ const ZerothReport = () => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
     const [selectedConductor, setSelectedConductor] = useState<Conductor | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [accidentId, setAccidentId] = useState<string | null>(null);
+    const [isSubmittingDocumentation, setIsSubmittingDocumentation] = useState(false);
+
 
     const [locationData, setLocationData] = useState({
         address: '',
@@ -58,16 +65,14 @@ const ZerothReport = () => {
     const [formData, setFormData] = useState({
         timeOfAccident: '',
         dateOfAccident: new Date().toISOString().split("T")[0],
-        homeDepot: 'Main Depot',
-        operatedDepot: 'City Center Depot',
+        homeDepot: '',
+        operatedDepot: '',
         scheduleNumber: '',
         description: '',
         driverName: '',
         driverPhone: '',
         conductorName: '',
         conductorPhone: '',
-        severity: '',
-        vehicleTowed: '',
     });
 
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -124,6 +129,15 @@ const ZerothReport = () => {
         setSelectedDriver(vehicle.driver);
         setSelectedConductor(vehicle.conductor);
         setIsVehicleModalSearch(false);
+        setFormData((prev) => ({
+            ...prev,
+            operatedDepot: vehicle.depot || "",
+            scheduleNumber: vehicle.schedule || "",
+            driverName: vehicle.driver.name,
+            driverPhone: vehicle.driver.phone,
+            conductorName: vehicle.conductor.name,
+            conductorPhone: vehicle.conductor.phone,
+        }));
 
     };
 
@@ -170,11 +184,123 @@ const ZerothReport = () => {
         }));
         setMediaFiles(prev => [...prev, ...newFiles]);
     };
-
-    const handleSubmit = (e: FormEvent) => {
+    const formatDateToISO = (dateString: string) => {
+        const [day, month, year] = dateString.split('-'); // if input is DD-MM-YYYY
+        return `${year}-${month}-${day}`;
+    };
+    const handleSubmitAccidentDetails = async (e: FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', { ...formData, ...locationData, mediaFiles });
-        alert('Zeroth Report submitted successfully!');
+        setIsSubmitting(true);
+        setSubmitError(null);
+
+        try {
+            // Prepare data for API
+            const payload = {
+                vehicle_info: [
+                    { bonet_no: selectedVehicle?.busNumber || '' }
+                ],
+                location_info: [
+                    {
+                        address: locationData.address,
+                        place: locationData.place,
+                        district: locationData.district,
+                        state: locationData.state
+                    }
+                ],
+                Geolocation: [
+                    {
+                        latitude: locationData.latitude,
+                        longitude: locationData.longitude,
+                        nearest_police_station: locationData.policeStation
+                    }
+                ],
+                "Accident Details": [
+                    {
+                        date_of_accident: formatDateToISO(formData.dateOfAccident),
+                        time_of_accident: formData.timeOfAccident,
+                        operated_depot: formData.operatedDepot,
+                        schedule_number: formData.scheduleNumber,
+                        description: formData.description
+                    }
+                ],
+                crew_information: [
+                    {
+                        driver_name: selectedDriver?.name || '',
+                        driver_phn_no: selectedDriver?.phone || '',
+                        conductor_name: selectedConductor?.name || '',
+                        conductor_phn_no: selectedConductor?.phone || ''
+                    }
+                ]
+            };
+
+            // Call API
+            const response = await fetch('/api/submitZeroReportDetails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit accident details');
+            }
+
+            const result = await response.json();
+            setAccidentId(result.accident_id);
+
+            // Move to documentation tab
+            setActiveTab(2);
+
+            console.log('Accident details submitted successfully:', result);
+        } catch (error) {
+            console.error('Error submitting accident details:', error);
+            setSubmitError('Failed to submit accident details. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSubmitDocumentation = async (e: FormEvent) => {
+        e.preventDefault();
+        setIsSubmittingDocumentation(true);
+
+        if (!accidentId) {
+            alert("Accident ID is missing. Please submit accident details first.");
+            return;
+        }
+
+        if (mediaFiles.length === 0) {
+            alert("Please upload at least one photo");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('accidentId', accidentId);
+
+            mediaFiles.forEach((media, index) => {
+                formData.append(`media_${index}`, media.file);
+            });
+
+            const response = await fetch('/api/upload-media', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload media');
+            }
+
+            const result = await response.json();
+            alert('Documentation submitted successfully!');
+            // Optionally reset or redirect
+        } catch (error) {
+            console.error('Error submitting documentation:', error);
+            alert('Error submitting documentation. Please try again.');
+        } finally {
+            setIsSubmittingDocumentation(false);
+        }
     };
     const router = useRouter()
     const handleLogout = () => {
@@ -190,16 +316,14 @@ const ZerothReport = () => {
         setFormData({
             timeOfAccident: '',
             dateOfAccident: '',
-            homeDepot: 'KKD',
-            operatedDepot: 'KKD',
+            homeDepot: '',
+            operatedDepot: '',
             scheduleNumber: '',
             description: '',
             driverName: '',
             driverPhone: '',
             conductorName: '',
             conductorPhone: '',
-            severity: '',
-            vehicleTowed: '',
         });
         setMediaFiles([]);
     };
@@ -228,7 +352,7 @@ const ZerothReport = () => {
                     </h6>
                     <input
                         type="text"
-                        value={selectedVehicle ? selectedVehicle.BUSNO : ""}
+                        value={selectedVehicle ? selectedVehicle.busNumber : ""}
                         placeholder="Search and select bus number"
                         onClick={() => setIsVehicleModalSearch(true)}
                         readOnly
@@ -259,19 +383,26 @@ const ZerothReport = () => {
                         {/* Tabs */}
                         <div className='flex flex-col'>
                             <div className="flex border-b border-t border-gray-200 bg-white overflow-x-auto flex-shrink-0">
-                                {tabLabels.map((tab, index) => (
-                                    <button
-                                        key={index}
-                                        type="button"
-                                        className={`flex items-center px-4 py-2.5 text-[12px] font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
-                          ${activeTab === index
-                                                ? 'text-[var(--sidebar)] border-[var(--sidebar)] bg-white'
-                                                : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
-                                        onClick={() => setActiveTab(index)}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
+                                {tabLabels.map((tab, index) => {
+                                    const isDisabled = index === 2 && !accidentId;
+                                    return (
+                                        <button
+                                            key={index}
+                                            type="button"
+                                            disabled={isDisabled}
+                                            className={`flex items-center px-4 py-2.5 text-[12px] font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
+                                            ${activeTab === index
+                                                    ? 'text-[var(--sidebar)] border-[var(--sidebar)] bg-white'
+                                                    : isDisabled
+                                                        ? 'text-gray-400 cursor-not-allowed'
+                                                        : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
+                                            onClick={() => !isDisabled && setActiveTab(index)}
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    );
+                                })}
+
                             </div>
                             <div className="h-0.5 bg-gray-200 flex-shrink-0">
                                 <div
@@ -435,10 +566,11 @@ const ZerothReport = () => {
                                                 <input
                                                     name="scheduleNumber"
                                                     placeholder="Enter Schedule Number"
-                                                    value={formData.scheduleNumber}
+                                                    value={formData.scheduleNumber ?? ""}
                                                     onChange={handleChange}
                                                     className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
                                                 />
+
                                             </div>
 
                                             <div>
@@ -604,66 +736,85 @@ const ZerothReport = () => {
 
                     <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
                         <div className="flex justify-between items-center">
-
-                            {/* Left Buttons */}
                             <div className="flex gap-3">
                                 {activeTab > 0 && (
                                     <button
                                         type="button"
                                         onClick={() => setActiveTab(activeTab - 1)}
-                                        className="flex items-center justify-center px-5 py-1 text-[12px] font-medium bg-green-500 text-white rounded hover:bg-green-600 transition-all
-                     sm:px-5 sm:py-1 sm:text-base"
-                                        aria-label="Previous"
+                                        className="flex items-center justify-center px-5 py-1 text-[12px] font-medium bg-green-500 text-white rounded hover:bg-green-600 transition-all"
                                     >
-                                        <ChevronLeft className="w-4 h-4 sm:mr-2" />
-                                        <span className="hidden sm:inline text-[12px]">Previous</span>
+                                        <ChevronLeft className="w-4 h-4 mr-2" />
+                                        Previous
                                     </button>
                                 )}
-
-                                {activeTab < tabLabels.length - 1 &&
-                                    !(formData.severity === "Insignificant" && activeTab === 2) && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveTab(activeTab + 1)}
-                                            className="flex items-center justify-center px-5 py-1 text-sm font-medium bg-[var(--sidebar)] text-white rounded hover:bg-[#001670] transition-all
-                       sm:px-5 sm:py-1 sm:text-base"
-                                            aria-label="Next"
-                                        >
-                                            <span className="hidden sm:inline text-[12px]">Next</span>
-                                            <ChevronRight className="w-4 h-4 sm:ml-2 text-[12px]" />
-                                        </button>
-                                    )}
                             </div>
 
-                            {/* Right Buttons */}
                             <div className="flex gap-3">
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className="flex items-center justify-center px-5 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 transition-all
-                   sm:px-5 sm:py-1 sm:text-base"
-                                    aria-label="Cancel"
+                                    className="flex items-center justify-center px-5 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 transition-all"
                                 >
-                                    <X className="w-4 h-4 sm:mr-2" />
-                                    <span className="hidden sm:inline text-[12px]">Cancel</span>
+                                    <X className="w-4 h-4 mr-2" />
+                                    Cancel
                                 </button>
 
-                                <button
-                                    type="button"
-                                    onClick={handleSubmit}
-                                    className="flex items-center justify-center px-5 py-1 text-sm font-medium bg-[var(--sidebar)] text-white rounded hover:bg-[#001670] transition-all
-                   sm:px-5 sm:py-1 sm:text-base"
-                                    aria-label="Submit Report"
-                                >
-                                    <Check className="w-4 h-4 sm:mr-2" />
-                                    <span className="hidden sm:inline text-[12px]">Submit Report</span>
-                                </button>
+                                {activeTab === 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmitAccidentDetails}
+                                        disabled={isSubmitting}
+                                        className={`flex items-center justify-center px-5 py-1 text-sm font-medium text-white rounded transition-all
+                            ${isSubmitting
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-[var(--sidebar)] hover:bg-[#001670]'}`}
+                                    >
+                                        {isSubmitting ? (
+                                            <span className="flex items-center">
+                                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Submitting...
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <Check className="w-4 h-4 mr-2" />
+                                                Submit Details
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+
+                                {activeTab === 2 && (
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmitDocumentation}
+                                        disabled={isSubmittingDocumentation}
+                                        className={`flex items-center justify-center px-5 py-1 text-sm font-medium text-white rounded transition-all
+                            ${isSubmittingDocumentation
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-[var(--sidebar)] hover:bg-[#001670]'}`}
+                                    >
+                                        {isSubmittingDocumentation ? (
+                                            <span className="flex items-center">
+                                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Submitting...
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <Check className="w-4 h-4 mr-2" />
+                                                Submit Documentation
+                                            </>
+                                        )}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
             )}
         </div>
