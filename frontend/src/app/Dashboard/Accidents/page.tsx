@@ -3,7 +3,7 @@ import { AccidentLineChart } from "@/components/accident_dashboard_linechart";
 import { PieChartComponet } from "@/components/accident_dashboard_piechart";
 import { SectionCards } from "@/components/section-cards";
 import { Ambulance, File, FileCheck2, FileClock } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const dummyData = [
   {
@@ -55,11 +56,46 @@ const lineChartData = [
 ];
 
 const AccidentsDashboard = () => {
+  const [bonnetSearchNo, setBonnetSearchNo] = useState<string>("");
+  const [bonnetNumberList, setBonnetNumberList] = useState<string[]>([]);
+
+  // bonnet number search handler
+  const handleSearchBonnetnumber = (searchValue: string) => {
+    setBonnetSearchNo(searchValue);
+    if (searchValue === "") {
+      setBonnetNumberList([]);
+      return;
+    }
+
+    setBonnetNumberList(["RF1574", "RF1575"]);
+  };
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-3 md:gap-6 md:py-2">
           <div className="flex gap-2 justify-end pr-6">
+            <div className="relative">
+              <Input
+                onChange={(e) => handleSearchBonnetnumber(e.target.value)}
+                value={bonnetSearchNo}
+                placeholder="bonnet no"
+                className="bg-white h-8"
+              />
+              {bonnetNumberList.length > 0 && (
+                <div className="absolute border-2 rounded-sm top-10 w-48 h-52 bg-white z-10 flex flex-col px-3 py-3 gap-3">
+                  {bonnetNumberList.map((b, index) => (
+                    <p
+                      onClick={() => setBonnetSearchNo(b)}
+                      key={index}
+                      className="border-b-1"
+                    >
+                      {b}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
             <Select>
               <SelectTrigger
                 size="sm"
@@ -68,9 +104,9 @@ const AccidentsDashboard = () => {
                 <SelectValue placeholder="Select District" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="depo1">District 1</SelectItem>
-                <SelectItem value="depo2">District 2</SelectItem>
-                <SelectItem value="depo3">District 3</SelectItem>
+                <SelectItem value="depo1">Thiruvanathapuram</SelectItem>
+                <SelectItem value="depo2">Kottayam</SelectItem>
+                <SelectItem value="depo3">Pathanamthitta</SelectItem>
               </SelectContent>
             </Select>
             <Select>
@@ -81,9 +117,9 @@ const AccidentsDashboard = () => {
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="depo1">Category 1</SelectItem>
-                <SelectItem value="depo2">Category 2</SelectItem>
-                <SelectItem value="depo3">Category 3</SelectItem>
+                <SelectItem value="depo1">Super Fast</SelectItem>
+                <SelectItem value="depo2">Minnal</SelectItem>
+                <SelectItem value="depo3">Ac lowfloor</SelectItem>
               </SelectContent>
             </Select>
             <Select>
@@ -94,9 +130,9 @@ const AccidentsDashboard = () => {
                 <SelectValue placeholder="Select Fuel type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="depo1">Fuel 1</SelectItem>
-                <SelectItem value="depo2">Fuel 2</SelectItem>
-                <SelectItem value="depo3">Fuel 3</SelectItem>
+                <SelectItem value="depo1">Diseal</SelectItem>
+                <SelectItem value="depo2">Electric</SelectItem>
+                <SelectItem value="depo3">Cng</SelectItem>
               </SelectContent>
             </Select>
             <Button size={"sm"} className="bg-sidebar">

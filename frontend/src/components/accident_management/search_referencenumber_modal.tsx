@@ -1,7 +1,7 @@
+import { Divider } from "@mui/material";
 import React, { Dispatch, SetStateAction, useState } from "react";
 
 interface Props {
-  closeHandler: () => void;
   caseSelectHandler: (selectedData: any) => void;
 }
 
@@ -50,30 +50,61 @@ const dummyData = [
   },
 ];
 
-const ReferenceNumberSearchModal = ({
-  closeHandler,
-  caseSelectHandler,
-}: Props) => {
-  const [searchData, setSearchData] = useState(false);
+const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
+  const [searchData, setSearchData] = useState<{
+    date: string;
+    bonnet_no: string;
+    district: string;
+    operated_depo: string;
+  }>({
+    date: "",
+    bonnet_no: "",
+    district: "",
+    operated_depo: "",
+  });
   const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
+  const [accidentList, setAccidentList] = useState<{}[] | null>(null);
+
+  // search handler
+  const handleSearch = () => {
+    setAccidentList(dummyData);
+  };
 
   // handle case select
   const handlecaseSelect = (selectedData: any) => {
     caseSelectHandler(selectedData);
-    closeHandler();
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-dvh bg-black/30 flex justify-center items-center">
-      <div className="relative bg-white flex flex-col gap-5 w-[35rem] rounded-sm overflow-hidden">
-        <div className="flex gap-3 justify-between items-center bg-slate-50 px-3 py-2">
-          <h6>Search Accident Report</h6>
-          <button onClick={closeHandler}>x</button>
-        </div>
-        <div className="w-full grid grid-cols-3 gap-5 text-[12px] px-3 py-2">
+    <div className="w-full flex flex-col gap-8 my-5">
+      <div className="flex items-center gap-3 px-3">
+        <h6>
+          Accident Reference Number <span className="text-red-600">*</span>
+        </h6>
+        <input
+          type="text"
+          placeholder="Search and select accident reference"
+          readOnly
+          className="w-[79%] border px-3 py-1 rounded-xs bg-white"
+        />
+      </div>
+      <div className="flex justify-center items-center gap-3">
+        <Divider className="w-1/3" />
+        <p>OR</p>
+        <Divider className="w-1/3" />
+      </div>
+      <div className="relative bg-white flex flex-col gap-5 rounded-sm">
+        <div className="w-full grid grid-cols-4 gap-5 text-[12px] px-3 py-2">
           <div className="flex flex-col">
             <label>Date</label>
-            <input type="date" className="px-3 py-2 border rounded-sm" />
+            <input
+              onChange={(e) =>
+                setSearchData({ ...searchData, date: e.target.value })
+              }
+              type="date"
+              className="px-3 py-2 border rounded-sm"
+              value={searchData.date}
+            />
           </div>
           <div className="relative flex flex-col">
             <label>Bonnet No</label>
@@ -82,12 +113,22 @@ const ReferenceNumberSearchModal = ({
               placeholder="search bonnet number"
               className="px-3 py-2 border rounded-sm"
               onClick={() => setShowBonnetDropDown(true)}
+              value={searchData.bonnet_no}
+              onChange={(e) =>
+                setSearchData((prev) => ({
+                  ...prev,
+                  bonnet_no: e.target.value,
+                }))
+              }
             />
             {showBonnetDropDown && (
               <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
                 {dummyData.map((d) => (
                   <button
-                    onClick={() => handlecaseSelect(d)}
+                    onClick={() => {
+                      setSearchData({ ...searchData, bonnet_no: d.bus_no });
+                      setShowBonnetDropDown(false);
+                    }}
                     className="py-2 text-start"
                     key={d.bus_no}
                   >
@@ -99,43 +140,76 @@ const ReferenceNumberSearchModal = ({
           </div>
           <div className="flex flex-col">
             <label>District</label>
-            <select className="px-3 py-2 border rounded-sm">
-              <option value="">Kottayam</option>
-              <option value="">Thiruvanathapuram</option>
+            <select
+              onChange={(e) =>
+                setSearchData({ ...searchData, district: e.target.value })
+              }
+              className="px-3 py-2 border rounded-sm"
+              value={searchData.district}
+            >
+              <option value="kottayam">Kottayam</option>
+              <option value="thiruvanathapuram">Thiruvanathapuram</option>
             </select>
           </div>
-        </div>
-        <div className="bg-slate-50 max-h-52 mx-3 rounded-sm overflow-y-scroll text-[12px]">
-          {searchData &&
-            dummyData.map((data) => (
-              <div
-                onClick={() => handlecaseSelect(data)}
-                key={data.accedent_ref_no}
-                className="px-3 py-4 border-b-2"
-              >
-                <h6>
-                  ACC001 - <span>{data.bus_no}</span>
-                </h6>
-                <p className="text-gray-400">{`${data.accedent_date} | District`}</p>
-                <p className="text-gray-400">
-                  Accident at {data.accidentPlace}
-                </p>
-              </div>
-            ))}
+          <div className="relative flex flex-col">
+            <label>Operated Depo</label>
+            <input
+              type="text"
+              onChange={(e) =>
+                setSearchData({ ...searchData, operated_depo: e.target.value })
+              }
+              placeholder="operated depo"
+              className="px-3 py-2 border rounded-sm"
+              value={searchData.operated_depo}
+            />
+          </div>
         </div>
         <div className="flex items-center px-3 py-2 bg-slate-50">
           <div className="flex gap-3 ms-auto">
-            <button className="border px-3 py-1 rounded-sm bg-white">
+            <button
+              onClick={() => setAccidentList(null)}
+              className="border px-3 py-1 rounded-sm bg-white"
+            >
               clear
             </button>
             <button
-              onClick={() => setSearchData(true)}
+              onClick={handleSearch}
               className="border px-3 py-1 rounded-sm bg-sidebar text-white"
             >
               search
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-3 px-3 py-5">
+        {accidentList &&
+          accidentList.map((d: any) => (
+            <div
+              key={d.accedent_ref_no}
+              className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer"
+              onClick={handlecaseSelect}
+            >
+              <div className="flex justify-between">
+                <div>
+                  <label>Reference number:</label>
+                  <label>{d.accedent_ref_no}</label>
+                </div>
+                <label>{d.accedent_date}</label>
+              </div>
+              <div className="flex gap-3">
+                <p>
+                  bonnet Number: <span>{d.bus_no}</span>
+                </p>
+                <p>
+                  Accident Place: <span>{d.accidentPlace}</span>
+                </p>
+                <p>
+                  Operated Depo: <span>{d.operatedDepot}</span>
+                </p>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );
