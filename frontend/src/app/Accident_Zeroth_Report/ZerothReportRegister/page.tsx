@@ -91,13 +91,17 @@ const ZerothReportReg = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (validate()) {
-            const queryParams = new URLSearchParams({
-                bonnetNumber: formData.bonnetNumber,
-                operatedDepot: formData.operatedDepot,
-            });
-            router.push(`/Accident_Zeroth_Report/ZerothForm?${queryParams.toString()}`);
+            sessionStorage.setItem(
+                'accidentData',
+                JSON.stringify({
+                    bonnetNumber: formData.bonnetNumber,
+                    operatedDepot: formData.operatedDepot,
+                })
+            );
+            router.push('/Accident_Zeroth_Report/ZerothForm');
         }
     };
+
 
     const handleLogout = () => {
         localStorage.clear();

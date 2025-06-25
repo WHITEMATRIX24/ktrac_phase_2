@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, ChangeEvent, DragEvent, FormEvent } from 'react';
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type MediaFile = {
     id: string;
@@ -60,6 +60,7 @@ interface Depot {
 }
 
 const ZerothReport = () => {
+    const searchParams = useSearchParams();
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [activeTab, setActiveTab] = useState(0);
     const [locationPermission, setLocationPermission] = useState(false);
@@ -153,17 +154,24 @@ const ZerothReport = () => {
 
     // Initialize form with passed data
     useEffect(() => {
-        const data = sessionStorage.getItem('accidentData');
-        if (data) {
-            const { bonnetNumber, operatedDepot } = JSON.parse(data);
-            setFormData((prev) => ({
-                ...prev,
-                bonnetNumber,
-                operatedDepot,
-            }));
-        }
-    }, []);
+        const busDataString = searchParams.get('busData');
+        const operatedDepot = searchParams.get('operatedDepot');
 
+        // Handle bus data
+        if (busDataString) {
+            try {
+                const busData: Vehicle = JSON.parse(busDataString);
+
+                setFormData(prev => ({
+                    ...prev,
+                    operatedDepot: operatedDepot || busData.depot || "",
+                    scheduleNumber: busData.schedule || "",
+                }));
+            } catch (error) {
+                console.error("Invalid busData JSON:", error);
+            }
+        }
+    }, [searchParams]);
 
     // NEW: Filter police stations and depots when district changes
     useEffect(() => {
