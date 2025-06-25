@@ -61,7 +61,7 @@ export default function Home() {
       } else if (user.role == "Accident_Management") {
         router.replace("/Accident_Management/Accident_Report");
       } else if (user.role == "Accident_Report") {
-        router.replace("/Accident_Zeroth_Report");
+        router.replace("/Accident_Zeroth_Report/ZerothReportRegister");
       }
     } else {
       alert("Invalid username or password");

@@ -34,6 +34,11 @@ interface AccidentReference {
     id: string;
     refNo: string;
     busNo: string;
+    regNo: string;
+    ksrcOrKswift: string;
+    busClass: string;
+    operatedDepotZone: string;
+    ageOfBus: number;
     accidentPlace: string;
     accidentDate: string;
     policeStation: string;
@@ -65,76 +70,26 @@ interface Conductor {
     name: string;
     phone: string;
 }
+interface Bus {
+    id: number;
+    bonet_number: string;
+    registration_number: string;
+    class: string;
+    insurance_id: string;
+    rc_id: string;
+    pollution_certificate: string;
+    body_type: string;
+    age: number;
+    zone: string;
+    vehicle_no: string;
+    created_at: string;
+    created_by: string;
+    updated_at: string;
+    updated_by: string | null;
+    schedule_no: number;
+    operated_depot: string;
+}
 
-
-// const dummyAccidentReferences: AccidentReference[] = [
-//     {
-//         id: 'REF-2023-001',
-//         refNo: 'KKD/06/25/01',
-//         busNo: 'RPC200',
-//         accidentPlace: 'Main Road, Kochi',
-//         accidentDate: '2023-06-15',
-//         policeStation: 'Ernakulam South',
-//         timeOfAccident: '14:30',
-//         homeDepot: 'KKD',
-//         operatedDepot: 'KKD',
-//         scheduleNumber: '48',
-//         driverName: 'Rajesh Kumar',
-//         driverPhone: '9876543210',
-//         conductorName: 'Suresh Nair',
-//         conductorPhone: '9876543211',
-//         accidentState: 'Kerala',
-//         accidentDistrict: 'Ernakulam',
-//         description: 'Collision with private car',
-//         accidentLatitude: "9.9312",
-//         accidentLongitude: " 76.2673",
-//         photos: []
-//     },
-//     {
-//         id: 'REF-2023-002',
-//         refNo: 'KTM/07/25/05',
-//         busNo: 'RPC292',
-//         accidentPlace: 'MG Road, Trivandrum',
-//         accidentDate: '2023-07-22',
-//         policeStation: 'Thiruvananthapuram East',
-//         timeOfAccident: '10:15',
-//         homeDepot: 'KTM',
-//         operatedDepot: 'KTM',
-//         scheduleNumber: '52',
-//         driverName: 'Manoj Pillai',
-//         driverPhone: '9876543222',
-//         conductorName: 'Deepak Kumar',
-//         conductorPhone: '9876543223',
-//         accidentState: 'Kerala',
-//         accidentDistrict: 'Thiruvananthapuram',
-//         description: 'Rear-ended by truck',
-//         accidentLatitude: "8.5241",
-//         accidentLongitude: "76.9366",
-//         photos: []
-//     },
-//     {
-//         id: 'REF-2023-003',
-//         refNo: 'CGR/08/25/12',
-//         busNo: 'RPC202',
-//         accidentPlace: 'Central Junction, Kottayam',
-//         accidentDate: '2023-08-10',
-//         policeStation: 'Kottayam Town',
-//         timeOfAccident: '16:45',
-//         homeDepot: 'CGR',
-//         operatedDepot: 'CGR',
-//         scheduleNumber: '34',
-//         driverName: 'Anil Nair',
-//         driverPhone: '9876543333',
-//         conductorName: 'Vijay Mohan',
-//         conductorPhone: '9876543334',
-//         accidentState: 'Kerala',
-//         accidentDistrict: 'Kottayam',
-//         description: 'Side collision with auto rickshaw',
-//         accidentLatitude: "9.5916",
-//         accidentLongitude: "76.5222",
-//         photos: []
-//     }
-// ];
 
 const PrimaryAccidentReport: React.FC = () => {
     const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null);
@@ -240,67 +195,99 @@ const PrimaryAccidentReport: React.FC = () => {
     };
 
     const [formData, setFormData] = React.useState(initialFormState);
-    const handleSearchSelect = (selectedData: any) => {
-        // Map modal response to AccidentReference structure
-        const mappedData: AccidentReference = {
-            id: selectedData.accedent_ref_no,
-            refNo: selectedData.accedent_ref_no,
-            busNo: selectedData.bus_no,
-            accidentPlace: selectedData.accidentPlace,
-            accidentDate: selectedData.accedent_date,
-            policeStation: selectedData.policeStation,
-            timeOfAccident: selectedData.timeOfAccident,
-            homeDepot: selectedData.homeDepot,
-            operatedDepot: selectedData.operatedDepot,
-            scheduleNumber: selectedData.scheduleNumber,
-            driverName: selectedData.driverName,
-            driverPhone: selectedData.driverPhone,
-            conductorName: selectedData.conductorName,
-            conductorPhone: selectedData.conductorPhone,
-            accidentState: selectedData.accidentState,
-            accidentDistrict: selectedData.accidentDistrict,
-            accidentLatitude: selectedData.accidentLatitude,
-            accidentLongitude: selectedData.accidentLongitude,
-            description: selectedData.description,
-            photos: selectedData.photos || [],
-        };
-        setZeroSelectedVehicle(null);
-        // Update state with selected data
-        setSelectedReference(mappedData);
-        setFormData(prev => ({
-            ...prev,
-            accidentRefNo: mappedData.refNo,
-            bonnetNo: mappedData.busNo,
-            accidentPlace: mappedData.accidentPlace,
-            dateOfAccident: mappedData.accidentDate,
-            policeStation: mappedData.policeStation,
-            timeOfAccident: mappedData.timeOfAccident,
-            homeDepot: mappedData.homeDepot,
-            operatedDepot: mappedData.operatedDepot,
-            scheduleNumber: mappedData.scheduleNumber,
-            driverName: mappedData.driverName,
-            driverPhone: mappedData.driverPhone,
-            conductorName: mappedData.conductorName,
-            conductorPhone: mappedData.conductorPhone,
-            accidentState: mappedData.accidentState,
-            accidentDistrict: mappedData.accidentDistrict,
-            latitude: mappedData.accidentLatitude,
-            longitude: mappedData.accidentLongitude,
-            description: mappedData.description,
-            fatalitiesKsrtcCrew: 0,
-            fatalitiesPassengers: 0,
-            fatalitiesThirdParty: 0,
-            majorInjuriesKsrtcCrew: 0,
-            minorInjuriesKsrtcCrew: 0,
-            majorInjuriesPassengers: 0,
-            minorInjuriesPassengers: 0,
-            majorInjuriesThirdParty: 0,
-            minorInjuriesThirdParty: 0,
-            totalFatalities: 0,
-            totalMajorInjuries: 0,
-            totalMinorInjuries: 0,
-        }));
+    const handleSearchSelect = async () => {
+        try {
+            const response = await fetch(
+                'https://px02q616lk.execute-api.ap-south-1.amazonaws.com/DEV/get_by_accident_id?accident_id=RUR/06/25/0003'
+            );
+
+            if (!response.ok) {
+                throw new Error(`API error! status: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            const accidentData = responseData.data;
+            const bus = await fetchBusByBonnetNumber(accidentData.bonet_no);
+            if (!bus) {
+                console.error("No bus found with the given bonnet number:", accidentData.bonet_no);
+                return; // Exit early or show a fallback UI
+            }
+            const mappedData: AccidentReference = {
+                id: accidentData.accident_id,
+                refNo: accidentData.accident_id,
+                busNo: accidentData.bonet_no,
+                regNo: bus.registration_number,
+                accidentPlace: accidentData.place,
+                accidentDate: accidentData.date_of_accident,
+                policeStation: accidentData.nearest_police_station,
+                timeOfAccident: accidentData.time_of_accident,
+                ksrcOrKswift: bus.class,
+                busClass: bus.class,
+                operatedDepotZone: bus.zone,
+                ageOfBus: bus.age,
+                operatedDepot: accidentData.operated_depot,
+                homeDepot: accidentData.operated_depot,
+                scheduleNumber: accidentData.schedule_number,
+                driverName: accidentData.driver_name,
+                driverPhone: accidentData.driver_phn_no,
+                conductorName: accidentData.conductor_name,
+                conductorPhone: accidentData.conductor_phn_no,
+                accidentState: accidentData.state,
+                accidentDistrict: accidentData.district,
+                accidentLatitude: accidentData.latitude,
+                accidentLongitude: accidentData.longitude,
+                description: accidentData.description,
+                photos: accidentData.photos || [],
+            };
+            console.log("check time format", mappedData.timeOfAccident);
+            console.log("check time format", mappedData.accidentDate);
+            setZeroSelectedVehicle(null);
+            setSelectedReference(mappedData);
+
+            // Update form state
+            setFormData(prev => ({
+                ...prev,
+                accidentRefNo: mappedData.refNo,
+                bonnetNo: mappedData.busNo,
+                regNo: mappedData.regNo,
+                ksrcOrKswift: mappedData.ksrcOrKswift,
+                busClass: mappedData.busClass,
+                operatedDepotZone: mappedData.operatedDepotZone,
+                ageOfBus: mappedData.ageOfBus,
+                accidentPlace: mappedData.accidentPlace,
+                dateOfAccident: mappedData.accidentDate,
+                policeStation: mappedData.policeStation,
+                timeOfAccident: mappedData.timeOfAccident,
+                homeDepot: mappedData.homeDepot,
+                operatedDepot: mappedData.operatedDepot,
+                scheduleNumber: mappedData.scheduleNumber,
+                driverName: mappedData.driverName,
+                driverPhone: mappedData.driverPhone,
+                conductorName: mappedData.conductorName,
+                conductorPhone: mappedData.conductorPhone,
+                accidentState: mappedData.accidentState,
+                accidentDistrict: mappedData.accidentDistrict,
+                latitude: mappedData.accidentLatitude,
+                longitude: mappedData.accidentLongitude,
+                description: mappedData.description,
+                fatalitiesKsrtcCrew: 0,
+                fatalitiesPassengers: 0,
+                fatalitiesThirdParty: 0,
+                majorInjuriesKsrtcCrew: 0,
+                minorInjuriesKsrtcCrew: 0,
+                majorInjuriesPassengers: 0,
+                minorInjuriesPassengers: 0,
+                majorInjuriesThirdParty: 0,
+                minorInjuriesThirdParty: 0,
+                totalFatalities: 0,
+                totalMajorInjuries: 0,
+                totalMinorInjuries: 0,
+            }));
+        } catch (error) {
+            console.error('Error fetching zeroth report by ID:', error);
+        }
     };
+
     const handleVehicleSelect = (value: any) => {
         setSelectedVehicle(null)
         setSelectedReference(null);
@@ -385,30 +372,228 @@ const PrimaryAccidentReport: React.FC = () => {
         setActiveTab(0);
     };
 
-    const generateReferenceNumber = () => {
-        if (!formData.operatedDepot || !formData.dateOfAccident) {
-            return "ERROR: Missing depot or date";
+
+    const fetchBusByBonnetNumber = async (bonnetNumber: string): Promise<Bus | null> => {
+        try {
+            const response = await fetch('/api/getAllBusInfo');
+            if (!response.ok) throw new Error('Failed to fetch bus data');
+
+            const result: { data: Bus[] } = await response.json();
+
+            // Find bus with matching bonnet number
+            const bus = result.data.find((b: Bus) => b.bonet_number === bonnetNumber);
+
+            return bus || null;
+        } catch (error) {
+            console.error('Error fetching bus data:', error);
+            return null;
         }
-
-        const depot = formData.operatedDepot;
-        const date = new Date(formData.dateOfAccident);
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear().toString().slice(-2);
-        const nextSeq = 1;
-        const seqStr = nextSeq.toString().padStart(2, '0');
-
-        return `${depot}/${month}/${year}/${seqStr}`;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const refNo = generateReferenceNumber();
-        setGeneratedRefNo(refNo);
-        const updatedFormData = { ...formData, accidentRefNo: refNo };
-        setFormData(updatedFormData);
-        console.log('Form submitted:', updatedFormData);
-        setShowSuccessPopup(true);
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Stop page refresh
+
+        const datePart = formData.dateOfAccident;   // e.g. "2025-06-17"
+        const timePart = formData.timeOfAccident;   // e.g. "14:30:00"
+        const combinedDateTime = `${datePart}T${timePart}`;
+
+        const primaryPayload = {
+            accident_id: formData.accidentRefNo,
+            bonnet_no: formData.bonnetNo,
+            registration_no: formData.regNo,
+            transport_type: formData.ksrcOrKswift,
+            bus_class: formData.busClass,
+            operated_depot: formData.operatedDepot,
+            operated_depot_zone: formData.operatedDepotZone,
+            home_depot: formData.operatedDepot,
+            age_of_bus: Number(formData.ageOfBus),
+            type_of_other_vehicle: formData.typeOfOtherVehicle,
+            involved_vehicle_reg_numbers: formData.involvedVehicleRegNumbers,
+            accident_state: formData.accidentState,
+            accident_district: formData.accidentDistrict,
+            accident_place: formData.accidentPlace,
+            gps_latitude: formData.latitude ? parseFloat(formData.latitude) : "",
+            gps_longitude: formData.longitude ? parseFloat(formData.longitude) : "",
+            jurisdiction_depot: formData.jurisdictionDepot,
+            police_station_jurisdiction: formData.nearestPoliceStation,
+            time_of_accident: combinedDateTime,
+            description: formData.description,
+            created_by: "Home Depo",
+        };
+
+        try {
+            const primaryResponse = await fetch("/api/addPrimaryDetails", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(primaryPayload),
+            });
+
+            if (!primaryResponse.ok) throw new Error("Primary details submission failed");
+
+            const damageResponse = await fetch("/api/addDamageDetails", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    accident_id: formData.accidentRefNo,
+                    severity: formData.severity,
+                    accident_type: formData.accidentType,
+                    type_of_collision: formData.typeOfCollision,
+                    primary_cause_of_accident: formData.primaryCause,
+                    primary_responsibility_for_accident: formData.primaryResponsibility,
+                    fatalities_ksrtc_crew: formData.fatalitiesKsrtcCrew,
+                    fatalities_passengers: formData.fatalitiesPassengers,
+                    fatalities_third_party: formData.fatalitiesThirdParty,
+                    major_injuries_ksrtc_crew: formData.majorInjuriesKsrtcCrew,
+                    major_injuries_passengers: formData.majorInjuriesPassengers,
+                    major_injuries_third_party: formData.majorInjuriesThirdParty,
+                    minor_injuries_ksrtc_crew: formData.minorInjuriesKsrtcCrew,
+                    minor_injuries_passengers: formData.minorInjuriesPassengers,
+                    minor_injuries_third_party: formData.minorInjuriesThirdParty,
+
+                    created_by: "home depo",
+                }),
+            });
+
+            if (!damageResponse.ok) throw new Error("Damage details submission failed");
+
+            const serviceResponse = await fetch("/api/addServiceDetails", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    accident_id: formData.accidentRefNo,
+                    schedule_number_cdit: formData.scheduleNumber,
+                    operated_schedule_name: formData.operatedScheduleName,
+                    accident_occurred: formData.accidentOccurred,
+                    road_classification: formData.roadClassification,
+                    road_condition: formData.roadCondition,
+                    weather_condition: formData.weatherCondition,
+                    traffic_density: formData.trafficDensity,
+                    damage_to_the_bus: formData.damageToBus,
+                    third_party_properties_damaged: formData.thirdPartyPropertiesDamaged,
+                    driver_dc_name: formData.driverName,
+                    driver_category: formData.driverName,
+                    driver_pen_id_no: formData.driverName,
+                    driver_phone_no: formData.driverPhone,
+                    conductor_name: formData.conductorName,
+                    cdr_pen_id_no: formData.conductorName,
+                    cdr_phone_no: formData.conductorPhone,
+                    inquiry_inspector_name_ksrtc: formData.inquiryInspectorName,
+                    inspector_phone_no: formData.inspectorPhone,
+                    created_by: "Home depo",
+                }),
+            });
+
+            if (!serviceResponse.ok) throw new Error("Service details submission failed");
+
+
+            alert("Primary report submitted successfully.");
+            window.location.reload(); // Refresh page after closing popup
+
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert("Error submitting details.");
+            // Page won't refresh
+        }
     };
+
+
+    //     const handleSubmit = async () => {
+    //         try {
+    //             console.log('Submitting formData:', formData);
+    //             const payload = {
+    //                 accident_id: formData.accidentRefNo,
+    //                 bonnet_no: formData.bonnetNo,
+    //                 registration_no: formData.regNo,
+    //                 transport_type: formData.ksrcOrKswift,
+    //                 bus_class: formData.busClass,
+    //                 operated_depot: formData.operatedDepot,
+    //                 operated_depot_zone: formData.operatedDepotZone,
+    //                 home_depot: formData.operatedDepot, // Corrected field name
+    //                 age_of_bus: Number(formData.ageOfBus),
+    //                 type_of_other_vehicle: formData.typeOfOtherVehicle,
+    //                 involved_vehicle_reg_numbers: formData.involvedVehicleRegNumbers,
+    //                 accident_state: formData.accidentState,
+    //                 accident_district: formData.accidentDistrict,
+    //                 accident_place: formData.accidentPlace,
+    //                 gps_latitude: formData.latitude ? parseFloat(formData.latitude) : "",
+    //   gps_longitude: formData.longitude ? parseFloat(formData.longitude) : "",
+    //                 jurisdiction_depot: formData.jurisdictionDepot,
+    //                 police_station_jurisdiction: formData.nearestPoliceStation, // Corrected field name
+    //                 time_of_accident: new Date(formData.timeOfAccident).toISOString(),
+    //                 description: formData.description, // Send actual description
+    //                 created_by: "Home Depo"
+    //             }
+    //             const primaryResponse = await fetch('/api/addPrimaryDetails', {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 body: JSON.stringify(payload)
+    //             });
+    //             if (!primaryResponse.ok) throw new Error('Primary details submission failed');
+
+    //             // 2. Submit Damage Details
+    //             // const damageResponse = await fetch('/api/addDamagesDetails', {
+    //             //     method: 'POST',
+    //             //     headers: { 'Content-Type': 'application/json' },
+    //             //     body: JSON.stringify({
+    //             //         accident_id: formData.accidentRefNo,
+    //             //         severity: formData.severity,
+    //             //         accident_type: formData.accidentType,
+    //             //         type_of_collision: formData.typeOfCollision,
+    //             //         primary_cause_of_accident: formData.primaryCause,
+    //             //         primary_responsibility_for_accident: formData.primaryResponsibility,
+    //             //         fatalities_ksrtc_crew: parseInt(formData.fatalitiesKsrtcCrew),
+    //             //         fatalities_passengers: parseInt(formData.fatalitiesPassengers),
+    //             //         fatalities_third_party: parseInt(formData.fatalitiesThirdParty),
+    //             //         major_injuries_ksrtc_crew: parseInt(formData.majorInjuriesKsrtcCrew),
+    //             //         major_injuries_passengers: parseInt(formData.majorInjuriesPassengers),
+    //             //         major_injuries_third_party: parseInt(formData.majorInjuriesThirdParty),
+    //             //         minor_injuries_ksrtc_crew: parseInt(formData.minorInjuriesKsrtcCrew),
+    //             //         minor_injuries_passengers: parseInt(formData.minorInjuriesPassengers),
+    //             //         minor_injuries_third_party: parseInt(formData.minorInjuriesThirdParty),
+    //             //         created_by: "home depo"
+    //             //     })
+    //             // });
+    //             // if (!damageResponse.ok) throw new Error('Damage details submission failed');
+
+    //             // 3. Submit Service Details
+    //             // const serviceResponse = await fetch('/api/addServiceDetails', {
+    //             //     method: 'POST',
+    //             //     headers: { 'Content-Type': 'application/json' },
+    //             //     body: JSON.stringify({
+    //             //         accident_id: formData.accidentRefNo,
+    //             //         schedule_number_cdit: formData.scheduleNumber,
+    //             //         operated_schedule_name: formData.operatedScheduleName,
+    //             //         accident_occurred: formData.accidentOccurred,
+    //             //         road_classification: formData.roadClassification,
+    //             //         road_condition: formData.roadCondition,
+    //             //         weather_condition: formData.weatherCondition,
+    //             //         traffic_density: formData.trafficDensity,
+    //             //         damage_to_the_bus: formData.damageToBus,
+    //             //         third_party_properties_damaged: formData.thirdPartyPropertiesDamaged,
+    //             //         driver_dc_name: formData.driverName,
+    //             //         driver_category: formData.driverName,
+    //             //         driver_pen_id_no: formData.driverName,
+    //             //         driver_phone_no: formData.driverPhone,
+    //             //         conductor_name: formData.conductorName,
+    //             //         cdr_pen_id_no: formData.conductorName,
+    //             //         cdr_phone_no: formData.conductorPhone,
+    //             //         inquiry_inspector_name_ksrtc: formData.inquiryInspectorName,
+    //             //         inspector_phone_no: formData.inspectorPhone,
+    //             //         created_by: "Home depo"
+    //             //     })
+    //             // });
+    //             // if (!serviceResponse.ok) throw new Error('Service details submission failed');
+
+    //             return { success: true, message: 'All data submitted successfully' };
+
+    //         } catch (error) {
+    //             console.error('Submission error:', error);
+    //             return {
+    //                 success: false,
+    //                 message: error.message || 'Failed to submit accident report'
+    //             };
+    //         }
+    //     };
 
     const handlePopupClose = () => {
         setShowSuccessPopup(false);
@@ -488,116 +673,6 @@ const PrimaryAccidentReport: React.FC = () => {
         setConductorSearchTearm(conductor.gNumber);
         setShowConductorDropdown(false);
     };
-
-    // const renderReferenceSection = () => (
-    //     <div className="flex items-center gap-2.5 px-4 py-2.5 flex-shrink-0 border-b border-blue-100 bg-blue-50">
-    //         <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">
-    //             {searchMode === 'reference' ? 'Accident Reference Number' : 'Bus Number'}
-    //             <span className="text-red-600">*</span>
-    //         </span>
-
-    //         {searchMode === 'reference' ? (
-    //             <div className="flex-1">
-    //                 <Autocomplete
-    //                     options={dummyAccidentReferences}
-    //                     getOptionLabel={(option) => `${option.refNo} - ${option.busNo}`}
-    //                     renderOption={(props, option) => {
-    //                         const { key, ...rest } = props;
-    //                         return (
-    //                             <li
-    //                                 key={key}
-    //                                 {...rest}
-    //                                 className="text-xs p-2 hover:bg-gray-100 cursor-pointer"
-    //                             >
-    //                                 <div className="font-medium">{option.refNo}</div>
-    //                                 <div className="text-gray-500">
-    //                                     Bus: {option.busNo} | Place: {option.accidentPlace}
-    //                                 </div>
-    //                             </li>
-    //                         );
-    //                     }}
-
-    //                     value={selectedReference}
-    //                     onChange={handleReferenceSelect}
-    //                     renderInput={(params) => (
-    //                         <div ref={params.InputProps.ref} className="relative">
-    //                             <input
-    //                                 {...params.inputProps}
-    //                                 className="w-full py-1.5 px-2.5 text-xs bg-white border border-gray-300 rounded-[3px]"
-    //                                 placeholder="Search and select accident reference"
-    //                             />
-    //                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-    //                                 <svg
-    //                                     className="w-4 h-4 text-gray-400"
-    //                                     fill="none"
-    //                                     stroke="currentColor"
-    //                                     viewBox="0 0 24 24"
-    //                                 >
-    //                                     <path
-    //                                         strokeLinecap="round"
-    //                                         strokeLinejoin="round"
-    //                                         strokeWidth="2"
-    //                                         d="M19 9l-7 7-7-7"
-    //                                     ></path>
-    //                                 </svg>
-    //                             </div>
-    //                         </div>
-    //                     )}
-    //                 />
-    //             </div>
-    //         ) : (
-    //             <div className="flex-1">
-    //                 <Autocomplete
-    //                     options={dummyVehicles}
-    //                     getOptionLabel={(option) => option.BUSNO}
-    //                     value={selectedVehicle}
-    //                     onChange={handleVehicleSelect}
-    //                     renderInput={(params) => (
-    //                         <div ref={params.InputProps.ref} className="relative">
-    //                             <input
-    //                                 {...params.inputProps}
-    //                                 className="w-full py-1.5 px-2.5 text-xs bg-white border border-gray-300 rounded-[3px]"
-    //                                 placeholder="Search by bus number"
-    //                             />
-    //                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-    //                                 <svg
-    //                                     className="w-4 h-4 text-gray-400"
-    //                                     fill="none"
-    //                                     stroke="currentColor"
-    //                                     viewBox="0 0 24 24"
-    //                                 >
-    //                                     <path
-    //                                         strokeLinecap="round"
-    //                                         strokeLinejoin="round"
-    //                                         strokeWidth="2"
-    //                                         d="M19 9l-7 7-7-7"
-    //                                     ></path>
-    //                                 </svg>
-    //                             </div>
-    //                         </div>
-    //                     )}
-    //                 />
-    //             </div>
-    //         )}
-
-    //         <button
-    //             type="button"
-    //             className="py-1.5 px-3 text-xs font-medium text-white bg-blue-600 border border-blue-600 rounded-[3px] cursor-pointer whitespace-nowrap hover:bg-blue-700"
-    //         >
-    //             {searchMode === 'reference' ? 'Search' : 'Select'}
-    //         </button>
-
-    //         <button
-    //             type="button"
-    //             className="text-xs text-blue-600 underline whitespace-nowrap"
-    //             onClick={() => setSearchMode(searchMode === 'reference' ? 'bus' : 'reference')}
-    //         >
-    //             {searchMode === 'reference'
-    //                 ? 'Search by Bus Number instead'
-    //                 : 'Search by Accident Reference instead'}
-    //         </button>
-    //     </div>
-    // );
 
     // Define tabs conditionally based on zeroth report status
     const tabLabels = zerothReportFilled
@@ -1108,68 +1183,25 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </h3>
 
                                                     <div className="grid grid-cols-2 gap-3">
-                                                        {/* Hardcoded 4 images */}
-                                                        <div
-                                                            className="cursor-pointer"
-                                                            onClick={() => setPreviewImage("https://res.cloudinary.com/dpo91btlc/image/upload/v1749304400/8_xhmi5s.png")}
-                                                        >
-                                                            <div className="bg-gray-200 border border-gray-300 rounded h-24 flex items-center justify-center">
-                                                                <div className="text-gray-500 text-center h-full w-full">
-                                                                    <img
-                                                                        src="https://res.cloudinary.com/dpo91btlc/image/upload/v1749304400/8_xhmi5s.png"
-                                                                        alt="accident"
-                                                                        className="h-full w-full object-fit"
-                                                                    />
+                                                        {selectedReference?.photos?.map((photo: any, index: number) => (
+                                                            <div
+                                                                key={index}
+                                                                className="cursor-pointer"
+                                                                onClick={() => setPreviewImage(photo.url)}
+                                                            >
+                                                                <div className="bg-gray-200 border border-gray-300 rounded h-24 flex items-center justify-center">
+                                                                    <div className="text-gray-500 text-center h-full w-full">
+                                                                        <img
+                                                                            src={photo.url}
+                                                                            alt={`accident-${index + 1}`}
+                                                                            className="h-full w-full object-cover"
+                                                                        />
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-
-                                                        <div
-                                                            className="cursor-pointer"
-                                                            onClick={() => setPreviewImage("https://res.cloudinary.com/dpo91btlc/image/upload/v1749303818/Capture_owmfke.png")}
-                                                        >
-                                                            <div className="bg-gray-200 border border-gray-300 rounded h-24 flex items-center justify-center">
-                                                                <div className="text-gray-500 text-center h-full w-full">
-                                                                    <img
-                                                                        src="https://res.cloudinary.com/dpo91btlc/image/upload/v1749303818/Capture_owmfke.png"
-                                                                        alt="accident"
-                                                                        className="h-full w-full object-fit"
-                                                                    />
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-
-                                                        <div
-                                                            className="cursor-pointer"
-                                                            onClick={() => setPreviewImage("https://res.cloudinary.com/dpo91btlc/image/upload/v1749304400/8_xhmi5s.png")}
-                                                        >
-                                                            <div className="bg-gray-200 border border-gray-300 rounded h-24 flex items-center justify-center">
-                                                                <div className="text-gray-500 text-center h-full w-full">
-                                                                    <img
-                                                                        src="https://res.cloudinary.com/dpo91btlc/image/upload/v1749304400/8_xhmi5s.png"
-                                                                        alt="accident"
-                                                                        className="h-full w-full object-fit"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div
-                                                            className="cursor-pointer"
-                                                            onClick={() => setPreviewImage("https://res.cloudinary.com/dpo91btlc/image/upload/v1749304400/8_xhmi5s.png")}
-                                                        >
-                                                            <div className="bg-gray-200 border border-gray-300 rounded h-24 flex items-center justify-center">
-                                                                <div className="text-gray-500 text-center h-full w-full">
-                                                                    <img
-                                                                        src="https://res.cloudinary.com/dpo91btlc/image/upload/v1749304400/8_xhmi5s.png"
-                                                                        alt="accident"
-                                                                        className="h-full w-full object-fit"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        ))}
                                                     </div>
+
                                                 </div>
                                             </div>
 
@@ -1294,19 +1326,19 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     <div className="space-y-4">
                                                         <div>
                                                             <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Type of Other Vehicle Involved</label>
-                                                            <input name="otherVehicleRegNo" placeholder="Enter Type of Other Vehicle Involved" value={formData.typeOfOtherVehicle} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
+                                                            <input name="typeOfOtherVehicle" placeholder="Enter Type of Other Vehicle Involved" value={formData.typeOfOtherVehicle} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
                                                         </div>
                                                         <div>
                                                             <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Vehicle Reg. Number</label>
-                                                            <input name="otherVehicleRegNo" placeholder="Enter Involved Vehicle Registration Number" value={formData.involvedVehicleRegNumbers} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
+                                                            <input name="involvedVehicleRegNumbers" placeholder="Enter Involved Vehicle Registration Number" value={formData.involvedVehicleRegNumbers} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
                                                         </div>
                                                         <div>
                                                             <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Jurisdiction (Depot)</label>
-                                                            <input name="jurisdiction" placeholder="Enter Jurisdiction Depo Name" value={formData.jurisdictionDepot} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
+                                                            <input name="jurisdictionDepot" placeholder="Enter Jurisdiction Depo Name" value={formData.jurisdictionDepot} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
                                                         </div>
                                                         <div>
                                                             <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Description</label>
-                                                            <textarea name="otherVehicleDescription" placeholder="Enter Details" value={formData.primarydescription} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" rows={5} />
+                                                            <textarea name="primarydescription" placeholder="Enter Details" value={formData.primarydescription} onChange={handleChange} className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" rows={5} />
                                                         </div>
                                                     </div>
                                                 </div>

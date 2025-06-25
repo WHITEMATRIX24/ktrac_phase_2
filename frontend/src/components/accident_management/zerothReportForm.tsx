@@ -65,6 +65,8 @@ const AccidentReportForm = ({ selectedVehicle }: AccidentReportFormProps) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
     const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
     const [locationData, setLocationData] = useState({
         address: '',
         place: '',
@@ -308,7 +310,7 @@ const AccidentReportForm = ({ selectedVehicle }: AccidentReportFormProps) => {
             if (!response.ok) throw new Error('Failed to submit accident details');
 
             const result = await response.json();
-            setAccidentId(result.accident_id);
+            setAccidentId(result.uuid);
             setIsFormSubmitted(true);
             setActiveTab(2);
         } catch (error) {
@@ -324,35 +326,67 @@ const AccidentReportForm = ({ selectedVehicle }: AccidentReportFormProps) => {
 
         if (!accidentId) {
             alert("Accident ID is missing. Please submit accident details first.");
+            setIsSubmittingDocumentation(false);
             return;
         }
 
         if (mediaFiles.length === 0) {
             alert("Please upload at least one photo");
+            setIsSubmittingDocumentation(false);
             return;
         }
 
         try {
             const formData = new FormData();
-            formData.append('accidentId', accidentId);
+            formData.append("uuid", accidentId); // Assuming backend expects `uuid` for accident ID
+
             mediaFiles.forEach((media, index) => {
-                formData.append(`media_${index}`, media.file);
+                formData.append("photos", media.file); // File input
+                formData.append("description", "Accident documentation"); // Can be indexed if needed
+                formData.append("timestamp", new Date().toISOString());
+                formData.append("category", "damage");
             });
 
-            const response = await fetch('/api/upload-media', {
+            const response = await fetch('/api/uploadZerothReportPhoto', {
                 method: 'POST',
-                body: formData
+                body: formData, // Do not set Content-Type; browser sets it automatically
             });
 
-            if (!response.ok) throw new Error('Failed to upload media');
+            if (!response.ok) throw new Error('Upload failed');
 
+            setShowSuccessModal(true);
+
+            // Set timeout to refresh after 5 seconds
+            const id = setTimeout(() => {
+
+                setShowSuccessModal(false)
+            }, 5000);
+            setTimeoutId(id)
 
         } catch (error) {
-            alert('Error submitting documentation. Please try again.');
+            console.error('Submission error:', error);
+            alert('Error submitting documentation');
         } finally {
             setIsSubmittingDocumentation(false);
         }
     };
+    useEffect(() => {
+        if (showSuccessModal) {
+            let count = 5;
+            const countdownElement = document.getElementById('countdown');
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (countdownElement) {
+                    countdownElement.textContent = count.toString();
+                    countdownElement.classList.toggle('text-red-500');
+                    setTimeout(() => countdownElement.classList.toggle('text-red-500'), 250);
+                }
+                if (count <= 0) clearInterval(countdownInterval);
+            }, 1000);
+
+            return () => clearInterval(countdownInterval);
+        }
+    }, [showSuccessModal]);
     const isTab0Complete = () => {
         return (
             locationData.address.trim() !== '' &&
@@ -860,6 +894,39 @@ const AccidentReportForm = ({ selectedVehicle }: AccidentReportFormProps) => {
                     )}
                 </div>
             </div>
+            {showSuccessModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+                    <div className="bg-white rounded-xl p-8 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 animate-scaleIn">
+                        <div className="flex flex-col items-center">
+                            {/* Success icon animation */}
+                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-pulseOnce">
+                                <svg className="w-12 h-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+
+                            {/* Success message */}
+                            <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
+                                Accident Reported Successfully!
+                            </h3>
+
+
+                            {/* OK button */}
+                            <button
+                                onClick={() => {
+                                    if (timeoutId) clearTimeout(timeoutId);
+                                    setShowSuccessModal(false);
+
+                                }}
+                                className="px-8 py-3 bg-[var(--sidebar)] text-white rounded-lg hover:bg-[#001670] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--sidebar)] focus:ring-opacity-50 transform hover:scale-105 transition-transform duration-200"
+                            >
+                                OK
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
 
 
