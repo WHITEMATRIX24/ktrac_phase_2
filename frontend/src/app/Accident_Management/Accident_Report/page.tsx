@@ -2017,7 +2017,6 @@ const PrimaryAccidentReport: React.FC = () => {
             </div>
             {isReferenceModalSearchOpen && (
                 <ReferenceNumberSearchModal
-                    closeHandler={handleSearchModalClose}
                     caseSelectHandler={handleSearchSelect}
                 />
             )}
