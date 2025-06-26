@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-const LAMBDA_URL = 'https://lh2tiovrbr2yfyqy42yiqx42pm0rniwi.lambda-url.ap-south-1.on.aws/';
+const LAMBDA_URL = 'https://d6vs3cus00.execute-api.ap-south-1.amazonaws.com/DEV/accident-report';
 
 export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
 
-        if (!data.vehicle_info || !data.vehicle_info[0]?.bonet_no) {
+        if (!data.accident_id || !data.vehicle_info?.bonet_no) {
             return NextResponse.json(
-                { error: 'Vehicle information is required' },
+                { error: 'Vehicle and accident id information is required' },
                 { status: 400 }
             );
         }
+
 
         const config = {
             method: 'post',

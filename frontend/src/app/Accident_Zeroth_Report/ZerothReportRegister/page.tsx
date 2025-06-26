@@ -8,6 +8,30 @@ type BusData = {
     bonet_number: string;
 };
 
+type ApiResponse = {
+    success: boolean;
+    message: string;
+    accident_id: string;
+    bonet_no: string;
+    created_at: string;
+    vehicle_info: {
+        vehicle_id: number;
+        vehicle_type: string;
+        model: string;
+        registration_date: string | null;
+    };
+    details: {
+        depot_name: string;
+        depot_abv: string;
+        month: string;
+        year: string;
+        serial_number: string;
+        format: string;
+    };
+    additional_data: Record<string, unknown>;
+    note: string;
+};
+
 const ZerothReportReg = () => {
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -21,6 +45,8 @@ const ZerothReportReg = () => {
     const [busError, setBusError] = useState('');
     const [showBusDropdown, setShowBusDropdown] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [apiLoading, setApiLoading] = useState(false);
+    const [apiError, setApiError] = useState('');
 
     const busRef = useRef<HTMLDivElement>(null);
 
@@ -88,23 +114,57 @@ const ZerothReportReg = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            sessionStorage.setItem(
-                'accidentData',
-                JSON.stringify({
-                    bonnetNumber: formData.bonnetNumber,
-                    operatedDepot: formData.operatedDepot,
-                })
-            );
+        if (!validate()) return;
+
+        try {
+            setApiLoading(true);
+            setApiError('');
+
+            // Call the validate API
+            const response = await fetch('/api/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    bonet_no: formData.bonnetNumber,
+                    depot_name: formData.operatedDepot,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`API request failed with status ${response.status}`);
+            }
+
+            const result: ApiResponse = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || 'Validation failed');
+            }
+
+            // Store the response data in local storage
+
+            // Also store in session storage for immediate use
+            sessionStorage.setItem('accidentData', JSON.stringify({
+                bonnetNumber: formData.bonnetNumber,
+                operatedDepot: formData.operatedDepot,
+                referenceNumber: result.accident_id,
+            }));
+
             router.push('/Accident_Zeroth_Report/ZerothForm');
+        } catch (err) {
+            setApiError('Failed to validate data: ' + (err as Error).message);
+            console.error('Validation error:', err);
+        } finally {
+            setApiLoading(false);
         }
     };
 
-
     const handleLogout = () => {
         localStorage.clear();
+        sessionStorage.clear();
         router.push("/");
     };
 
@@ -126,18 +186,20 @@ const ZerothReportReg = () => {
                 </button>
             </div>
 
-            <div className="flex-1 p-4 w-full h-full ">
+            <div className="flex-1 p-4 w-full h-full">
                 <div className="bg-white border rounded-sm shadow-sm w-full min-h-[80vh] p-4 sm:p-6">
                     <div className="text-center mb-6">
                         <h3 className="text-xl font-semibold text-gray-800">
                             Enter Vehicle Details <br />
                             വാഹന വിശദാംശങ്ങൾ നൽകുക
                         </h3>
-                        {/* <p className="text-sm text-gray-600">
-                            Please provide required information to proceed <br />
-                            തുടരാൻ ആവശ്യമായ വിവരങ്ങൾ നൽകുക
-                        </p> */}
                     </div>
+
+                    {apiError && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {apiError}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="flex flex-col gap-4 md:flex-row">
@@ -188,9 +250,8 @@ const ZerothReportReg = () => {
                             <div className="flex-1">
                                 <label className="text-sm font-medium text-gray-700 mb-1 block">
                                     Operated Depot <span className="text-red-600">*</span>
-                                    <span className="text-xs text-gray-500 block ">
-
-                                        ഓപ്പറേറ്റഡ്  ഡിപ്പോ
+                                    <span className="text-xs text-gray-500 block">
+                                        ഓപ്പറേറ്റഡ് ഡിപ്പോ
                                     </span>
                                 </label>
                                 <input
@@ -209,13 +270,17 @@ const ZerothReportReg = () => {
                         <div className="pt-2 flex justify-center md:justify-end">
                             <button
                                 type="submit"
-                                className="py-2.5 px-4 bg-[var(--sidebar)] text-white rounded hover:bg-[#001670] transition-colors text-sm font-medium shadow-md"
+                                disabled={apiLoading}
+                                className={`py-2.5 px-4 bg-[var(--sidebar)] text-white rounded hover:bg-[#001670] transition-colors text-sm font-medium shadow-md ${apiLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
-                                Continue / തുടരുക
+                                {apiLoading ? (
+                                    <span>Processing... / പ്രോസസ്സ് ചെയ്യുന്നു...</span>
+                                ) : (
+                                    <span>Continue / തുടരുക</span>
+                                )}
                             </button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

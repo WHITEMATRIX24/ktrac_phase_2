@@ -14,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Calendar, SearchIcon, Settings } from "lucide-react";
 import { NavUser } from "./nav-user";
+import NotificationSystem from "./Notification";
+
 
 interface User {
   name: string;
@@ -114,6 +116,9 @@ export default function Header() {
             <SearchIcon className="h-4 w-4" />
           </div>
         </div>
+
+        {/* Add Notification System Here */}
+        <NotificationSystem />
 
         <div className="flex items-center gap-2">
           <NavUser user={user} />

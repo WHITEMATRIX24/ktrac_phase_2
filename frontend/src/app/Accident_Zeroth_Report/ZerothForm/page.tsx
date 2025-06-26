@@ -44,7 +44,6 @@ interface Conductor {
     phone: string;
 }
 
-// Define types for police stations and depots
 interface PoliceStation {
     id: number;
     name: string;
@@ -60,6 +59,7 @@ interface Depot {
 }
 
 const ZerothReport = () => {
+    const router = useRouter();
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [activeTab, setActiveTab] = useState(0);
     const [locationPermission, setLocationPermission] = useState(false);
@@ -74,7 +74,7 @@ const ZerothReport = () => {
     const [accidentRefernceId, setAccidentRefernceId] = useState<string | null>(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-    const [driverCategory, setDriverCategory] = useState<string>(''); // 'DC' or 'DR'
+    const [driverCategory, setDriverCategory] = useState<string>('');
     const [allDrivers, setAllDrivers] = useState<UserData[]>([]);
     const [filteredDrivers, setFilteredDrivers] = useState<UserData[]>([]);
     const [showDriverDropdown, setShowDriverDropdown] = useState(false);
@@ -83,15 +83,11 @@ const ZerothReport = () => {
     const [filteredConductors, setFilteredConductors] = useState<UserData[]>([]);
     const [showConductorDropdown, setShowConductorDropdown] = useState(false);
     const conductorRef = useRef<HTMLDivElement>(null);
-
-
-    // NEW STATE VARIABLES
     const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const [locationQuery, setLocationQuery] = useState('');
     const [timeSlot, setTimeSlot] = useState('');
 
-    // Hardcoded data for police stations and depots
     const policeStations: PoliceStation[] = [
         { id: 1, name: "Central Police Station", district: "Thiruvananthapuram", contact: "0471-2560000" },
         { id: 2, name: "East Police Station", district: "Thiruvananthapuram", contact: "0471-2561111" },
@@ -125,6 +121,7 @@ const ZerothReport = () => {
     });
 
     const [formData, setFormData] = useState({
+        bonnetNumber: '',
         timeOfAccident: '',
         dateOfAccident: new Date().toISOString().split("T")[0],
         homeDepot: '',
@@ -151,21 +148,19 @@ const ZerothReport = () => {
         { label: "Documentation" }
     ];
 
-    // Initialize form with passed data
     useEffect(() => {
         const data = sessionStorage.getItem('accidentData');
         if (data) {
-            const { bonnetNumber, operatedDepot } = JSON.parse(data);
+            const { bonnetNumber, operatedDepot, referenceNumber } = JSON.parse(data);
             setFormData((prev) => ({
                 ...prev,
                 bonnetNumber,
                 operatedDepot,
             }));
+            setAccidentRefernceId(referenceNumber)
         }
     }, []);
 
-
-    // NEW: Filter police stations and depots when district changes
     useEffect(() => {
         if (locationData.district) {
             const filteredStations = policeStations.filter(station =>
@@ -180,7 +175,6 @@ const ZerothReport = () => {
         }
     }, [locationData.district]);
 
-    // Fetch all drivers and conductor
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -199,7 +193,6 @@ const ZerothReport = () => {
 
                 setAllDrivers(drivers);
                 setFilteredDrivers(drivers);
-
                 setAllConductors(conductors);
                 setFilteredConductors(conductors);
             } catch (error) {
@@ -209,14 +202,12 @@ const ZerothReport = () => {
         fetchUsers();
     }, []);
 
-
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (driverRef.current && !driverRef.current.contains(event.target as Node)) {
                 setShowDriverDropdown(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
@@ -226,7 +217,6 @@ const ZerothReport = () => {
             setFilteredDrivers(allDrivers);
             return;
         }
-
         const term = searchTerm.toLowerCase();
         const filtered = allDrivers.filter(driver =>
             driver.pen_no?.toLowerCase().includes(term) ||
@@ -251,12 +241,12 @@ const ZerothReport = () => {
         });
         setShowDriverDropdown(false);
     };
+
     const filterConductors = (searchTerm: string) => {
         if (!searchTerm) {
             setFilteredConductors(allConductors);
             return;
         }
-
         const term = searchTerm.toLowerCase();
         const filtered = allConductors.filter(conductor =>
             conductor.pen_no?.toLowerCase().includes(term) ||
@@ -275,20 +265,17 @@ const ZerothReport = () => {
         }));
         setShowConductorDropdown(false);
     };
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (conductorRef.current && !conductorRef.current.contains(event.target as Node)) {
                 setShowConductorDropdown(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-
-
-    // NEW: Fetch location suggestions from OpenStreetMap
     const fetchLocationSuggestions = async (query: string) => {
         try {
             const response = await fetch(
@@ -301,10 +288,8 @@ const ZerothReport = () => {
         }
     };
 
-    // NEW: Handle location suggestion selection
     const handleLocationSelect = (suggestion: any) => {
         const address = suggestion.address;
-        // Extract district in English
         const district = address.county || address.district || address.state_district || '';
 
         setLocationData(prev => ({
@@ -321,10 +306,8 @@ const ZerothReport = () => {
         setShowLocationSuggestions(false);
     };
 
-    // NEW: Calculate time slot based on time
     const calculateTimeSlot = (time: string) => {
         if (!time) return '';
-
         const [hoursStr, minutesStr] = time.split(':');
         const hours = parseInt(hoursStr, 10);
         const minutes = parseInt(minutesStr, 10) / 60;
@@ -336,7 +319,6 @@ const ZerothReport = () => {
         if (totalHours >= 15 && totalHours < 18) return '15:00-18:00';
         if (totalHours >= 18 && totalHours < 22) return '18:00-22:00';
         if (totalHours >= 22 || totalHours < 4) return '22:00-04:00';
-
         return '';
     };
 
@@ -346,7 +328,6 @@ const ZerothReport = () => {
                 async (position) => {
                     const lat = position.coords.latitude.toFixed(6);
                     const lon = position.coords.longitude.toFixed(6);
-
                     setLocationPermission(true);
 
                     try {
@@ -355,8 +336,6 @@ const ZerothReport = () => {
                         );
                         const data = await response.json();
                         const address = data.address || {};
-
-                        // Improved district extraction in English
                         const district = address.county || address.district || address.state_district || '';
 
                         setLocationData({
@@ -385,13 +364,11 @@ const ZerothReport = () => {
         }
     }, []);
 
-    // NEW: Debounce location search
     useEffect(() => {
         if (locationQuery.length > 2) {
             const handler = setTimeout(() => {
                 fetchLocationSuggestions(locationQuery);
             }, 300);
-
             return () => clearTimeout(handler);
         } else {
             setLocationSuggestions([]);
@@ -402,7 +379,6 @@ const ZerothReport = () => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // NEW: Update time slot when time changes
         if (name === 'timeOfAccident') {
             const slot = calculateTimeSlot(value);
             setTimeSlot(slot);
@@ -415,7 +391,6 @@ const ZerothReport = () => {
         setLocationData(prev => ({ ...prev, [name]: value }));
     };
 
-    // NEW: Handle police station selection
     const handlePoliceStationSelect = (e: ChangeEvent<HTMLSelectElement>) => {
         const stationId = parseInt(e.target.value);
         const station = policeStations.find(s => s.id === stationId);
@@ -423,8 +398,8 @@ const ZerothReport = () => {
         if (station) {
             setLocationData(prev => ({
                 ...prev,
-                policeStation: station.id.toString(), // store ID
-                policeStationName: station.name,      // optional: for display elsewhere
+                policeStation: station.id.toString(),
+                policeStationName: station.name,
                 policeStationContact: station.contact
             }));
         } else {
@@ -437,8 +412,6 @@ const ZerothReport = () => {
         }
     };
 
-
-    // NEW: Handle depot selection
     const handleDepotSelect = (e: ChangeEvent<HTMLSelectElement>) => {
         const depotId = parseInt(e.target.value);
         const depot = depots.find(d => d.id === depotId);
@@ -490,65 +463,82 @@ const ZerothReport = () => {
         setMediaFiles(prev => [...prev, ...newFiles]);
     };
 
-    const formatDateToISO = (dateString: string) => {
-        const [day, month, year] = dateString.split('-'); // if input is DD-MM-YYYY
-        return `${year}-${month}-${day}`;
-    };
-
     const handleSubmitAccidentDetails = async (e: FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         setSubmitError(null);
 
         try {
-            // Prepare data for API
+            if (mediaFiles.length === 0) {
+                throw new Error('Please upload at least one photo of the accident');
+            }
+
+            const photoPromises = mediaFiles.map(file => {
+                return new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        if (typeof reader.result === 'string') {
+                            resolve(reader.result);
+                        } else {
+                            reject(new Error('Failed to read file'));
+                        }
+                    };
+                    reader.onerror = () => reject(reader.error);
+                    reader.readAsDataURL(file.file);
+                });
+            });
+
+            const photoBase64Strings = await Promise.all(photoPromises);
+            const photosPayload = photoBase64Strings.map(base64 => ({
+                base64: base64.split(',')[1] || base64,
+                content_type: "image/jpeg"
+            }));
+
             const payload = {
-                vehicle_info: [
-                    { bonet_no: selectedVehicle?.busNumber || '' }
-                ],
-                location_info: [
-                    {
-                        address: locationData.address,
-                        place: locationData.place,
-                        district: locationData.district,
-                        state: locationData.state
+                accident_id: accidentRefernceId,
+                location_info: {
+                    address: locationData.address,
+                    place: locationData.place,
+                    district: locationData.district,
+                    state: locationData.state,
+                    nearest_depo: formData.nearestDepoName,
+                    nearest_depo_contact_number: formData.depotContact
+                },
+                geolocation: {
+                    latitude: parseFloat(locationData.latitude),
+                    longitude: parseFloat(locationData.longitude),
+                    nearest_police_station: locationData.policeStation,
+                    nearest_police_station_contact_number: locationData.policeStationContact,
+                    timezone_info: {
+                        timezone: "Asia/Kolkata",
+                        offset: "+05:30"
                     }
-                ],
-                Geolocation: [
-                    {
-                        latitude: locationData.latitude,
-                        longitude: locationData.longitude,
-                        nearest_police_station: locationData.policeStation
-                    }
-                ],
-                "Accident Details": [
-                    {
-                        date_of_accident: formatDateToISO(formData.dateOfAccident),
-                        time_of_accident: formData.timeOfAccident,
-                        operated_depot: formData.operatedDepot,
-                        schedule_number: formData.scheduleNumber,
-                        description: formData.description,
-                        time_zone: formData.timeZone // NEW: Include time zone
-                    }
-                ],
-                crew_information: [
-                    {
-                        driver_name: selectedDriver?.name || '',
-                        driver_phn_no: selectedDriver?.phone || '',
-                        conductor_name: selectedConductor?.name || '',
-                        conductor_phn_no: selectedConductor?.phone || ''
-                    }
-                ],
-                // NEW: Include depot information
-                depot_info: [
-                    {
-                        name: formData.nearestDepoName,
-                        contact: formData.depotContact
-                    }
-                ]
+                },
+                accident_details: {
+                    date_of_accident: formData.dateOfAccident,
+                    time_of_accident: formData.timeOfAccident,
+                    time_zone_of_accident: formData.timeZone,
+                    operated_depot: formData.operatedDepot,
+                    schedule_number: formData.scheduleNumber,
+                    description: formData.description
+                },
+                crew_information: {
+                    driver_type_code: driverCategory,
+                    driver_name: formData.driverName,
+                    driver_phn_no: formData.driverPhone,
+                    driver_pen_no: formData.driverPenNo,
+                    conductor_name: formData.conductorName,
+                    conductor_phn_no: formData.conductorPhone,
+                    conductor_pen_no: formData.conductorPenNo
+                },
+                vehicle_info: {
+                    bonet_no: formData.bonnetNumber,
+                    vehicle_register_no: "",
+                    vehicle_make: ""
+                },
+                photos: photosPayload
             };
 
-            // Call API
             const response = await fetch('/api/submitZeroReportDetails', {
                 method: 'POST',
                 headers: {
@@ -558,105 +548,31 @@ const ZerothReport = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to submit accident details');
+                throw new Error('Failed to submit accident report');
             }
 
             const result = await response.json();
-            setAccidentId(result.uuid);
-            setAccidentRefernceId(result.accident_id)
-            // Move to documentation tab
-            setActiveTab(2);
+            console.log('Accident report submitted successfully:', result);
+            setShowSuccessModal(true);
 
-            console.log('Accident details submitted successfully:', result);
+            const id = setTimeout(() => {
+                router.push('/Accident_Zeroth_Report/ZerothReportRegister');
+            }, 3000);
+            setTimeoutId(id);
+
         } catch (error) {
-            console.error('Error submitting accident details:', error);
-            setSubmitError('Failed to submit accident details. Please try again.');
+            console.error('Error submitting accident report:', error);
+            setSubmitError(error instanceof Error ? error.message : 'Failed to submit accident report. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleSubmitDocumentation = async (e: FormEvent) => {
-        e.preventDefault();
-        setIsSubmittingDocumentation(true);
-
-        if (!accidentId) {
-            alert("Accident ID is missing. Please submit accident details first.");
-            setIsSubmittingDocumentation(false);
-            return;
-        }
-
-        if (mediaFiles.length === 0) {
-            alert("Please upload at least one photo");
-            setIsSubmittingDocumentation(false);
-            return;
-        }
-
-        try {
-            const formData = new FormData();
-            formData.append("uuid", accidentId); // Assuming backend expects `uuid` for accident ID
-
-            mediaFiles.forEach((media, index) => {
-                formData.append("photos", media.file); // File input
-                formData.append("description", "Accident documentation"); // Can be indexed if needed
-                formData.append("timestamp", new Date().toISOString());
-                formData.append("category", "damage");
-            });
-
-            const response = await fetch('/api/uploadZerothReportPhoto', {
-                method: 'POST',
-                body: formData, // Do not set Content-Type; browser sets it automatically
-            });
-
-            if (!response.ok) throw new Error('Upload failed');
-
-            setShowSuccessModal(true);
-
-            // Set timeout to refresh after 5 seconds
-            const id = setTimeout(() => {
-                setSelectedVehicle(null)
-                setFormData({
-                    timeOfAccident: '',
-                    dateOfAccident: '',
-                    homeDepot: '',
-                    operatedDepot: '',
-                    scheduleNumber: '',
-                    scheduleName: '',
-                    description: '',
-                    driverPenNo: '',
-                    driverName: '',
-                    driverPhone: '',
-                    conductorPenNo: '',
-                    conductorName: '',
-                    conductorPhone: '',
-                    nearestDepoName: '',
-                    depotContact: '',
-                    timeZone: '',
-                });
-                setMediaFiles([]);
-                setShowSuccessModal(false)
-            }, 5000);
-            setTimeoutId(id)
-            console.log(accidentRefernceId);
-        } catch (error) {
-            console.error('Submission error:', error);
-            alert('Error submitting documentation');
-        } finally {
-            setIsSubmittingDocumentation(false);
-        }
-    };
-
     useEffect(() => {
         if (showSuccessModal) {
-            let count = 5;
-            const countdownElement = document.getElementById('countdown');
+            let count = 3;
             const countdownInterval = setInterval(() => {
                 count--;
-                if (countdownElement) {
-                    countdownElement.textContent = count.toString();
-                    countdownElement.classList.toggle('text-red-500');
-                    setTimeout(() => countdownElement.classList.toggle('text-red-500'), 250);
-                }
                 if (count <= 0) clearInterval(countdownInterval);
             }, 1000);
 
@@ -664,36 +580,17 @@ const ZerothReport = () => {
         }
     }, [showSuccessModal]);
 
-    const router = useRouter()
     const handleLogout = () => {
-        // Clear any auth tokens or user state here
-        localStorage.clear() // or remove specific keys like localStorage.removeItem("token")
-        router.push("/") // Adjust path as needed
-    }
+        localStorage.clear();
+        router.push("/");
+    };
 
     const handleCancel = () => {
-        setSelectedVehicle(null);
-        setFormData({
-            timeOfAccident: '',
-            dateOfAccident: '',
-            homeDepot: '',
-            operatedDepot: '',
-            scheduleNumber: '',
-            scheduleName: '',
-            description: '',
-            driverPenNo: '',
-            driverName: '',
-            driverPhone: '',
-            conductorPenNo: '',
-            conductorName: '',
-            conductorPhone: '',
-            nearestDepoName: '',
-            depotContact: '',
-            timeZone: '',
-        });
-        setMediaFiles([]);
-        setAccidentId('');
+        router.push('/Accident_Zeroth_Report/ZerothReportRegister');
     };
+    const MalayalamText = ({ text }: { text: string }) => (
+        <span className="text-[10px]">{text}</span>
+    );
 
     return (
         <div className="min-h-screen bg-gray-50 text-xs flex flex-col">
@@ -715,7 +612,7 @@ const ZerothReport = () => {
                 </div>
 
                 <h2 className="text-[14px] font-semibold py-1 text-[var(--sidebar)]">
-                    Accident Reference Number: KKD/06/25/001
+                    Accident Reference Number: {accidentRefernceId}
                 </h2>
             </div>
 
@@ -758,10 +655,10 @@ const ZerothReport = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                                 <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh]">
                                     <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
-                                        Accident Location Details (അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ)
+                                        Accident Location Details (<MalayalamText text="അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ" />)
                                     </h3>
                                     <div className="mb-3 relative">
-                                        <label className="text-[12px]  text-gray-700 mb-1">Accident Place (അപകടം നടന്ന സ്ഥലം)</label>
+                                        <label className="text-[12px]  text-gray-700 mb-1">Accident Place (<MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)</label>
 
                                         <input
                                             value={locationQuery}
@@ -789,7 +686,7 @@ const ZerothReport = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Accident District (അപകടം നടന്ന ജില്ല)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)</label>
                                             <input
                                                 name="district"
                                                 value={locationData.district}
@@ -798,7 +695,7 @@ const ZerothReport = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Accident State  (അപകടം നടന്ന സംസ്ഥാനം)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Accident State  (<MalayalamText text="അപകടം നടന്ന സംസ്ഥാനം" />)</label>
                                             <input
                                                 name="state"
                                                 value={locationData.state}
@@ -809,7 +706,7 @@ const ZerothReport = () => {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Latitude (അക്ഷാംശം)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Latitude (<MalayalamText text="അക്ഷാംശം" />)</label>
                                             <input
                                                 value={locationData.latitude}
                                                 onChange={handleLocationChange}
@@ -817,7 +714,7 @@ const ZerothReport = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Longitude (രേഖാംശം)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Longitude (<MalayalamText text="രേഖാംശം" />)</label>
                                             <input
                                                 value={locationData.longitude}
                                                 onChange={handleLocationChange}
@@ -829,14 +726,14 @@ const ZerothReport = () => {
 
                                 <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
                                     <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
-                                        Nearby Assistance Details (സമീപ സഹായ വിവരം)
+                                        Nearby Assistance Details (<MalayalamText text="സമീപ സഹായ വിവരം" />)
                                     </h3>
 
 
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Nearest Police Station (സമീപ പോലീസ് സ്റ്റേഷൻ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Nearest Police Station (<MalayalamText text="സമീപ പോലീസ് സ്റ്റേഷൻ" />)</label>
                                             <select
                                                 name="policeStation"
                                                 value={locationData.policeStation}
@@ -853,7 +750,7 @@ const ZerothReport = () => {
 
                                         </div>
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">police Station Contact Number (പോലീസ് സ്റ്റേഷനിൽ ബന്ധപ്പെടേണ്ട നമ്പർ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">police Station Contact Number (<MalayalamText text="പോലീസ് സ്റ്റേഷനിൽ ബന്ധപ്പെടേണ്ട നമ്പർ" />)</label>
                                             <input
                                                 value={locationData.policeStationContact}
                                                 readOnly
@@ -863,7 +760,7 @@ const ZerothReport = () => {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Nearest Depot to Accident Location (അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Nearest Depot to Accident Location (<MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />)</label>
                                             <select
                                                 value={formData.nearestDepoName}
                                                 onChange={handleDepotSelect}
@@ -878,7 +775,7 @@ const ZerothReport = () => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Depot Contact (ഡിപ്പോയുമായി ബന്ധപ്പെടാനുള്ള നമ്പർ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Depot Contact (<MalayalamText text="ഡിപ്പോയുമായി ബന്ധപ്പെടാനുള്ള നമ്പർ" />)</label>
                                             <input
                                                 value={formData.depotContact}
                                                 readOnly
@@ -891,12 +788,12 @@ const ZerothReport = () => {
                                             {locationPermission ? (
                                                 <>
                                                     Location data fetched successfully. This information is prefilled based on your current location, but it may contain errors. You can edit it if needed. <br />
-                                                    ലൊക്കേഷൻ ഡാറ്റ വിജയകരമായി ലഭിച്ചു. നിങ്ങളുടെ നിലവിലെ ലൊക്കേഷനെ അടിസ്ഥാനമാക്കി ഈ വിവരങ്ങൾ മുൻകൂട്ടി പൂരിപ്പിച്ചിരിക്കുന്നു, പക്ഷേ അതിൽ പിശകുകൾ അടങ്ങിയിരിക്കാം. ആവശ്യമെങ്കിൽ നിങ്ങൾക്ക് ഇത് എഡിറ്റ് ചെയ്യാൻ കഴിയും.
+                                                    <MalayalamText text="ലൊക്കേഷൻ ഡാറ്റ വിജയകരമായി ലഭിച്ചു. നിങ്ങളുടെ നിലവിലെ ലൊക്കേഷനെ അടിസ്ഥാനമാക്കി ഈ വിവരങ്ങൾ മുൻകൂട്ടി പൂരിപ്പിച്ചിരിക്കുന്നു, പക്ഷേ അതിൽ പിശകുകൾ അടങ്ങിയിരിക്കാം. ആവശ്യമെങ്കിൽ നിങ്ങൾക്ക് ഇത് എഡിറ്റ് ചെയ്യാൻ കഴിയും." />
                                                 </>
                                             ) : (
                                                 <>
                                                     Location permission not granted. Please enable location services for accurate reporting. <br />
-                                                    ലൊക്കേഷൻ അനുമതി ലഭിച്ചില്ല. കൃത്യമായ റിപ്പോർട്ടിംഗിനായി ലൊക്കേഷൻ സേവനങ്ങൾ പ്രാപ്തമാക്കുക.
+                                                    <MalayalamText text="ലൊക്കേഷൻ അനുമതി ലഭിച്ചില്ല. കൃത്യമായ റിപ്പോർട്ടിംഗിനായി ലൊക്കേഷൻ സേവനങ്ങൾ പ്രാപ്തമാക്കുക." />
                                                 </>
                                             )}
                                         </p>
@@ -911,12 +808,12 @@ const ZerothReport = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full ">
                                 {/* Accident Details */}
                                 <div className="bg-white border border-gray-200 rounded p-4 overflow-auto h-full md:min-h-[65vh]">
-                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Accident Details (അപകടത്തിന്റെ വിശദാംശങ്ങൾ)</h3>
+                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Accident Details (<MalayalamText text="അപകടത്തിന്റെ വിശദാംശങ്ങൾ" />)</h3>
 
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div>
-                                                <label className="text-[12px] text-gray-700 mb-1">Date of Accident (അപകടം നടന്ന തീയതി)</label>
+                                                <label className="text-[12px] text-gray-700 mb-1">Date of Accident (<MalayalamText text="അപകടം നടന്ന തീയതി" />)</label>
                                                 <input
                                                     type="date"
                                                     name="dateOfAccident"
@@ -926,7 +823,7 @@ const ZerothReport = () => {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Time of Accident (അപകടം നടന്ന സമയം)</label>
+                                                <label className="text-[12px] text-gray-700 mb-1">Time of Accident (<MalayalamText text="അപകടം നടന്ന സമയം" />)</label>
                                                 <input
                                                     type="time"
                                                     name="timeOfAccident"
@@ -938,7 +835,7 @@ const ZerothReport = () => {
                                         </div>
 
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Time Zone of Accident (അപകടം നടന്ന സമയ മേഖല)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Time Zone of Accident (<MalayalamText text="അപകടം നടന്ന സമയ മേഖല" />)</label>
                                             <input
                                                 name="timeZone"
                                                 value={timeSlot}
@@ -948,7 +845,7 @@ const ZerothReport = () => {
                                         </div>
 
                                         <div>
-                                            <label className="text-[12px] font-[600] text-gray-700 mb-1">Operated Depot</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Operated Depot (<MalayalamText text="ഓപ്പറേറ്റഡ് ഡിപോട്" /> )</label>
                                             <input
                                                 name="operatedDepot"
                                                 value={formData.operatedDepot}
@@ -958,7 +855,7 @@ const ZerothReport = () => {
                                         </div>
 
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Schedule Number (ഷെഡ്യൂൾ നമ്പർ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Schedule Number (<MalayalamText text="ഷെഡ്യൂൾ നമ്പർ" />)</label>
                                             <input
                                                 name="scheduleNumber"
                                                 placeholder="Enter Schedule Number"
@@ -968,7 +865,7 @@ const ZerothReport = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Schedule Name (ഷെഡ്യൂളിൻ്റെ പേര്)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Schedule Name (<MalayalamText text="ഷെഡ്യൂളിൻ്റെ പേര്" />)</label>
                                             <input
                                                 name="scheduleName"
                                                 placeholder="Enter Schedule Name"
@@ -981,7 +878,7 @@ const ZerothReport = () => {
 
 
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Accident Description (അപകടത്തെക്കുറിച്ചുള്ള വിവരണം)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Accident Description (<MalayalamText text="അപകടത്തെക്കുറിച്ചുള്ള വിവരണം" />)</label>
                                             <textarea
                                                 name="description"
                                                 value={formData.description}
@@ -995,11 +892,11 @@ const ZerothReport = () => {
 
                                 {/* Crew Information */}
                                 <div className="bg-white border border-gray-200 rounded p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
-                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Crew Information (ക്രൂ വിവരങ്ങൾ)</h3>
+                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Crew Information (<MalayalamText text="ക്രൂ വിവരങ്ങൾ" />)</h3>
 
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Driver Category (ഡ്രൈവർ വിഭാഗം)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Driver Category (<MalayalamText text="ഡ്രൈവർ വിഭാഗം" />)</label>
                                             <select
                                                 value={driverCategory}
                                                 onChange={(e) => setDriverCategory(e.target.value)}
@@ -1012,7 +909,7 @@ const ZerothReport = () => {
                                         </div>
 
                                         <div className="relative" ref={driverRef}>
-                                            <label className="text-[12px] text-gray-700 mb-1">Driver PEN Number (ഡ്രൈവർ പെൻ നമ്പർ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Driver PEN Number (<MalayalamText text="ഡ്രൈവർ പെൻ നമ്പർ" />)</label>
                                             <input
                                                 type="text"
                                                 name='driverPenNo'
@@ -1051,7 +948,7 @@ const ZerothReport = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div>
-                                                <label className="text-[12px] text-gray-700 mb-1">Driver Name (ഡ്രൈവറുടെ പേര്)</label>
+                                                <label className="text-[12px] text-gray-700 mb-1">Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)</label>
                                                 <input
                                                     value={formData.driverName}
                                                     readOnly
@@ -1059,18 +956,18 @@ const ZerothReport = () => {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="text-[12px] text-gray-700 mb-1">Driver Phone (ഡ്രൈവറുടെ ഫോൺ നമ്പർ)</label>
+                                                <label className="text-[12px] text-gray-700 mb-1">Driver Phone (<MalayalamText text="ഡ്രൈവറുടെ ഫോൺ നമ്പർ" />)</label>
                                                 <input
                                                     type="tel"
                                                     name="driverPhone"
                                                     value={formData.driverPhone}
-                                                    readOnly
+                                                    onChange={handleChange}
                                                     className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
                                                 />
                                             </div>
                                         </div>
                                         <div className="relative" ref={conductorRef}>
-                                            <label className="text-[12px] text-gray-700 mb-1">Conductor PEN Number (കണ്ടക്ടർ പെൻ നമ്പർ)</label>
+                                            <label className="text-[12px] text-gray-700 mb-1">Conductor PEN Number (<MalayalamText text="കണ്ടക്ടർ പെൻ നമ്പർ" />)</label>
                                             <input
                                                 type="text"
                                                 name="conductorPenNo"
@@ -1109,7 +1006,7 @@ const ZerothReport = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div>
-                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor Name (കണ്ടക്ടറുടെ പേര്)</label>
+                                                <label className="text-[12px] text-gray-700 mb-1">Conductor Name (<MalayalamText text="കണ്ടക്ടറുടെ പേര്" />)</label>
                                                 <input
                                                     name="conductorName"
                                                     value={formData.conductorName}
@@ -1119,7 +1016,7 @@ const ZerothReport = () => {
                                             </div>
 
                                             <div>
-                                                <label className="text-[12px] font-[600] text-gray-700 mb-1">Conductor Phone (കണ്ടക്ടറുടെ ഫോൺ നമ്പർ)</label>
+                                                <label className="text-[12px] text-gray-700 mb-1">Conductor Phone (<MalayalamText text="കണ്ടക്ടറുടെ ഫോൺ നമ്പർ" />)</label>
                                                 <input
                                                     type="tel"
                                                     name="conductorPhone"
@@ -1140,7 +1037,7 @@ const ZerothReport = () => {
                                 {/* Left Section - Upload Form */}
                                 <div className="w-full lg:w-1/2 h-full bg-white border border-gray-300 rounded-[4px] p-[16px] overflow-auto md:min-h-[65vh] sm:min-h-[50vh]">
                                     <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
-                                        Accident Documentation (അപകടം സംബന്ധിച്ച ഡോക്യുമെന്റേഷൻ)
+                                        Accident Documentation (<MalayalamText text="അപകടം സംബന്ധിച്ച ഡോക്യുമെന്റേഷൻ" />)
                                     </h3>
 
                                     <div
@@ -1167,7 +1064,7 @@ const ZerothReport = () => {
                                             </p>
                                             <p className="text-xs text-gray-500 mt-1">
                                                 Upload images of the accident scene <br />
-                                                അപകട സ്ഥലത്തിന്റെ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക
+                                                <MalayalamText text="അപകട സ്ഥലത്തിന്റെ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
                                             </p>
                                         </div>
                                     </div>
@@ -1175,9 +1072,9 @@ const ZerothReport = () => {
                                     <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200">
                                         <h4 className="text-xs font-semibold mb-2"> Guidelines to Upload Photos (ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുന്നതിനുള്ള മാർഗ്ഗനിർദ്ദേശങ്ങൾ)</h4>
                                         <ul className="text-xs text-gray-600 space-y-1">
-                                            <li>• Upload clear photos showing the accident from multiple angles<br />• വിവിധ കോണുകളിൽ നിന്ന് അപകടം കാണിക്കുന്ന വ്യക്തമായ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക</li>
-                                            <li>• Include close-up shots of any vehicle damage<br />• വാഹനത്തിന്റെ നാശനഷ്ടം വ്യക്തമാക്കുന്ന ക്ലോസ്‌അപ്പ് ഫോട്ടോകൾ ഉൾപ്പെടുത്തുക</li>
-                                            <li>• Maximum file size: 5MB per image<br />• ഓരോ ചിത്രത്തിന്റെയും പരമാവധി ഫയൽ വലുപ്പം: 5MB</li>
+                                            <li>• Upload clear photos showing the accident from multiple angles<br />• <MalayalamText text="വിവിധ കോണുകളിൽ നിന്ന് അപകടം കാണിക്കുന്ന വ്യക്തമായ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക" /></li>
+                                            <li>• Include close-up shots of any vehicle damage<br />•<MalayalamText text=" വാഹനത്തിന്റെ നാശനഷ്ടം വ്യക്തമാക്കുന്ന ക്ലോസ്‌അപ്പ് ഫോട്ടോകൾ ഉൾപ്പെടുത്തുക" /></li>
+                                            <li>• Maximum file size: 5MB per image<br />• <MalayalamText text="ഓരോ ചിത്രത്തിന്റെയും പരമാവധി ഫയൽ വലുപ്പം: 5MB" /></li>
                                         </ul>
 
                                     </div>
@@ -1186,7 +1083,7 @@ const ZerothReport = () => {
                                 {/* Right Section - Uploaded Images */}
                                 <div className="w-full lg:w-1/2 bg-white border border-gray-300 rounded-[4px] p-[16px] overflow-auto min-h-[50vh] md:min-h-[65vh] mb-[50px] md:mb-2">
                                     <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
-                                        Uploaded Images (അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ)
+                                        Uploaded Images (<MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ" />)
                                     </h3>
 
                                     {mediaFiles.length > 0 ? (
@@ -1213,7 +1110,7 @@ const ZerothReport = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-gray-500">No images are uploaded. (ഫോട്ടോകളൊന്നും അപ്‌ലോഡ് ചെയ്തിട്ടില്ല.)</p>
+                                        <p className="text-sm text-gray-500">No images are uploaded. (<MalayalamText text="ഫോട്ടോകളൊന്നും അപ്‌ലോഡ് ചെയ്തിട്ടില്ല." />)</p>
                                     )}
                                 </div>
                             </div>
@@ -1248,37 +1145,12 @@ const ZerothReport = () => {
                                 Cancel
                             </button>
 
-                            {activeTab === 1 && (
-                                <button
-                                    type="button"
-                                    onClick={handleSubmitAccidentDetails}
-                                    disabled={isSubmitting}
-                                    className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all
-                            ${isSubmitting
-                                            ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-[var(--sidebar)] hover:bg-[#001670]'}`}
-                                >
-                                    {isSubmitting ? (
-                                        <span className="flex items-center">
-                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Submitting...
-                                        </span>
-                                    ) : (
-                                        <>
 
-                                            Submit Details
-                                        </>
-                                    )}
-                                </button>
-                            )}
 
                             {activeTab === 2 && (
                                 <button
                                     type="button"
-                                    onClick={handleSubmitDocumentation}
+                                    onClick={handleSubmitAccidentDetails}
                                     disabled={isSubmittingDocumentation}
                                     className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all
                             ${isSubmittingDocumentation
@@ -1331,6 +1203,7 @@ const ZerothReport = () => {
                                     if (timeoutId) clearTimeout(timeoutId);
                                     setShowSuccessModal(false);
                                     setSelectedVehicle(null)
+                                    router.push('/Accident_Zeroth_Report/ZerothReportRegister');
                                 }}
                                 className="px-8 py-3 bg-[var(--sidebar)] text-white rounded-lg hover:bg-[#001670] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--sidebar)] focus:ring-opacity-50 transform hover:scale-105 transition-transform duration-200"
                             >

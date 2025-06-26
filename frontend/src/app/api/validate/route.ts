@@ -2,14 +2,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-const LAMBDA_URL = 'https://5xrhx7t63zdswfhc2ztypyyo440spcxl.lambda-url.ap-south-1.on.aws/';
+const LAMBDA_URL = 'https://nj2w71zd9k.execute-api.ap-south-1.amazonaws.com/DEV/accident_id';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     console.log('Proxying request to Lambda:', body);
-    const { bonet_no, driver_pen_no, conductor_pen_no } = body;
-    if (!bonet_no || !driver_pen_no || !conductor_pen_no) {
+    const { bonet_no, depot_name } = body;
+    if (!bonet_no || !depot_name) {
       return NextResponse.json(
         {
           status_code: '400',
@@ -27,9 +27,8 @@ export async function POST(request: NextRequest) {
         'content-type': 'application/json'
       },
       data: JSON.stringify({
+        depot_name,
         bonet_no,
-        driver_pen_no,
-        conductor_pen_no
       }),
       timeout: 30000
     };
