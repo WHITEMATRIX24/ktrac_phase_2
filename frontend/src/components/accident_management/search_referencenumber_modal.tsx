@@ -1,3 +1,4 @@
+"use client";
 import { Divider } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
