@@ -1,24 +1,14 @@
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-const LAMBDA_FILTER_URL =
-  "https://py8t6eino8.execute-api.ap-south-1.amazonaws.com/DEV/filter?";
+const LAMBDA_URL =
+  "https://nj2w71zd9k.execute-api.ap-south-1.amazonaws.com/DEV/depots";
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-
-  const date = searchParams.get("date");
-  const district = searchParams.get("district");
-  const depo = searchParams.get("depo");
-  const bonnetNo = searchParams.get("bonnet_no");
-
   try {
     const config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `${LAMBDA_FILTER_URL}date=${date}&district=${district}&bonnet_no=${bonnetNo}&operated_depot=${depo}`,
-      headers: {
-        "content-type": "application/json",
-      },
+      url: LAMBDA_URL,
       timeout: 30000,
     };
 

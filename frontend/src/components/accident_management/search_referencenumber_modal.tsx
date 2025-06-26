@@ -1,73 +1,48 @@
 import { Divider } from "@mui/material";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface Props {
   caseSelectHandler: (selectedData: any) => void;
 }
 
-const dummyData = [
-  {
-    accedent_ref_no: "KKD/06/25/01",
-    accedent_date: "06/05/2025",
-    bus_no: "FA3465",
-    accidentPlace: "Main Road, Kochi",
-    policeStation: "Ernakulam South",
-    timeOfAccident: "14:30",
-    homeDepot: "KKD",
-    operatedDepot: "KKD",
-    scheduleNumber: "48",
-    driverName: "Rajesh Kumar",
-    driverPhone: "9876543210",
-    conductorName: "Suresh Nair",
-    conductorPhone: "9876543211",
-    accidentState: "Kerala",
-    accidentDistrict: "Ernakulam",
-    description: "Collision with private car",
-    accidentLatitude: "9.9312",
-    accidentLongitude: " 76.2673",
-    photos: [],
-  },
-  {
-    accedent_ref_no: "KTM/07/25/05",
-    bus_no: "RPC292",
-    accidentPlace: "MG Road, Trivandrum",
-    accedent_date: "2023-07-22",
-    policeStation: "Thiruvananthapuram East",
-    timeOfAccident: "10:15",
-    homeDepot: "KTM",
-    operatedDepot: "KTM",
-    scheduleNumber: "52",
-    driverName: "Manoj Pillai",
-    driverPhone: "9876543222",
-    conductorName: "Deepak Kumar",
-    conductorPhone: "9876543223",
-    accidentState: "Kerala",
-    accidentDistrict: "Thiruvananthapuram",
-    description: "Rear-ended by truck",
-    accidentLatitude: "8.5241",
-    accidentLongitude: "76.9366",
-    photos: [],
-  },
-];
-
 const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
-  const [searchData, setSearchData] = useState<{
-    date: string;
-    bonnet_no: string;
-    district: string;
-    operated_depo: string;
-  }>({
-    date: "",
-    bonnet_no: "",
-    district: "",
-    operated_depo: "",
-  });
+  const searchParams = useSearchParams();
+  const [date, setDate] = useState(searchParams.get("date") || "");
+  const [district, setDistrict] = useState(searchParams.get("district") || "");
+  const [depo, setDepo] = useState(searchParams.get("depo") || "");
+  const [bonnetNo, setBonnetNo] = useState(searchParams.get("bonnet_no") || "");
   const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
   const [accidentList, setAccidentList] = useState<{}[] | null>(null);
+  const [allBusInfo, setAllbusinfo] = useState([]);
+  const [filteredBusinfo, setFilteredbusInfo] = useState([]);
+  const [allDepos, setAllDepos] = useState([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // search handler
-  const handleSearch = () => {
-    setAccidentList(dummyData);
+  const handleSearch = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `/api/searchAccidentData?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
+      );
+      const data = await response.json();
+      setAccidentList(data.data.accident_reports);
+      // console.log(data);
+    } catch (error) {
+      console.log("error in filtering");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // clear handler
+  const handleClear = () => {
+    setAccidentList(null);
+    setDate("");
+    setBonnetNo("");
+    setDistrict("");
+    setDepo("");
   };
 
   // handle case select
@@ -75,9 +50,46 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
     caseSelectHandler(selectedData);
   };
 
+  const handleSearchBonnetNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setBonnetNo(value);
+    setFilteredbusInfo((prevData) => {
+      const filteredData = allBusInfo.filter((f: any) =>
+        f.bonet_number.toLowerCase().includes(value.toLowerCase())
+      );
+      return filteredData;
+    });
+  };
+
+  const getAllBusInfoHandler = async () => {
+    try {
+      const response = await fetch("/api/getAllBusInfo");
+      const data = await response.json();
+      setFilteredbusInfo(data.data);
+      setAllbusinfo(data.data);
+    } catch (error) {
+      console.log("error on getting bus details");
+    }
+  };
+
+  const getAllDepoHandler = async () => {
+    try {
+      const response = await fetch("/api/getAllDepos");
+      const data = await response.json();
+      setAllDepos(data.data);
+    } catch (error) {
+      console.log("error on getting depo details");
+    }
+  };
+
+  useEffect(() => {
+    getAllBusInfoHandler();
+    getAllDepoHandler();
+  }, []);
+
   return (
-    <div className="w-full flex flex-col gap-8 my-5">
-      <div className="flex items-center gap-3 px-3">
+    <div className="w-full flex flex-col gap-3 px-3 my-5">
+      <div className="flex items-center gap-3">
         <h6>
           Accident Reference Number <span className="text-red-600">*</span>
         </h6>
@@ -85,7 +97,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           type="text"
           placeholder="Search and select accident reference"
           readOnly
-          className="w-[79%] border px-3 py-1 rounded-xs bg-white"
+          className="flex-1 border px-3 py-1 rounded-xs bg-white"
         />
       </div>
       <div className="flex justify-center items-center gap-3">
@@ -98,12 +110,10 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           <div className="flex flex-col">
             <label>Date</label>
             <input
-              onChange={(e) =>
-                setSearchData({ ...searchData, date: e.target.value })
-              }
+              onChange={(e) => setDate(e.target.value)}
               type="date"
               className="px-3 py-2 border rounded-sm"
-              value={searchData.date}
+              value={date}
             />
           </div>
           <div className="relative flex flex-col">
@@ -113,26 +123,21 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               placeholder="search bonnet number"
               className="px-3 py-2 border rounded-sm"
               onClick={() => setShowBonnetDropDown(true)}
-              value={searchData.bonnet_no}
-              onChange={(e) =>
-                setSearchData((prev) => ({
-                  ...prev,
-                  bonnet_no: e.target.value,
-                }))
-              }
+              value={bonnetNo}
+              onChange={handleSearchBonnetNumber}
             />
             {showBonnetDropDown && (
               <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
-                {dummyData.map((d) => (
+                {filteredBusinfo.map((d: any) => (
                   <button
                     onClick={() => {
-                      setSearchData({ ...searchData, bonnet_no: d.bus_no });
+                      setBonnetNo(d.bonet_number);
                       setShowBonnetDropDown(false);
                     }}
                     className="py-2 text-start"
-                    key={d.bus_no}
+                    key={d.bonet_number}
                   >
-                    {d.bus_no}
+                    {d.bonet_number}
                   </button>
                 ))}
               </div>
@@ -141,75 +146,99 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           <div className="flex flex-col">
             <label>District</label>
             <select
-              onChange={(e) =>
-                setSearchData({ ...searchData, district: e.target.value })
-              }
+              onChange={(e) => setDistrict(e.target.value)}
               className="px-3 py-2 border rounded-sm"
-              value={searchData.district}
+              value={district}
             >
-              <option value="kottayam">Kottayam</option>
-              <option value="thiruvanathapuram">Thiruvanathapuram</option>
+              <option value="">Select depo</option>
+              <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+              <option value="Kollam">Kollam</option>
+              <option value="Pathanamthitta">Pathanamthitta</option>
+              <option value="Alappuzha">Alappuzha</option>
+              <option value="Kottayam">Kottayam</option>
+              <option value="Idukki">Idukki</option>
+              <option value="Ernakulam">Ernakulam</option>
+              <option value="Thrissur">Thrissur</option>
+              <option value="Palakkad">Palakkad</option>
+              <option value="Malappuram">Malappuram</option>
+              <option value="Kozhikode">Kozhikode</option>
+              <option value="Wayanad">Wayanad</option>
+              <option value="Kannur">Kannur</option>
+              <option value="Kasaragod">Kasaragod</option>
             </select>
           </div>
-          <div className="relative flex flex-col">
+          <div className="flex flex-col">
             <label>Operated Depo</label>
-            <input
-              type="text"
-              onChange={(e) =>
-                setSearchData({ ...searchData, operated_depo: e.target.value })
-              }
-              placeholder="Operated depo"
+            <select
+              onChange={(e) => setDepo(e.target.value)}
               className="px-3 py-2 border rounded-sm"
-              value={searchData.operated_depo}
-            />
+              value={depo}
+            >
+              <option value="" disabled>
+                Select Depot
+              </option>
+              {allDepos.map((depo: any) =>
+                depo.depot.map((d: any) => (
+                  <option key={d["depot-abv"]} value={d["depot-name"]}>
+                    {d["depot-name"]}
+                  </option>
+                ))
+              )}
+            </select>
           </div>
         </div>
         <div className="flex items-center px-3 py-2 bg-slate-50">
           <div className="flex gap-3 ms-auto">
             <button
-              onClick={() => setAccidentList(null)}
+              onClick={handleClear}
               className="border px-3 py-1 rounded-sm bg-white"
             >
-              clear
+              Clear
             </button>
             <button
               onClick={handleSearch}
               className="border px-3 py-1 rounded-sm bg-sidebar text-white"
             >
-              search
+              Search
             </button>
           </div>
         </div>
       </div>
 
       <div className="flex flex-col gap-3 px-3 py-5">
-        {accidentList &&
+        {isLoading ? (
+          <p>loading...</p>
+        ) : !isLoading && accidentList && accidentList?.length < 1 ? (
+          <p>no data found</p>
+        ) : (
+          accidentList &&
           accidentList.map((d: any) => (
             <div
-              key={d.accedent_ref_no}
+              key={d.accident_id}
               className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer"
-              onClick={handlecaseSelect}
+              onClick={() => handlecaseSelect(d)}
             >
               <div className="flex justify-between">
                 <div>
                   <label>Reference number:</label>
-                  <label>{d.accedent_ref_no}</label>
+                  <label>{d.accident_id}</label>
                 </div>
-                <label>{d.accedent_date}</label>
+                <label>{d.accident_details.date_of_accident}</label>
               </div>
               <div className="flex gap-3">
                 <p>
-                  bonnet Number: <span>{d.bus_no}</span>
+                  bonnet Number: <span>{d.vehicle_info.bonet_no}</span>
                 </p>
                 <p>
-                  Accident Place: <span>{d.accidentPlace}</span>
+                  Accident Place: <span>{d.location_info.place}</span>
                 </p>
                 <p>
-                  Operated Depo: <span>{d.operatedDepot}</span>
+                  Operated Depo: <span>{d.location_info.operated_depot}</span>
                 </p>
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
     </div>
   );

@@ -5,28 +5,77 @@ import FormInspectorReport from "@/components/accident_management/inspector/form
 import FormInsurenceReport from "@/components/accident_management/inspector/form_insurence_report";
 import ReferenceNumberSearchModal from "@/components/accident_management/search_referencenumber_modal";
 import { Input } from "@/components/ui/input";
+import { InspectorReportData } from "@/models/AccidentData";
 import { Autocomplete, TextField } from "@mui/material";
 import { User2, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const tabs = ["Basic Details", "Inspector Report", "Insurance"];
-const tabList = [
-  <FormBasicReport />,
-  <FormInspectorReport />,
-  <FormInsurenceReport />,
-];
 
 const AccedentInspectorForm = () => {
-  const [selectedAccedentData, setSelectedAccedentData] = useState<{
-    accedent_ref_no: string;
-    accedent_date: string;
-    bus_no: string;
+  const [inspectorReportData, setInspectorReportData] =
+    useState<InspectorReportData>({
+      accident_uuid: "",
+      jurisdiction_of_inspector: "",
+      accident_id: "",
+      date_of_accident: "",
+      bonet_no: "",
+      inquiry_inspector_name_ksrtc: "",
+      fir_registered: false,
+      fir_number: "",
+      under_section_details: "",
+      accused_in_accident_in_fir: "",
+      fir_case_against_ksrtc: false,
+      date_of_bus_released_from_police_station: "",
+      enquiry_police_person_name: "",
+      enquiry_police_phone_number: "",
+      digital_evidence: "",
+      witness: "",
+      primary_cause_of_accident_in_insp_report: "",
+      responsibility_of_accident_in_insp_report: "",
+      if_not_ksrtc_responsible_action_taken: "",
+      whether_fir_is_modified_or_not: false,
+      responsibility_changed_from_ksrtc_as_per_evidence_submitted: false,
+      total_no_of_days_bus_docked_due_to_accident: 0,
+      revenue_loss_due_to_dock_of_bus: 0,
+      inspector_report_additional_details: "",
+      remarks: "",
+      whether_bus_have_valid_insurance_or_not: false,
+      created_by: "",
+    });
+  const [fetchedDetails, setFetchedDetails] = useState<{
+    accident_id: string;
+    date: string;
+    timeZone: string;
+    driverName: string;
+    driverPhoneNumber: string;
+    conductorName: string;
+    conductorPhoneNumber: string;
   } | null>(null);
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(50);
 
-  const handleSearchSelect = (selectedData: any) =>
-    setSelectedAccedentData(selectedData);
+  const handleSearchSelect = (selectedData: any) => {
+    console.log(selectedData);
+
+    const accidentId = selectedData.accident_id;
+    const date = selectedData.accident_details.date_of_accident;
+    const timeZone = selectedData.accident_details.time_zone_of_accident;
+    const driverName = selectedData.crew_information.driver_name;
+    const driverPhoneNumber = selectedData.crew_information.driver_phn_no;
+    const conductorName = selectedData.crew_information.conductor_name;
+    const conductorPhoneNumber = selectedData.crew_information.conductor_phn_no;
+    setFetchedDetails({
+      accident_id: accidentId,
+      date,
+      timeZone,
+      driverName,
+      driverPhoneNumber,
+      conductorName,
+      conductorPhoneNumber,
+    });
+    setInspectorReportData(selectedData);
+  };
 
   // progressbar
   useEffect(() => {
@@ -34,10 +83,19 @@ const AccedentInspectorForm = () => {
     setProgressStatus(progressValuePerTab * (selectedTab + 1));
   }, [selectedTab]);
 
+  const tabList = [
+    <FormBasicReport
+      accidentData={inspectorReportData}
+      stateUpdateHandler={setInspectorReportData}
+      fetchedDetails={fetchedDetails}
+    />,
+    <FormInspectorReport />,
+    <FormInsurenceReport />,
+  ];
   return (
     <React.Fragment>
       <div className="flex flex-col h-[88vh] pt-1 text-[12px] gap-3">
-        {selectedAccedentData === null ? (
+        {fetchedDetails === null ? (
           <ReferenceNumberSearchModal caseSelectHandler={handleSearchSelect} />
         ) : (
           <>

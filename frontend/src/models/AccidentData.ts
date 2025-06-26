@@ -1,0 +1,29 @@
+export interface InspectorReportData {
+  accident_uuid: string;
+  jurisdiction_of_inspector: string;
+  accident_id: string;
+  date_of_accident: string;
+  bonet_no: string;
+  inquiry_inspector_name_ksrtc: string;
+  fir_registered: boolean;
+  fir_number: string;
+  under_section_details: string;
+  accused_in_accident_in_fir: string;
+  fir_case_against_ksrtc: boolean;
+  date_of_bus_released_from_police_station: string;
+  enquiry_police_person_name: string;
+  enquiry_police_phone_number: string;
+  digital_evidence: string;
+  witness: string;
+  primary_cause_of_accident_in_insp_report: string;
+  responsibility_of_accident_in_insp_report: string;
+  if_not_ksrtc_responsible_action_taken: string;
+  whether_fir_is_modified_or_not: boolean;
+  responsibility_changed_from_ksrtc_as_per_evidence_submitted: boolean;
+  total_no_of_days_bus_docked_due_to_accident: number;
+  revenue_loss_due_to_dock_of_bus: number;
+  inspector_report_additional_details: string;
+  remarks: string;
+  whether_bus_have_valid_insurance_or_not: boolean;
+  created_by: string;
+}

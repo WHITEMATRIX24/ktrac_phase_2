@@ -81,7 +81,7 @@ export function ReportDataTable<TData, TValue>({
   });
 
   const exportToExcel = () => {
-    if (rowSelection) {
+    if (Object.keys(rowSelection).length > 0) {
       const selectedRows = table
         .getSelectedRowModel()
         .rows.map((row) => row.original);
