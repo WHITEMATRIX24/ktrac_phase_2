@@ -1,6 +1,5 @@
 "use client";
 import { Divider } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface Props {
@@ -8,11 +7,10 @@ interface Props {
 }
 
 const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
-  const searchParams = useSearchParams();
-  const [date, setDate] = useState(searchParams.get("date") || "");
-  const [district, setDistrict] = useState(searchParams.get("district") || "");
-  const [depo, setDepo] = useState(searchParams.get("depo") || "");
-  const [bonnetNo, setBonnetNo] = useState(searchParams.get("bonnet_no") || "");
+  const [date, setDate] = useState("");
+  const [district, setDistrict] = useState("");
+  const [depo, setDepo] = useState("");
+  const [bonnetNo, setBonnetNo] = useState("");
   const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
   const [accidentList, setAccidentList] = useState<{}[] | null>(null);
   const [allBusInfo, setAllbusinfo] = useState([]);
