@@ -158,7 +158,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               onChange={(e) =>
                 setSearchData({ ...searchData, operated_depo: e.target.value })
               }
-              placeholder="operated depo"
+              placeholder="Operated depo"
               className="px-3 py-2 border rounded-sm"
               value={searchData.operated_depo}
             />

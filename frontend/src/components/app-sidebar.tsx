@@ -95,14 +95,32 @@ const defaultNavItems: NavItem[] = [
     url: "#",
     icon: PieChart,
     items: [
-      { title: "Bus Position", url: "/Reports/Busposition" },
-      { title: "Classwise Dock", url: "/Reports/Classwise_Dock" },
-      { title: "Dock Busses", url: "/Reports/Dock_Busses" },
+      // { title: "Bus Position", url: "/Reports/Busposition" },
+      // { title: "Classwise Dock", url: "/Reports/Classwise_Dock" },
+      // { title: "Dock Busses", url: "/Reports/Dock_Busses" },
+      // {
+      //   title: "Unitwise Bus Deployment",
+      //   url: "/Reports/Unitwise_bus_deployment",
+      // },
+      // { title: "Enroute Buses", url: "/Reports/Enroute_buses" },
+      { title: "Accident Bus Type", url: "/Reports/Accidents/Bus_Type_Wise" },
       {
-        title: "Unitwise Bus Deployment",
-        url: "/Reports/Unitwise_bus_deployment",
+        title: "Accident Collision Type",
+        url: "/Reports/Accidents/Collision_Type",
       },
-      { title: "Enroute Buses", url: "/Reports/Enroute_buses" },
+      {
+        title: "Accident District Wise",
+        url: "/Reports/Accidents/District_Wise",
+      },
+      {
+        title: "Accident Involved Vehicle",
+        url: "/Reports/Accidents/Involved_Vehicle",
+      },
+      {
+        title: "Accident Responsibility",
+        url: "/Reports/Accidents/Responsibility",
+      },
+      { title: "Accident Time Wise", url: "/Reports/Accidents/Time_Wise" },
     ],
   },
 ];
