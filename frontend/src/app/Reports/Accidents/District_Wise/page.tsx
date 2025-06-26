@@ -16,7 +16,7 @@ export type DistrictAccidentData = {
 };
 
 // Table column definitions
-export const districtAccidentColumns: ColumnDef<DistrictAccidentData>[] = [
+const districtAccidentColumns: ColumnDef<DistrictAccidentData>[] = [
   { accessorKey: "District", header: "District" },
   { accessorKey: "Fatal", header: "Fatal" },
   { accessorKey: "Major", header: "Major" },

@@ -15,7 +15,7 @@ export type AccidentTypeData = {
 };
 
 // Table column definitions
-export const accidentTypeColumns: ColumnDef<AccidentTypeData>[] = [
+const accidentTypeColumns: ColumnDef<AccidentTypeData>[] = [
   { accessorKey: "Type", header: "Accident Type" },
   { accessorKey: "Fatal", header: "Fatal" },
   { accessorKey: "Major", header: "Major" },

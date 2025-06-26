@@ -16,7 +16,7 @@ export type TimePeriodAccidentData = {
 };
 
 // Column definitions
-export const timePeriodColumns: ColumnDef<TimePeriodAccidentData>[] = [
+const timePeriodColumns: ColumnDef<TimePeriodAccidentData>[] = [
   { accessorKey: "TimePeriod", header: "Time Period" },
   { accessorKey: "Fatal", header: "Fatal" },
   { accessorKey: "Major", header: "Major" },

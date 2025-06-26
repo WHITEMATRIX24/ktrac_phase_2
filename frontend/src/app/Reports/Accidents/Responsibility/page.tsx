@@ -14,7 +14,7 @@ export type VehicleAccidentData = {
   Date: string;
 };
 
-export const vehicleColumns: ColumnDef<VehicleAccidentData>[] = [
+const vehicleColumns: ColumnDef<VehicleAccidentData>[] = [
   { accessorKey: "VehicleType", header: "Vehicle Type" },
   { accessorKey: "Fatal", header: "Fatal" },
   { accessorKey: "Major", header: "Major" },

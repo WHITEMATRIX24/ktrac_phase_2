@@ -16,7 +16,7 @@ export type AccidentCauseData = {
 };
 
 // Column configuration for table
-export const accidentCauseColumns: ColumnDef<AccidentCauseData>[] = [
+const accidentCauseColumns: ColumnDef<AccidentCauseData>[] = [
   { accessorKey: "Cause", header: "Accident Type" },
   { accessorKey: "Fatal", header: "Fatal" },
   { accessorKey: "Major", header: "Major" },
