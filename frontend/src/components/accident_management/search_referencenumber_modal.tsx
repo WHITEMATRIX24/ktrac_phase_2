@@ -17,17 +17,32 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
   const [filteredBusinfo, setFilteredbusInfo] = useState([]);
   const [allDepos, setAllDepos] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [accidentReferenceNumber, setAccidentReferencenumber] =
+    useState<string>("");
 
   // search handler
   const handleSearch = async () => {
+    if (!date && !bonnetNo && !district && !depo && !accidentReferenceNumber)
+      return;
+
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `/api/searchAccidentData?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
-      );
-      const data = await response.json();
-      setAccidentList(data.data.accident_reports);
-      // console.log(data);
+
+      if (accidentReferenceNumber) {
+        const response = await fetch(
+          `/api/searchZerothReportById?accident_reference_number=${accidentReferenceNumber}`
+        );
+        const data = await response.json();
+
+        setAccidentList([data.data]);
+      } else {
+        const response = await fetch(
+          `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
+        );
+        const data = await response.json();
+        setAccidentList(data.data || []);
+        // console.log(data);
+      }
     } catch (error) {
       console.log("error in filtering");
     } finally {
@@ -94,9 +109,10 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
         </h6>
         <input
           type="text"
-          placeholder="Search and select accident reference"
-          readOnly
-          className="flex-1 border px-3 py-1 rounded-xs bg-white"
+          placeholder="Enter accident reference"
+          value={accidentReferenceNumber}
+          onChange={(e) => setAccidentReferencenumber(e.target.value)}
+          className="flex-1 border px-3 py-1 bg-white rounded-sm"
         />
       </div>
       <div className="flex justify-center items-center gap-3">
@@ -105,9 +121,11 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
         <Divider className="w-1/3" />
       </div>
       <div className="relative bg-white flex flex-col gap-5 rounded-sm">
-        <div className="w-full grid grid-cols-4 gap-5 text-[12px] px-3 py-2">
+        <div className="w-full grid grid-cols-4 gap-5 items-end text-[12px] px-3 py-2">
           <div className="flex flex-col">
-            <label>Date</label>
+            <label>
+              Date /<span className="text-[10px]"> തീയതി</span>
+            </label>
             <input
               onChange={(e) => setDate(e.target.value)}
               type="date"
@@ -116,10 +134,12 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             />
           </div>
           <div className="relative flex flex-col">
-            <label>Bonnet No</label>
+            <label>
+              Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span>
+            </label>
             <input
               type="text"
-              placeholder="search bonnet number"
+              placeholder="Search bonnet number"
               className="px-3 py-2 border rounded-sm"
               onClick={() => setShowBonnetDropDown(true)}
               value={bonnetNo}
@@ -143,13 +163,15 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             )}
           </div>
           <div className="flex flex-col">
-            <label>District</label>
+            <label>
+              District /<span className="text-[10px]"> ജില്ല</span>
+            </label>
             <select
               onChange={(e) => setDistrict(e.target.value)}
               className="px-3 py-2 border rounded-sm"
               value={district}
             >
-              <option value="">Select depo</option>
+              <option value="">Select District</option>
               <option value="Thiruvananthapuram">Thiruvananthapuram</option>
               <option value="Kollam">Kollam</option>
               <option value="Pathanamthitta">Pathanamthitta</option>
@@ -167,14 +189,17 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             </select>
           </div>
           <div className="flex flex-col">
-            <label>Operated Depo</label>
+            <label>
+              Operated Depo /
+              <span className="text-[10px]"> പ്രവർത്തിപ്പിക്കുന്ന ഡിപ്പോ</span>
+            </label>
             <select
               onChange={(e) => setDepo(e.target.value)}
               className="px-3 py-2 border rounded-sm"
               value={depo}
             >
               <option value="" disabled>
-                Select Depot
+                Select Depo
               </option>
               {allDepos.map((depo: any) =>
                 depo.depot.map((d: any) => (
@@ -204,7 +229,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 px-3 py-5">
+      <div className="flex flex-col gap-3 py-5">
         {isLoading ? (
           <p>loading...</p>
         ) : !isLoading && accidentList && accidentList?.length < 1 ? (
@@ -214,7 +239,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           accidentList.map((d: any) => (
             <div
               key={d.accident_id}
-              className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer"
+              className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer rounded-sm"
               onClick={() => handlecaseSelect(d)}
             >
               <div className="flex justify-between">

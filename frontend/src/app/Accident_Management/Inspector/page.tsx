@@ -5,7 +5,10 @@ import FormInspectorReport from "@/components/accident_management/inspector/form
 import FormInsurenceReport from "@/components/accident_management/inspector/form_insurence_report";
 import ReferenceNumberSearchModal from "@/components/accident_management/search_referencenumber_modal";
 import { Input } from "@/components/ui/input";
-import { InspectorReportData } from "@/models/AccidentData";
+import {
+  AccidentInsuranceModel,
+  InspectorReportData,
+} from "@/models/AccidentData";
 import { Autocomplete, TextField } from "@mui/material";
 import { User2, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -20,7 +23,7 @@ const AccedentInspectorForm = () => {
       accident_id: "",
       date_of_accident: "",
       bonet_no: "",
-      inquiry_inspector_name_ksrtc: "",
+      inquiry_inspector_name: "",
       fir_registered: false,
       fir_number: "",
       under_section_details: "",
@@ -29,7 +32,6 @@ const AccedentInspectorForm = () => {
       date_of_bus_released_from_police_station: "",
       enquiry_police_person_name: "",
       enquiry_police_phone_number: "",
-      digital_evidence: "",
       witness: "",
       primary_cause_of_accident_in_insp_report: "",
       responsibility_of_accident_in_insp_report: "",
@@ -42,6 +44,34 @@ const AccedentInspectorForm = () => {
       remarks: "",
       whether_bus_have_valid_insurance_or_not: false,
       created_by: "",
+      digital_evidence_files: [],
+      summary_of_inspector_report: "",
+      unit: "",
+      upload_document: "",
+      waybill: "",
+      schedule_details: "",
+      document_content_type: "",
+      document_filename: "",
+    });
+  const [insuranceReportData, setInsuranceReportData] =
+    useState<AccidentInsuranceModel>({
+      accident_id: "",
+      type_of_insurance: "",
+      insurance_claim_applied: false,
+      insurance_company_name: "",
+      policy_number: "",
+      claim_number: "",
+      date_of_insurance_claim_applied: "",
+      name_of_spot_surveyor: "",
+      spot_surveyor_phone_number: "",
+      final_bill_submitted_insurance_co: false,
+      final_bill_amount_to_ksrtc: 0,
+      approved_amount_by_insurance_co: 0,
+      admitted_amount_by_insurance_co: 0,
+      payment_settled: false,
+      date_of_payment_settled: null,
+      remarks: "",
+      created_by: "",
     });
   const [fetchedDetails, setFetchedDetails] = useState<{
     accident_id: string;
@@ -51,6 +81,7 @@ const AccedentInspectorForm = () => {
     driverPhoneNumber: string;
     conductorName: string;
     conductorPhoneNumber: string;
+    bonnetNumber: string;
   } | null>(null);
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(50);
@@ -65,6 +96,7 @@ const AccedentInspectorForm = () => {
     const driverPhoneNumber = selectedData.crew_information.driver_phn_no;
     const conductorName = selectedData.crew_information.conductor_name;
     const conductorPhoneNumber = selectedData.crew_information.conductor_phn_no;
+    const bonnetNumber = selectedData.vehicle_info.bonet_no;
     setFetchedDetails({
       accident_id: accidentId,
       date,
@@ -73,8 +105,15 @@ const AccedentInspectorForm = () => {
       driverPhoneNumber,
       conductorName,
       conductorPhoneNumber,
+      bonnetNumber,
     });
-    setInspectorReportData(selectedData);
+    setInspectorReportData({
+      ...inspectorReportData,
+      accident_id: accidentId,
+      bonet_no: bonnetNumber,
+      date_of_accident: date,
+    });
+    setInsuranceReportData({ ...insuranceReportData, accident_id: accidentId });
   };
 
   // progressbar
@@ -89,9 +128,68 @@ const AccedentInspectorForm = () => {
       stateUpdateHandler={setInspectorReportData}
       fetchedDetails={fetchedDetails}
     />,
-    <FormInspectorReport />,
-    <FormInsurenceReport />,
+    <FormInspectorReport
+      accidentData={inspectorReportData}
+      stateUpdateHandler={setInspectorReportData}
+    />,
+    <FormInsurenceReport
+      insuranceForm={insuranceReportData}
+      stateUpdateHandler={setInsuranceReportData}
+      inspectorReport={inspectorReportData}
+      inspectorUpdateFunction={setInspectorReportData}
+    />,
   ];
+
+  // submit handler
+  const handleSubmit = async () => {
+    const inspectorReportBody = {
+      ...inspectorReportData,
+      report_date: new Date(),
+      created_by: "admin@ktrack",
+      digital_evidence_count: inspectorReportData.digital_evidence_files.length,
+    };
+
+    const insuranceBody = {
+      ...insuranceReportData,
+      created_by: "admin@ktrac",
+    };
+
+    console.log(insuranceBody);
+
+    const [inspectorResponse, insuranceResponse] = await Promise.all([
+      fetch("/api/submitAccidentInspectorForm", {
+        method: "POST",
+        body: JSON.stringify(inspectorReportBody),
+      }),
+      fetch("/api/submitAccidentInsuranceForm", {
+        method: "POST",
+        body: JSON.stringify(insuranceBody),
+      }),
+    ]);
+
+    if (inspectorResponse.ok && inspectorResponse.ok) {
+      const inspectorData = await inspectorResponse.json();
+      const insuranceData = await insuranceResponse.json();
+      // console.log(inspectorData, insuranceData);
+
+      alert("Inspector and Insurance data created");
+    }
+
+    if (!inspectorResponse.ok) {
+      const errorData = await inspectorResponse.json();
+      console.log(`error in inspector form submittion`);
+      console.log(errorData);
+      alert("something went wrong in inspector form");
+    }
+
+    if (!insuranceResponse.ok) {
+      const errorData = await inspectorResponse.json();
+      console.log(`error in inspector form submittion`);
+      console.log(errorData);
+      alert("something went wrong in insurance form");
+    }
+  };
+
   return (
     <React.Fragment>
       <div className="flex flex-col h-[88vh] pt-1 text-[12px] gap-3">
@@ -149,7 +247,10 @@ const AccedentInspectorForm = () => {
                   Save Draft
                 </button>
                 {selectedTab === tabs.length - 1 && (
-                  <button className="border font-[500] px-5 py-1 rounded-xs bg-sidebar text-white">
+                  <button
+                    onClick={handleSubmit}
+                    className="border font-[500] px-5 py-1 rounded-xs bg-sidebar text-white"
+                  >
                     Submit
                   </button>
                 )}

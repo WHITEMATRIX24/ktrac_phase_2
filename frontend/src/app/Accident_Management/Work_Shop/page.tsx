@@ -3,6 +3,7 @@ import ReferenceNumberSearchModal from "@/components/accident_management/search_
 import AdditionalInfoForm from "@/components/accident_management/workshop/form_additional";
 import BasicAndWorkShopForm from "@/components/accident_management/workshop/form_basicWorkshop";
 import InsuranceAndCostForm from "@/components/accident_management/workshop/form_insuranceCost";
+import { AccidentWorkshopReport } from "@/models/AccidentData";
 import React, { useEffect, useState } from "react";
 
 const tabs = ["Basic & Workshop", "Insurance & Cost", "Additional info"];
@@ -14,24 +15,109 @@ interface SelectedAccedentModel {
 }
 
 const AccedentWorkshop = () => {
-  const [selectedAccedentData, setSelectedAccedentData] =
-    useState<SelectedAccedentModel | null>(null);
+  const [selectedAccedentData, setSelectedAccedentData] = useState<{
+    accident_id: string;
+    bonet_no: string;
+    date_of_accident: string;
+  } | null>(null);
+  const [workShopForm, setWorkshopForm] = useState<AccidentWorkshopReport>({
+    accident_id: "",
+    bonet_no: "",
+    created_by: "",
+    accident_reference_number: "",
+    date_of_accident: "",
+    bus_no: "",
+    repair_work_done_at_workshop: false,
+    workshop_depot_name: "",
+    date_of_entry: "",
+    date_of_work_start: "",
+    date_of_released: "",
+    no_of_days_at_workshop: 0,
+    insurance_surveyor_name: "",
+    insurance_surveyor_phone_number: "",
+    damage_to_bus: "",
+    damage_assessment_report: "",
+    spare_part_cost: 0,
+    labour_cost: 0,
+    total_bill_amount: 0,
+    cost_of_damage: 0,
+    cod_recovered: false,
+    cod_recovery_amount: 0,
+    vehicle_towed_status: false,
+    towing_charges: 0,
+    towing_company_name: "",
+    repair_status: "",
+    work_completion_percentage: 0,
+    quality_check_status: false,
+    work_order_number: "",
+    invoice_number: "",
+    final_inspection_report: "",
+    remarks: "",
+  });
   const tabList = [
-    <BasicAndWorkShopForm selectedAccedentData={selectedAccedentData} />,
-    <InsuranceAndCostForm />,
-    <AdditionalInfoForm />,
+    <BasicAndWorkShopForm
+      workShopFormData={workShopForm}
+      formUpdateController={setWorkshopForm}
+    />,
+    <InsuranceAndCostForm
+      formUpdateController={setWorkshopForm}
+      workShopFormData={workShopForm}
+    />,
+    <AdditionalInfoForm
+      formUpdateController={setWorkshopForm}
+      workShopFormData={workShopForm}
+    />,
   ];
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(0);
 
-  const handleSearchSelect = (selectedData: any) =>
-    setSelectedAccedentData(selectedData);
+  const handleSearchSelect = (selectedData: any) => {
+    const accidentId = selectedData.accident_id;
+    const bonnetNo = selectedData.vehicle_info.bonet_no;
+    const accidentDate = selectedData.accident_details.date_of_accident;
 
+    setSelectedAccedentData({
+      accident_id: accidentId,
+      bonet_no: bonnetNo,
+      date_of_accident: accidentDate,
+    });
+  };
   // progressbar
   useEffect(() => {
     const progressValuePerTab = 100 / tabs.length;
     setProgressStatus(progressValuePerTab * (selectedTab + 1));
   }, [selectedTab]);
+
+  // submit handler
+  const handleSubmit = async () => {
+    const body = {
+      ...workShopForm,
+      accident_id: selectedAccedentData?.accident_id,
+      bonet_no: selectedAccedentData?.bonet_no,
+      bus_no: selectedAccedentData?.bonet_no,
+      date_of_accident: selectedAccedentData?.date_of_accident,
+      accident_reference_number: selectedAccedentData?.accident_id,
+      created_by: "admin",
+    };
+
+    try {
+      const response = await fetch("/api/submitAccidentWorkshopForm", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        // console.log(responseData);
+        alert("create successufully");
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error.error || "something went wrong");
+      }
+    } catch (error) {
+      console.error("Network error or unexpected error:", error);
+    }
+  };
 
   return (
     <React.Fragment>
@@ -90,7 +176,10 @@ const AccedentWorkshop = () => {
                   Save Draft
                 </button>
                 {selectedTab === tabs.length - 1 && (
-                  <button className="border font-[500] px-5 py-1 rounded-xs bg-sidebar text-white">
+                  <button
+                    onClick={handleSubmit}
+                    className="border font-[500] px-5 py-1 rounded-xs bg-sidebar text-white"
+                  >
                     Submit
                   </button>
                 )}
