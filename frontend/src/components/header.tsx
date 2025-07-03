@@ -24,6 +24,7 @@ interface User {
 }
 
 export default function Header() {
+  const [roles, setRoles] = useState('')
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
   const mainTitle = pathSegments[0]
@@ -39,6 +40,7 @@ export default function Header() {
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
+    setRoles(role);
     let userData = user;
     console.log(role);
     if (role === "Finance") {
@@ -64,6 +66,20 @@ export default function Header() {
     else if (role === "Accident_Management") {
       userData = {
         name: "Accident Managemet",
+        email: "Supervisor",
+        avatar: "/Captureuseravathar.PNG",
+      };
+    }
+    else if (role === "Depo") {
+      userData = {
+        name: "Depot Managemet",
+        email: "Supervisor",
+        avatar: "/Captureuseravathar.PNG",
+      };
+    }
+    else if (role === "Inspector") {
+      userData = {
+        name: "Inspector",
         email: "Supervisor",
         avatar: "/Captureuseravathar.PNG",
       };
@@ -118,8 +134,8 @@ export default function Header() {
         </div> */}
 
         {/* Add Notification System Here */}
-        <NotificationSystem />
-
+        {roles != "Inspector" && <NotificationSystem />
+        }
         <div className="flex items-center gap-2">
           <NavUser user={user} />
         </div>

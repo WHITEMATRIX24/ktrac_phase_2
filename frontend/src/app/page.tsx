@@ -14,31 +14,56 @@ export default function Home() {
       username: "admin",
       password: "admin@ktrac#",
       role: "Admin",
+      depo: "Admin",
     },
     {
       username: "financeunit",
       password: "finance@ktrac#",
       role: "Finance",
+      depo: "Admin",
     },
     {
       username: "maintenanceunit",
       password: "maintenance@ktrac#",
       role: "Maintenance",
+      depo: "Admin",
     },
     {
       username: "hrunit",
       password: "hr@ktrac#",
       role: "Employee",
+      depo: "Admin",
+
     },
     {
       username: "accident",
       password: "accident@ktrac#",
       role: "Accident_Management",
+      depo: "Admin"
     },
     {
       username: "accidentreport",
       password: "accidentreport@ktrac#",
       role: "Accident_Report",
+      depo: "Admin"
+    },
+    {
+      username: "tvmdepo",
+      password: "tvmdepo@ktrac#",
+      role: "Depo",
+      depo: "ernakulam"
+    },
+    {
+      username: "inspector",
+      password: "inspector@ktrac#",
+      role: "Inspector",
+      depo: "ernakulam"
+    },
+    {
+      username: "workshop",
+      password: "workshop@ktrac#",
+      role: "Workshop",
+      depo: "ernakulam"
     },
   ];
 
@@ -50,6 +75,7 @@ export default function Home() {
 
     if (user) {
       localStorage.setItem("userRole", user.role);
+      localStorage.setItem("userDepo", user.depo);
       if (user.role === "Admin") {
         router.replace("/Dashboard/Revenue");
       } else if (user.role === "Finance") {
@@ -58,10 +84,14 @@ export default function Home() {
         router.replace("/Predictive_Maintenance_System/Overview");
       } else if (user.role === "Employee") {
         router.replace("/Employee_Management/Overview");
-      } else if (user.role == "Accident_Management") {
+      } else if (user.role == "Accident_Management" || user.role == "Depo") {
         router.replace("/Accident_Management/Accident_Report");
       } else if (user.role == "Accident_Report") {
         router.replace("/Accident_Zeroth_Report/ZerothReportRegister");
+      } else if (user.role == "Inspector") {
+        router.replace("/Accident_Management/Inspector");
+      } else if (user.role == "Workshop") {
+        router.replace("/Accident_Management/Work_Shop");
       }
     } else {
       alert("Invalid username or password");

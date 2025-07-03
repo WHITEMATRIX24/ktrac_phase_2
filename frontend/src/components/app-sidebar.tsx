@@ -13,6 +13,11 @@ import {
   LucideIcon,
   Wrench,
   User2,
+  Bus,
+  UserCircle,
+  AlertTriangle,
+  ClipboardList,
+  FileWarning,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -25,110 +30,37 @@ import {
 } from "@/components/ui/sidebar";
 import { TeamSwitcherStatic } from "./team-switcher";
 
+interface NavSubItem {
+  title: string;
+  url: string;
+  disabled?: boolean;
+}
+
 interface NavItem {
   title: string;
   url: string;
   icon?: LucideIcon;
   isActive?: boolean;
-  items?: { title: string; url: string }[];
+  items?: NavSubItem[];
 }
-const defaultNavItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    url: "#",
-    icon: LayoutDashboard,
-    isActive: true,
-    items: [
-      { title: "Revenue", url: "/Dashboard/Revenue" },
-      { title: "Bus Position", url: "/Dashboard/Bus_Position" },
-      // {
-      //   title: "Unit wise bus allotment",
-      //   url: "/Dashboard/Unit_Wise_Bus_Allotment",
-      // },
-      { title: "Bus Attendance", url: "/Dashboard/Bus_Attendance" },
 
-      { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
-      { title: "Dockyard", url: "/Dashboard/Dockyard" },
-      {
-        title: "Predictive Revenue",
-        url: "/Dashboard/Predictive_Revenue",
-      },
-      {
-        title: "Predictive Expense",
-        url: "/Dashboard/Predictive_Expense",
-      },
-      {
-        title: "Predictive Maintenance",
-        url: "/Dashboard/Predictive_Maintenance",
-      },
-    ],
-  },
-  {
-    title: "Revenue",
-    url: "#",
-    icon: WalletCards,
-    items: [
-      { title: "Income", url: "#" },
-      { title: "Expense", url: "#" },
-    ],
-  },
-  {
-    title: "Schedule Management",
-    url: "#",
-    icon: Layers,
-    items: [
-      { title: "Add Schedule", url: "#" },
-      { title: "Update Schedule", url: "#" },
-    ],
-  },
-  {
-    title: "Dock Management",
-    url: "#",
-    icon: Layers,
-    items: [
-      { title: "Report Dock", url: "/Dock_Management/Report_Dock" },
-      { title: "Release Dock", url: "#" },
-    ],
-  },
-  {
-    title: "Reports",
-    url: "#",
-    icon: PieChart,
-    items: [
-      // { title: "Bus Position", url: "/Reports/Busposition" },
-      // { title: "Classwise Dock", url: "/Reports/Classwise_Dock" },
-      // { title: "Dock Busses", url: "/Reports/Dock_Busses" },
-      // {
-      //   title: "Unitwise Bus Deployment",
-      //   url: "/Reports/Unitwise_bus_deployment",
-      // },
-      // { title: "Enroute Buses", url: "/Reports/Enroute_buses" },
-      { title: "Accident Bus Type", url: "/Reports/Accidents/Bus_Type_Wise" },
-      {
-        title: "Accident Collision Type",
-        url: "/Reports/Accidents/Collision_Type",
-      },
-      {
-        title: "Accident District Wise",
-        url: "/Reports/Accidents/District_Wise",
-      },
-      {
-        title: "Accident Involved Vehicle",
-        url: "/Reports/Accidents/Involved_Vehicle",
-      },
-      {
-        title: "Accident Responsibility",
-        url: "/Reports/Accidents/Responsibility",
-      },
-      { title: "Accident Time Wise", url: "/Reports/Accidents/Time_Wise" },
-    ],
-  },
-];
+// Utility to mark subitems with url "#" as disabled
+function markDisabledUrls(items: NavItem[]): NavItem[] {
+  return items.map(item => ({
+    ...item,
+    items: item.items?.map(subItem => ({
+      ...subItem,
+      disabled: subItem.url === "#",
+    })),
+  }));
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [navItems, setNavItems] = React.useState<NavItem[]>(defaultNavItems);
+  const [navItems, setNavItems] = React.useState<NavItem[]>([]);
+
   React.useEffect(() => {
     const role = localStorage.getItem("userRole");
-    let computedNavItems: NavItem[];
+    let computedNavItems: NavItem[] = [];
 
     if (role === "Finance") {
       computedNavItems = [
@@ -234,13 +166,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               title: "All Employees",
               url: "/Employee_Management/All_Employees",
             },
-            { title: "Add Employee", url: "/Employee_Management/Add_Employee" },
-            { title: "Attendance", url: "/Employee_Management/Attendance" },
+            { title: "Add Employee", url: "#" },
+            { title: "Attendance", url: "#" },
             {
               title: "Leave Requests",
-              url: "/Employee_Management/Leave_Requests",
+              url: "#",
             },
-            { title: "Payroll", url: "/Employee_Management/Payroll" },
+            { title: "Payroll", url: "#" },
           ],
         },
       ];
@@ -274,11 +206,99 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ],
         },
       ];
-    } else {
-      computedNavItems = defaultNavItems;
+    } else if (role === "Depo") {
+      computedNavItems = [
+        {
+          title: "Accident Management",
+          url: "#",
+          icon: AlertTriangle,
+          items: [
+            {
+              title: "Primary Report",
+              url: "/Accident_Management/Accident_Report",
+            },
+            {
+              title: "Workshop Report",
+              url: "/Accident_Management/Work_Shop",
+            },
+          ],
+        },
+        {
+          title: "Vehicle Management",
+          url: "#",
+          icon: Bus,
+          items: [
+            { title: "Schedule Vehicle", url: "#" },
+            { title: "Maintenance Log", url: "#" },
+            { title: "Vehicle Status", url: "#" },
+          ],
+        },
+        {
+          title: "Staff Management",
+          url: "#",
+          icon: UserCircle,
+          items: [
+            { title: "Assign Driver", url: "#" },
+            { title: "Assign Conductor", url: "#" },
+            { title: "Staff Performance", url: "#" },
+          ],
+        },
+        {
+          title: "Reports & Analytics",
+          url: "#",
+          icon: BarChart2,
+          items: [
+            { title: "Monthly Report", url: "#" },
+            { title: "Depot Summary", url: "#" },
+          ],
+        },
+      ];
+    } else if (role === "Inspector") {
+      computedNavItems = [
+        {
+          title: "Accident Management",
+          url: "#",
+          icon: FileWarning,
+          items: [
+            {
+              title: "Inspector Report",
+              url: "/Accident_Management/Inspector",
+            },
+          ],
+        },
+        {
+          title: "Vehicle Inspection",
+          url: "#",
+          icon: ClipboardList,
+          items: [
+            { title: "Daily Inspection Log", url: "#" },
+            { title: "Vehicle Condition Report", url: "#" },
+            { title: "Pending Maintenance Follow-up", url: "#" },
+          ],
+        },
+        {
+          title: "Driver Oversight",
+          url: "#",
+          icon: User2,
+          items: [
+            { title: "Driver Feedback", url: "#" },
+            { title: "Performance Alerts", url: "#" },
+          ],
+        },
+        {
+          title: "Audit & Reports",
+          url: "#",
+          icon: BarChart2,
+          items: [
+            { title: "Depot Audit Summary", url: "#" },
+            { title: "Accident Analytics", url: "#" },
+          ],
+        },
+      ];
     }
 
-    setNavItems(computedNavItems);
+    // ✅ Mark all "#" subitems as disabled
+    setNavItems(markDisabledUrls(computedNavItems));
   }, []);
 
   return (

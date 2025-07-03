@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,20 +16,21 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+interface SubItem {
+  title: string;
+  url: string;
+  disabled?: boolean;
+}
+
+interface NavItem {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  isActive?: boolean;
+  items?: SubItem[];
+}
+
+export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -54,9 +54,18 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
+                        {subItem.disabled ? (
+                          <span
+                            className="px-2 py-1 text-gray-400 cursor-not-allowed opacity-50"
+                            title="Coming Soon"
+                          >
+                            {subItem.title}
+                          </span>
+                        ) : (
+                          <a href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </a>
+                        )}
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

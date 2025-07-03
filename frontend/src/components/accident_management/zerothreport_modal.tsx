@@ -244,7 +244,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
         <div className="min-h-screen  flex flex-col">
             <div className="flex-1 px-4 w-full h-full">
                 {showRegistrationForm ? (
-                    <div className="bg-white border rounded-sm shadow-sm w-full min-h-[80vh] p-4 sm:p-6">
+                    <div className="bg-white border rounded-sm shadow-sm w-full min-h-[80vh] p-4 sm:p-6 mt-3">
                         <div className="text-center mb-6">
                             <h3 className="text-xl font-semibold text-gray-800">
                                 Enter Vehicle Details <br />

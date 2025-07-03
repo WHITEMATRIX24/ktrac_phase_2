@@ -507,7 +507,7 @@ const PrimaryAccidentReport: React.FC = () => {
         handleCancel();
     };
     const [collisionOptions, setCollisionOptions] = React.useState<string[]>([
-        "Select Type of Collision", "Head On Collision", "Hit Behind By KSRTC", "Hit Behind by Thrid Party", "Hit Side by KSRTC"
+        "Select Type of Collision", "Head On Collision", "Hit Behind By KSRTC", "Hit Behind by Thrid Party", "Hit Side by KSRTC", "Hit Side by Thirdparty", "Hit behind Serial", "Hit Front by Ksrtc"
     ]);
     const [customCollision, setCustomCollision] = React.useState<string>("");
 
@@ -1305,7 +1305,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="accidentType"
                                                                     value={formData.accidentType}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
@@ -1315,11 +1315,12 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                 </label>
                                                                 <select
                                                                     name="accidentOccurred"
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 >
                                                                     <option value="">Select Status (സ്ഥിതി തിരഞ്ഞെടുക്കുക)</option>
                                                                     <option value="Middle of Service">Middle of Service (സേവനത്തിന്റെ മധ്യത്തിൽ)</option>
                                                                     <option value="Start of Service">Start of Service(സേവനത്തിന്റെ തുടക്കത്തിൽ)</option>
+                                                                    <option value="End of Service">End of Service(സേവനത്തിൻ്റെ അവസാനം)</option>
                                                                 </select>
                                                             </div>
 
@@ -1331,7 +1332,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="typeOfCollision"
                                                                     value={formData.typeOfCollision}
                                                                     onChange={handleCollisionChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 >
                                                                     {collisionOptions.map((opt) => (
                                                                         <option key={opt} value={opt}>{opt}</option>
@@ -1345,7 +1346,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         value={customCollision}
                                                                         onChange={(e) => setCustomCollision(e.target.value)}
                                                                         onBlur={handleAddCustomCollision}
-                                                                        className="w-full py-[8px] px-[12px] mt-[6px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] mt-[6px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 )}
                                                             </div>
@@ -1359,7 +1360,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="primaryCause"
                                                                     value={formData.primaryCause}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
@@ -1372,7 +1373,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="primaryResponsibility"
                                                                     value={formData.primaryResponsibility}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1392,13 +1393,15 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="roadClassification"
                                                                     value={formData.roadClassification}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 >
                                                                     <option value="">Select Classification</option>
                                                                     <option value="NH_ROAD">National Highway (ദേശീയ പാത)</option>
                                                                     <option value="SH_ROAD">State Highway (സംസ്ഥാന പാത)</option>
                                                                     <option value="DR_ROAD">District Road (ജില്ലാ റോഡ്)</option>
                                                                     <option value="RR_ROAD">Rural Road (ഗ്രാമീണ റോഡ്)</option>
+                                                                    <option value="BUS_STATION">Bus Station (ബസ് സ്റ്റേഷൻ)</option>
+                                                                    <option value="BY_ROAD">By Road</option>
                                                                 </select>
                                                             </div>
 
@@ -1410,13 +1413,13 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="roadCondition"
                                                                     value={formData.roadCondition}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 >
                                                                     <option value="">Select Condition (അവസ്ഥ തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="DOWN_HILL">Good (നല്ലത്)</option>
-                                                                    <option value="FLAT">Average (ശരാശരി)</option>
-                                                                    <option value="FLOOD">Poor (മോശം)</option>
-                                                                    <option value="U_TURN">Under Construction (നിർമ്മാണത്തിലുള്ള)</option>
+                                                                    <option value="DOWN_HILL">Down Hill (കുന്നിൻ താഴെ)</option>
+                                                                    <option value="FLAT">Flat (നിരപ്പായ)</option>
+                                                                    <option value="FLOOD">Flood</option>
+                                                                    <option value="U_TURN">Hairpin Down (ഹെയർപിൻP)</option>
                                                                 </select>
                                                             </div>
 
@@ -1428,10 +1431,10 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="weatherCondition"
                                                                     value={formData.weatherCondition}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 >
                                                                     <option value="">Select Condition (അവസ്ഥ തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="SUNNY">Clear (വെളിച്ചം)</option>
+                                                                    <option value="SUNNY">Sunny (വെളിച്ചം)</option>
                                                                     <option value="RAINY">Rainy (മഴ)</option>
                                                                     <option value="FOGGY">Foggy (മൂടൽമഞ്ഞ്)</option>
                                                                     <option value="NIGHT">Stormy (കൊടുങ്കാറ്റ്)</option>
@@ -1446,7 +1449,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="trafficDensity"
                                                                     value={formData.trafficDensity}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 >
                                                                     <option value="">Select Density (സാന്ദ്രത തിരഞ്ഞെടുക്കുക)</option>
                                                                     <option value="LIGHT">Low (കുറഞ്ഞ)</option>
@@ -1494,7 +1497,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="damageToBus"
                                                                     value={formData.damageToBus}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                     rows={3}
                                                                 />
                                                             </div>
@@ -1509,7 +1512,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="thirdPartyPropertiesDamaged"
                                                                     value={formData.thirdPartyPropertiesDamaged}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
@@ -1522,7 +1525,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="inquiryInspectorName"
                                                                     value={formData.inquiryInspectorName}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
@@ -1535,7 +1538,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="inspectorPhone"
                                                                     value={formData.inspectorPhone}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
@@ -1547,7 +1550,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="jurisdictionDepot"
                                                                     value={formData.jurisdictionDepot}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                             <div>
@@ -1558,7 +1561,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="nearestPoliceStation"
                                                                     value={formData.nearestPoliceStation}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1584,7 +1587,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="fatalitiesKsrtcCrew"
                                                                         value={formData.fatalitiesKsrtcCrew || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1596,7 +1599,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="fatalitiesPassengers"
                                                                         value={formData.fatalitiesPassengers || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1608,7 +1611,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="fatalitiesThirdParty"
                                                                         value={formData.fatalitiesThirdParty || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1620,7 +1623,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="majorInjuriesKsrtcCrew"
                                                                         value={formData.majorInjuriesKsrtcCrew || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1632,7 +1635,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="majorInjuriesPassengers"
                                                                         value={formData.majorInjuriesPassengers || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1644,7 +1647,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="majorInjuriesThirdParty"
                                                                         value={formData.majorInjuriesThirdParty || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1656,7 +1659,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="minorInjuriesKsrtcCrew"
                                                                         value={formData.minorInjuriesKsrtcCrew || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1668,7 +1671,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="minorInjuriesPassengers"
                                                                         value={formData.minorInjuriesPassengers || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1680,7 +1683,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="minorInjuriesThirdParty"
                                                                         value={formData.minorInjuriesThirdParty || ''}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1692,7 +1695,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="totalFatalities"
                                                                         value={formData.totalFatalities}
                                                                         readOnly
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1704,7 +1707,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="totalMajorInjuries"
                                                                         value={formData.totalMajorInjuries}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                                 <div>
@@ -1716,7 +1719,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="totalMinorInjuries"
                                                                         value={formData.totalMinorInjuries}
                                                                         onChange={handleChange}
-                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -1732,11 +1735,11 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                     {/* LEFT: Recovery Details */}
-                                                    <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar-bg)]">
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
                                                             Recovery Details <span className="text-[10px]">(പുനരുപയോഗ വിവരങ്ങൾ)</span>
-                                                        </h4>
-                                                        <div className="space-y-5">
+                                                        </h3>
+                                                        <div className="space-y-5 p-[16px]">
                                                             {/* Docked/Service After Accident */}
                                                             <div className="mb-3">
                                                                 <label className="text-[12px] text-[#374151] mb-[6px] block">
@@ -1758,10 +1761,10 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         <input
                                                                             type="radio"
                                                                             name="dockedOrServiceAfter"
-                                                                            value="Service After Accident"
+                                                                            value="Service"
                                                                             onChange={handleChange}
                                                                             className="w-[14px] h-[14px] mb-2"
-                                                                            checked={formData.dockedOrServiceAfter === "Service After Accident"}
+                                                                            checked={formData.dockedOrServiceAfter === "Service"}
                                                                         />
                                                                         <span className="text-xs font-medium">
                                                                             Service after Accident <span className="text-[10px]">(അപകടത്തിന് ശേഷം സേവനം)</span>
@@ -1870,11 +1873,11 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* RIGHT: Cost & Settlement */}
-                                                    <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar-bg)]">
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
                                                             Cost & Settlement <span className="text-[10px]">(ചെലവും തീർപ്പും)</span>
-                                                        </h4>
-                                                        <div className="space-y-4">
+                                                        </h3>
+                                                        <div className="space-y-4 p-[16px]">
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
                                                                     Cost of Damage Assessed Amount (₹) <span className="text-[10px]">(നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം)</span>
@@ -1884,7 +1887,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="costOfDamage"
                                                                     value={formData.costOfDamage}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
@@ -1897,7 +1900,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="amountSettledWithDriver"
                                                                     value={formData.amountSettledWithDriver}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                             <div>
@@ -1910,7 +1913,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     value={formData.severity}
                                                                     readOnly
 
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] bg-gray-100 rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] bg-gray-100 rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                             <div>
@@ -1986,7 +1989,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     name="remarks"
                                                                     value={formData.remarks}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                     rows={3}
                                                                 />
                                                             </div>
