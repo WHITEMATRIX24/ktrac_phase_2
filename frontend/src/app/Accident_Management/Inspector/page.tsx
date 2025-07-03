@@ -197,15 +197,20 @@ const AccedentInspectorForm = () => {
           <ReferenceNumberSearchModal caseSelectHandler={handleSearchSelect} />
         ) : (
           <>
+            <div className="pt-5 px-3 flex justify-end">
+              <h6 className="text-2xl font-semibold text-themeRed">
+                {fetchedDetails.accident_id}
+              </h6>
+            </div>
             {/* tab */}
-            <div className="flex flex-col bg-white">
-              <div className="flex  gap-3  border-b font-semibold text-slate-500 ">
+            <div className="flex flex-col">
+              <div className="flex  gap-3  border-b font-semibold text-white bg-[var(--sidebar-bg)]">
                 {tabs.map((tab, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedtab(index)}
                     className={`flex items-center px-4 py-2.5 text-[12px] font-medium cursor-pointer ${
-                      selectedTab === index && "border-b-2 border-b-sidebar"
+                      selectedTab === index && "border-b-2 border-b-white"
                     }`}
                   >
                     {tab}
@@ -213,7 +218,7 @@ const AccedentInspectorForm = () => {
                 ))}
               </div>
               <div
-                className={`h-[2px] bg-sidebar`}
+                className={`h-[2px] bg-[var(--sidebar-bg)]`}
                 style={{ width: `${progressStatus}%` }}
               ></div>
             </div>
@@ -224,7 +229,7 @@ const AccedentInspectorForm = () => {
               <div className="flex gap-3">
                 {selectedTab !== 0 && (
                   <button
-                    className="bg-green-600 font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+                    className="bg-[#059669] font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
                     onClick={() => setSelectedtab((prevValue) => prevValue - 1)}
                   >
                     Previous
@@ -240,12 +245,12 @@ const AccedentInspectorForm = () => {
                 )}
               </div>
               <div className="flex gap-3">
-                <button className="border font-[500] px-5 py-1 rounded-xs">
+                <button className="border bg-themeRed text-white font-[500] px-5 py-1 rounded-xs">
                   Cancel
                 </button>
-                <button className="border font-[500] px-5 py-1 rounded-xs">
+                {/* <button className="border font-[500] px-5 py-1 rounded-xs">
                   Save Draft
-                </button>
+                </button> */}
                 {selectedTab === tabs.length - 1 && (
                   <button
                     onClick={handleSubmit}

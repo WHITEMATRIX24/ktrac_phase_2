@@ -1,93 +1,102 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ReportDataTable } from "@/components/report_datatable";
+import { ReportDataTable } from "@/components/reports/accidents/report_datatable";
 import { ColumnDef } from "@tanstack/react-table";
 
 // Define data type
 export type AccidentTypeData = {
-  Type: string;
-  Fatal: number;
-  Major: number;
-  Minor: number;
-  Total: number;
-  Date: string;
+  type: string;
+  fatal: number;
+  major: number;
+  minor: number;
+  total: number;
 };
 
 // Table column definitions
 const accidentTypeColumns: ColumnDef<AccidentTypeData>[] = [
-  { accessorKey: "Type", header: "Accident Type" },
-  { accessorKey: "Fatal", header: "Fatal" },
-  { accessorKey: "Major", header: "Major" },
-  { accessorKey: "Minor", header: "Minor" },
-  { accessorKey: "Total", header: "Total" },
-  { accessorKey: "Date", header: "Date" },
+  { accessorKey: "type", header: "Accident Type" },
+  { accessorKey: "fatal", header: "Fatal" },
+  { accessorKey: "major", header: "Major" },
+  { accessorKey: "minor", header: "Minor" },
+  { accessorKey: "total", header: "Total" },
 ];
 
-// List of accident types
-const accidentTypes = [
-  "KSRTC - FOUR WHEELER",
-  "KSRTC - TWO WHEELER",
-  "KSRTC - OBJECT",
-  "KSRTC - LORRY",
-  "KSRTC - PEDESTRIAN",
-  "KSRTC - KSRTC",
-  "KSRTC - PICK UP",
-  "KSRTC - PRIVATE BUS",
-  "KSRTC - KSWIFT",
-  "KSRTC - TRUCK",
-  "OTHERS",
-  "KSRTC - BICYCLE",
-  "SUDDEN BRAKE",
-  "KSRTC - SCHOOL BUS",
-  "CAUGHT FIRE",
-  "JUMP OVER HUMP",
-];
+const formatDateForAPI = (input: string): string => {
+  const [year, month, day] = input.split("-");
+  const shortYear = year.slice(2);
+  return `${day}/${month}/${shortYear}`;
+};
 
-// Utility for random number
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const getSameDayLastMonth = () => {
+  const today = new Date();
+  const lastMonth = new Date(today);
 
-// Generate table data with random accident values and a date within the range
-const generateAccidentTypeData = (
-  from: string,
-  to: string
-): AccidentTypeData[] => {
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
+  lastMonth.setMonth(today.getMonth() - 1);
 
-  return accidentTypes.map((type) => {
-    const fatal = rand(0, 3);
-    const major = rand(0, 10);
-    const minor = rand(0, 20);
-    const total = fatal + major + minor;
-    const randomDate = new Date(
-      fromDate.getTime() +
-        Math.random() * (toDate.getTime() - fromDate.getTime())
-    )
-      .toISOString()
-      .split("T")[0];
+  // Handle cases where previous month had fewer days
+  if (
+    lastMonth.getMonth() === today.getMonth() - 1 + (12 % 12) &&
+    lastMonth.getDate() !== today.getDate()
+  ) {
+    lastMonth.setDate(0);
+  }
+  const year = lastMonth.getFullYear();
+  const month = String(lastMonth.getMonth() + 1).padStart(2, "0");
+  const day = String(lastMonth.getDate()).padStart(2, "0");
 
-    return {
-      Type: type,
-      Fatal: fatal,
-      Major: major,
-      Minor: minor,
-      Total: total,
-      Date: randomDate,
-    };
-  });
+  return `${year}-${month}-${day}`;
 };
 
 const InvolvedVehicleReport = () => {
-  const [startDate, setStartDate] = useState("2024-01-01");
+  const [startDate, setStartDate] = useState(getSameDayLastMonth());
   const [endDate, setEndDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [tableData, setTableData] = useState<AccidentTypeData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  //  report data fetching
+  const fetchReportData = async () => {
+    try {
+      !isLoading && setIsLoading(true);
+
+      const formatedStartDate = formatDateForAPI(startDate);
+      const formatedEndDate = formatDateForAPI(endDate);
+      //   console.log(formatedDate);
+
+      const response = await fetch(
+        `/api/reports/accidents/involved_vehicles?start_date=${formatedStartDate}&end_date=${formatedEndDate}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData);
+        return;
+      }
+
+      const responseData = await response.json();
+      const report = responseData.report;
+      const formatedReport = report.map((r: AccidentTypeData) => {
+        return {
+          ...r,
+          type: r.type
+            ? r.type.charAt(0).toUpperCase() + r.type.slice(1)
+            : r.type,
+        };
+      });
+      setTableData(formatedReport);
+    } catch (error) {
+      console.log(`something unexpected happen in responsibility report`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setTableData(generateAccidentTypeData(startDate, endDate));
+    if (startDate || endDate) {
+      fetchReportData();
+    }
   }, [startDate, endDate]);
 
   return (
@@ -96,13 +105,13 @@ const InvolvedVehicleReport = () => {
       <ReportDataTable
         columns={accidentTypeColumns}
         data={tableData}
-        searchKey="Type"
-        tableLabel="KSRTC Accident Type Table"
+        searchKey="type"
+        tableLabel="Involved Vehicle Report"
         startDate={startDate}
         startDateSetter={setStartDate}
         endDate={endDate}
         endDateSetter={setEndDate}
-        isLoading={false}
+        isLoading={isLoading}
       />
     </div>
   );

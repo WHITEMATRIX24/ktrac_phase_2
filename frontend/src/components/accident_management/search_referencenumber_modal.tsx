@@ -201,13 +201,15 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               <option value="" disabled>
                 Select Depo
               </option>
-              {allDepos.map((depo: any) =>
-                depo.depot.map((d: any) => (
-                  <option key={d["depot-abv"]} value={d["depot-name"]}>
-                    {d["depot-name"]}
-                  </option>
-                ))
-              )}
+              {allDepos &&
+                allDepos.length > 1 &&
+                allDepos.map((depo: any) =>
+                  depo.depot.map((d: any) => (
+                    <option key={d["depot-abv"]} value={d["depot-name"]}>
+                      {d["depot-name"]}
+                    </option>
+                  ))
+                )}
             </select>
           </div>
         </div>
@@ -221,7 +223,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             </button>
             <button
               onClick={handleSearch}
-              className="border px-3 py-1 rounded-sm bg-sidebar text-white"
+              className="border px-3 py-1 rounded-sm bg-[var(--sidebar-bg)] text-white"
             >
               Search
             </button>

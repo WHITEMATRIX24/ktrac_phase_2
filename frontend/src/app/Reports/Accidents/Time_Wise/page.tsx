@@ -2,28 +2,27 @@
 
 import React, { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ReportDataTable } from "@/components/report_datatable";
+import { ReportDataTable } from "@/components/reports/accidents/report_datatable";
 
 // Data type
 export type TimePeriodAccidentData = {
-  TimePeriod: string;
-  Fatal: number;
-  Major: number;
-  Minor: number;
-  Total: number;
-  Percentage: string;
-  Date: string;
+  time_period: string;
+  fatal: number;
+  major: number;
+  minor: number;
+  total: number;
+  percentage: string;
+  type?: string;
 };
 
 // Column definitions
 const timePeriodColumns: ColumnDef<TimePeriodAccidentData>[] = [
-  { accessorKey: "TimePeriod", header: "Time Period" },
-  { accessorKey: "Fatal", header: "Fatal" },
-  { accessorKey: "Major", header: "Major" },
-  { accessorKey: "Minor", header: "Minor" },
-  { accessorKey: "Total", header: "Total" },
-  { accessorKey: "Percentage", header: "% of Accident" },
-  { accessorKey: "Date", header: "Date" },
+  { accessorKey: "time_period", header: "Time Period" },
+  { accessorKey: "fatal", header: "Fatal" },
+  { accessorKey: "major", header: "Major" },
+  { accessorKey: "minor", header: "Minor" },
+  { accessorKey: "total", header: "Total" },
+  { accessorKey: "percentage", header: "% of Accident" },
 ];
 
 // Time slots from your data
@@ -37,54 +36,84 @@ const timeSlots = [
   "Time Not Assigned",
 ];
 
-// Random generator helper
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const formatDateForAPI = (input: string): string => {
+  const [year, month, day] = input.split("-");
+  const shortYear = year.slice(2);
+  return `${day}/${month}/${shortYear}`;
+};
 
-// Generator function
-const generateTimePeriodData = (
-  from: string,
-  to: string
-): TimePeriodAccidentData[] => {
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  const totalAccidents = rand(50, 100);
+const getSameDayLastMonth = () => {
+  const today = new Date();
+  const lastMonth = new Date(today);
 
-  return timeSlots.map((slot) => {
-    const fatal = rand(0, 3);
-    const major = rand(0, 15);
-    const minor = rand(0, 20);
-    const total = fatal + major + minor;
-    const percentage =
-      total > 0 ? ((total / totalAccidents) * 100).toFixed(2) + "%" : "0.00%";
-    const randomDate = new Date(
-      fromDate.getTime() +
-        Math.random() * (toDate.getTime() - fromDate.getTime())
-    )
-      .toISOString()
-      .split("T")[0];
+  lastMonth.setMonth(today.getMonth() - 1);
 
-    return {
-      TimePeriod: slot,
-      Fatal: fatal,
-      Major: major,
-      Minor: minor,
-      Total: total,
-      Percentage: percentage,
-      Date: randomDate,
-    };
-  });
+  // Handle cases where previous month had fewer days
+  if (
+    lastMonth.getMonth() === today.getMonth() - 1 + (12 % 12) &&
+    lastMonth.getDate() !== today.getDate()
+  ) {
+    lastMonth.setDate(0);
+  }
+  const year = lastMonth.getFullYear();
+  const month = String(lastMonth.getMonth() + 1).padStart(2, "0");
+  const day = String(lastMonth.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 };
 
 const TimePeriodAccidentReport = () => {
-  const [startDate, setStartDate] = useState("2024-01-01");
+  const [startDate, setStartDate] = useState(getSameDayLastMonth());
   const [endDate, setEndDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [tableData, setTableData] = useState<TimePeriodAccidentData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  //  report data fetching
+  const fetchReportData = async () => {
+    try {
+      !isLoading && setIsLoading(true);
+      const formatedStartDate = formatDateForAPI(startDate);
+      const formatedEndDate = formatDateForAPI(endDate);
+      //   console.log(formatedDate);
+
+      const response = await fetch(
+        `/api/reports/accidents/ksrtc_timewise?start_date=${formatedStartDate}&end_date=${formatedEndDate}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData);
+        return;
+      }
+
+      const responseData = await response.json();
+      // console.log(responseData);
+      const report = responseData.report;
+      const formatedReport = report.map((r: TimePeriodAccidentData) => {
+        return {
+          ...r,
+          time_period: r.time_period
+            ? r.time_period
+            : r.type && r.type.charAt(0).toUpperCase() + r.type.slice(1),
+        };
+      });
+      // console.log(formatedReport);
+
+      setTableData(formatedReport);
+    } catch (error) {
+      console.log(`something unexpected happen in time wise report`);
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setTableData(generateTimePeriodData(startDate, endDate));
+    if (startDate || endDate) {
+      fetchReportData();
+    }
   }, [startDate, endDate]);
 
   return (
@@ -95,13 +124,13 @@ const TimePeriodAccidentReport = () => {
       <ReportDataTable
         columns={timePeriodColumns}
         data={tableData}
-        searchKey="TimePeriod"
+        searchKey="time_period"
         tableLabel="Time Period Accident Table"
         startDate={startDate}
         startDateSetter={setStartDate}
         endDate={endDate}
         endDateSetter={setEndDate}
-        isLoading={false}
+        isLoading={isLoading}
       />
     </div>
   );

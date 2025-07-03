@@ -2,97 +2,106 @@
 
 import React, { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ReportDataTable } from "@/components/report_datatable";
+import { ReportDataTable } from "@/components/reports/accidents/report_datatable";
 
 // Data structure
 export type DistrictAccidentData = {
-  District: string;
-  Fatal: number;
-  Major: number;
-  Minor: number;
-  Total: number;
-  Percentage: string;
-  Date: string;
+  type: string;
+  fatal: number;
+  major: number;
+  minor: number;
+  total: number;
+  percentage: string;
 };
 
 // Table column definitions
 const districtAccidentColumns: ColumnDef<DistrictAccidentData>[] = [
-  { accessorKey: "District", header: "District" },
-  { accessorKey: "Fatal", header: "Fatal" },
-  { accessorKey: "Major", header: "Major" },
-  { accessorKey: "Minor", header: "Minor" },
-  { accessorKey: "Total", header: "Total" },
-  { accessorKey: "Percentage", header: "%" },
-  { accessorKey: "Date", header: "Date" },
+  { accessorKey: "type", header: "District" },
+  { accessorKey: "fatal", header: "Fatal" },
+  { accessorKey: "major", header: "Major" },
+  { accessorKey: "minor", header: "Minor" },
+  { accessorKey: "total", header: "Total" },
+  { accessorKey: "percentage", header: "%" },
 ];
 
-// Districts list from your data
-const districts = [
-  "THIRUVANANTHAPURAM",
-  "KOLLAM",
-  "KOTTAYAM",
-  "ERNAKULAM",
-  "IDUKKI",
-  "KOZHIKODE",
-  "THRISSUR",
-  "MALAPPURAM",
-  "KANNUR",
-  "PATHANAMTHITTA",
-  "ALAPPUZHA",
-  "PALAKKAD",
-  "WAYANAD",
-  "KASARAGOD",
-  "OTHER STATE",
-];
+const formatDateForAPI = (input: string): string => {
+  const [year, month, day] = input.split("-");
+  const shortYear = year.slice(2);
+  return `${day}/${month}/${shortYear}`;
+};
 
-// Random number helper
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const getSameDayLastMonth = () => {
+  const today = new Date();
+  const lastMonth = new Date(today);
 
-// Data generator
-const generateDistrictData = (
-  from: string,
-  to: string
-): DistrictAccidentData[] => {
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  const totalAccidents = rand(70, 100);
+  lastMonth.setMonth(today.getMonth() - 1);
 
-  return districts.map((district) => {
-    const fatal = rand(0, 3);
-    const major = rand(0, 10);
-    const minor = rand(0, 15);
-    const total = fatal + major + minor;
-    const percentage =
-      total > 0 ? ((total / totalAccidents) * 100).toFixed(2) + "%" : "0.00%";
-    const randomDate = new Date(
-      fromDate.getTime() +
-        Math.random() * (toDate.getTime() - fromDate.getTime())
-    )
-      .toISOString()
-      .split("T")[0];
+  // Handle cases where previous month had fewer days
+  if (
+    lastMonth.getMonth() === today.getMonth() - 1 + (12 % 12) &&
+    lastMonth.getDate() !== today.getDate()
+  ) {
+    lastMonth.setDate(0);
+  }
+  const year = lastMonth.getFullYear();
+  const month = String(lastMonth.getMonth() + 1).padStart(2, "0");
+  const day = String(lastMonth.getDate()).padStart(2, "0");
 
-    return {
-      District: district,
-      Fatal: fatal,
-      Major: major,
-      Minor: minor,
-      Total: total,
-      Percentage: percentage,
-      Date: randomDate,
-    };
-  });
+  return `${year}-${month}-${day}`;
 };
 
 const DistrictWiseAccidentReport = () => {
-  const [startDate, setStartDate] = useState("2024-01-01");
+  const [startDate, setStartDate] = useState(getSameDayLastMonth());
   const [endDate, setEndDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [tableData, setTableData] = useState<DistrictAccidentData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  //  report data fetching
+  const fetchReportData = async () => {
+    try {
+      !isLoading && setIsLoading(true);
+      const formatedStartDate = formatDateForAPI(startDate);
+      const formatedEndDate = formatDateForAPI(endDate);
+      //   console.log(formatedDate);
+
+      const response = await fetch(
+        `/api/reports/accidents/district_wise?start_date=${formatedStartDate}&end_date=${formatedEndDate}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData);
+        return;
+      }
+
+      const responseData = await response.json();
+      // console.log(responseData);
+      const report = responseData.data.report;
+      const formatedReport = report.map((r: DistrictAccidentData) => {
+        return {
+          ...r,
+          type: r.type
+            ? r.type.charAt(0).toUpperCase() + r.type.slice(1)
+            : r.type,
+        };
+      });
+      // console.log(formatedReport);
+
+      setTableData(formatedReport);
+    } catch (error) {
+      console.log(`something unexpected happen in district report`);
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setTableData(generateDistrictData(startDate, endDate));
+    if (startDate || endDate) {
+      fetchReportData();
+    }
   }, [startDate, endDate]);
 
   return (
@@ -101,13 +110,13 @@ const DistrictWiseAccidentReport = () => {
       <ReportDataTable
         columns={districtAccidentColumns}
         data={tableData}
-        searchKey="District"
-        tableLabel="District Accident Table"
+        searchKey="type"
+        tableLabel="District Wise Accident Table"
         startDate={startDate}
         startDateSetter={setStartDate}
         endDate={endDate}
         endDateSetter={setEndDate}
-        isLoading={false}
+        isLoading={isLoading}
       />
     </div>
   );

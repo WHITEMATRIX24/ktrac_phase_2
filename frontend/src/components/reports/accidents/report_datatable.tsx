@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "./ui/input";
+import { Input } from "../../ui/input";
 import React, { Dispatch, SetStateAction } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -28,9 +28,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Label } from "./ui/label";
+} from "../../ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { Label } from "../../ui/label";
 import { Ellipsis, EllipsisVertical } from "lucide-react";
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
@@ -118,38 +118,38 @@ export function ReportDataTable<TData, TValue>({
       <div className="flex items-center justify-between py-4">
         <div className="flex gap-5">
           <div className="flex gap-1 items-center">
-            <h6 className="font-medium text-[14px] text-grey-300">From :</h6>
+            <h6 className="font-medium text-[14px] text-grey-300">From </h6>
             <div className="flex items-center border rounded-md p-2 w-fit">
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => startDateSetter(e.target.value)}
-                className="border-none p-0 text-sm focus:ring-0 focus:outline-none w-32 h-full"
+                className="border-none p-0 text-sm focus:ring-0 focus:outline-none w-32 h-full bg-gray-100"
               />
             </div>
           </div>
           <div className="flex gap-1 items-center">
-            <h6 className="font-medium">To:</h6>
+            <h6 className="font-medium">To </h6>
             <div className="flex items-center border rounded-md p-2 w-fit">
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => endDateSetter(e.target.value)}
-                className="border-none p-0 text-sm focus:ring-0 focus:outline-none w-32 h-full"
+                className="border-none p-0 text-sm focus:ring-0 focus:outline-none w-32 h-full bg-gray-100"
               />
             </div>
           </div>
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="search"
+            placeholder="Search"
             value={
               (table.getColumn(searchKey)?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
-            className="max-w-sm"
+            className="max-w-sm bg-gray-100"
           />
           <Popover>
             <PopoverTrigger asChild>
@@ -157,24 +157,24 @@ export function ReportDataTable<TData, TValue>({
                 <EllipsisVertical color="black" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-60 flex flex-col gap-3">
+            <PopoverContent className="w-40 flex flex-col gap-3 mr-8">
               <button
                 onClick={exportPdfHandler}
-                className="bg-sidebar px-3 py-1 rounded-md text-sm text-white"
+                className="bg-green-700 px-3 py-1 rounded-sm text-sm text-white cursor-pointer"
               >
-                Export to pdf
+                PDF Export
               </button>
               <button
                 onClick={exportToExcel}
-                className="bg-sidebar px-3 py-1 rounded-md text-sm text-white"
+                className="bg-green-700 px-3 py-1 rounded-sm text-sm text-white cursor-pointer"
               >
-                Export to csv
+                CSV Export
               </button>
             </PopoverContent>
           </Popover>
         </div>
       </div>
-      <div className="rounded-md border w-full overflow-x-auto h-[28rem]">
+      <div className="rounded-md border w-full overflow-auto h-[55vh]">
         {isLoading ? (
           <p>Loading...</p>
         ) : (
@@ -183,7 +183,7 @@ export function ReportDataTable<TData, TValue>({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
                   key={headerGroup.id}
-                  className="bg-sidebar hover:bg-sidebar"
+                  className="bg-[var(--sidebar-bg)] hover:bg-[var(--sidebar-bg)]"
                 >
                   {headerGroup.headers.map((header) => {
                     return (
@@ -234,7 +234,6 @@ export function ReportDataTable<TData, TValue>({
           </Table>
         )}
       </div>
-      <p className="text-center text-sm text-gray-400 mt-2">{tableLabel}</p>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
@@ -261,22 +260,28 @@ export function ReportDataTable<TData, TValue>({
           {table.getPageCount()}
         </div>
         <div className="flex items-center justify-start space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+          {table.getCanPreviousPage() && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border border-red-700 bg-white"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+          )}
+          {table.getCanNextPage() && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border border-green-700 bg-white"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          )}
         </div>
       </div>
     </div>
