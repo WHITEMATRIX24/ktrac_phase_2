@@ -24,7 +24,7 @@ interface User {
 }
 
 export default function Header() {
-  const [roles, setRoles] = useState('')
+  const [roles, setRoles] = useState<string | null>(null);
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
   const mainTitle = pathSegments[0]
@@ -39,7 +39,7 @@ export default function Header() {
   });
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole");
+    const role = localStorage.getItem("userRole") ?? "";
     setRoles(role);
     let userData = user;
     console.log(role);

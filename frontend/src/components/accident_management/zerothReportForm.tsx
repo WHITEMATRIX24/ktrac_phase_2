@@ -645,11 +645,11 @@ const ZerothReport = () => {
                     <div className="flex-1 overflow-auto p-4">
                         {activeTab === 0 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full"> {/* Increased outer gap */}
-                                <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh]">
-                                    <h3 className="text-[14px] font-[600] mb-4 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]"> {/* Increased mb */}
+                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500"> {/* Increased mb */}
                                         Accident Location Details (<MalayalamText text="അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ" />)
                                     </h3>
-                                    <div className="mb-4 relative"> {/* Increased mb */}
+                                    <div className="mb-4 relative p-[16px]"> {/* Increased mb */}
                                         <label className="text-[12px] text-gray-700 block mb-2"> {/* Increased mb + min-height */}
                                             Accident Place (<MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)
                                         </label>
@@ -658,7 +658,7 @@ const ZerothReport = () => {
                                             name="address"
                                             value={locationData.address}
                                             onChange={handleAddressChange}
-                                            className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                            className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                             placeholder="Start typing to search for location..."
                                         />
 
@@ -686,7 +686,7 @@ const ZerothReport = () => {
                                         )}
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> {/* Increased gap and mb */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 px-[16px]"> {/* Increased gap and mb */}
                                         <div className="flex flex-col h-full"> {/* Flex container */}
                                             <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
                                                 Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
@@ -695,7 +695,7 @@ const ZerothReport = () => {
                                                 name="district"
                                                 value={locationData.district}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
                                             />
                                         </div>
                                         <div className="flex flex-col h-full"> {/* Flex container */}
@@ -706,12 +706,12 @@ const ZerothReport = () => {
                                                 name="state"
                                                 value={locationData.state}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> {/* Increased gap and mb */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 px-[16px]"> {/* Increased gap and mb */}
                                         <div className="flex flex-col h-full"> {/* Flex container */}
                                             <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
                                                 Latitude (<MalayalamText text="അക്ഷാംശം" />)
@@ -719,7 +719,7 @@ const ZerothReport = () => {
                                             <input
                                                 value={locationData.latitude}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                                             />
                                         </div>
                                         <div className="flex flex-col h-full"> {/* Flex container */}
@@ -729,19 +729,19 @@ const ZerothReport = () => {
                                             <input
                                                 value={locationData.longitude}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Second Column - Nearby Assistance */}
-                                <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
-                                    <h3 className="text-[14px] font-[600] mb-4 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]"> {/* Increased mb */}
+                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500"> {/* Increased mb */}
                                         Nearby Assistance Details (<MalayalamText text="സമീപ സഹായ വിവരം" />)
                                     </h3>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> {/* Increased gap and mb */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-[16px]"> {/* Increased gap and mb */}
                                         <div className="flex flex-col h-full"> {/* Flex container */}
                                             <label className="text-[12px] text-gray-700 min-h-[2rem]"> {/* min-height */}
                                                 Nearest Police Station (<MalayalamText text="സമീപ പോലീസ് സ്റ്റേഷൻ" />)
@@ -750,7 +750,7 @@ const ZerothReport = () => {
                                                 name="policeStation"
                                                 value={locationData.policeStation}
                                                 onChange={handlePoliceStationSelect}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                                             >
                                                 <option value="">Select Police Station</option>
                                                 {filteredPoliceStations.map(station => (
@@ -772,7 +772,7 @@ const ZerothReport = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Increased gap */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-[16px]"> {/* Increased gap */}
                                         <div className="flex flex-col h-full"> {/* Flex container */}
                                             <label className="text-[12px] text-gray-700 min-h-[2rem]"> {/* min-height */}
                                                 Nearest Depot (<MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />)
@@ -780,7 +780,7 @@ const ZerothReport = () => {
                                             <select
                                                 value={formData.nearestDepoName}
                                                 onChange={handleDepotSelect}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                                             >
                                                 <option value="">Select Depot</option>
                                                 {filteredDepots.map(depot => (
@@ -811,10 +811,10 @@ const ZerothReport = () => {
                         {activeTab === 1 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full ">
                                 {/* Accident Details */}
-                                <div className="bg-white border border-gray-200 rounded p-4 overflow-auto h-full md:min-h-[65vh]">
-                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Accident Details (<MalayalamText text="അപകടത്തിന്റെ വിശദാംശങ്ങൾ" />)</h3>
+                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">Accident Details (<MalayalamText text="അപകടത്തിന്റെ വിശദാംശങ്ങൾ" />)</h3>
 
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 p-[16px]">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div>
                                                 <label className="text-[12px] text-gray-700 mb-1">Date of Accident (<MalayalamText text="അപകടം നടന്ന തീയതി" />)</label>
@@ -823,7 +823,7 @@ const ZerothReport = () => {
                                                     name="dateOfAccident"
                                                     value={formData.dateOfAccident}
                                                     onChange={handleChange}
-                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                                 />
                                             </div>
                                             <div>
@@ -833,7 +833,7 @@ const ZerothReport = () => {
                                                     name="timeOfAccident"
                                                     value={formData.timeOfAccident}
                                                     onChange={handleChange}
-                                                    className="w-full py-2 px-3 border border-gray-300  rounded text-xs"
+                                                    className="w-full py-2 px-3 border border-gray-300  rounded text-xs bg-white"
                                                 />
                                             </div>
                                         </div>
@@ -844,7 +844,7 @@ const ZerothReport = () => {
                                                 name="timeZone"
                                                 value={timeSlot}
                                                 readOnly
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100 bg-white"
                                             />
                                         </div>
 
@@ -854,7 +854,7 @@ const ZerothReport = () => {
                                                 name="operatedDepot"
                                                 value={formData.operatedDepot}
                                                 onChange={handleChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                             />
                                         </div>
 
@@ -865,7 +865,7 @@ const ZerothReport = () => {
                                                 placeholder="Enter Schedule Number"
                                                 value={formData.scheduleNumber ?? ""}
                                                 onChange={handleChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                             />
                                         </div>
 
@@ -875,7 +875,7 @@ const ZerothReport = () => {
                                                 name="description"
                                                 value={formData.description}
                                                 onChange={handleChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                                 rows={3}
                                             />
                                         </div>
@@ -883,16 +883,16 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Crew Information */}
-                                <div className="bg-white border border-gray-200 rounded p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
-                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">Crew Information (<MalayalamText text="ക്രൂ വിവരങ്ങൾ" />)</h3>
+                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">Crew Information (<MalayalamText text="ക്രൂ വിവരങ്ങൾ" />)</h3>
 
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 p-[16px]">
                                         <div>
                                             <label className="text-[12px] text-gray-700 mb-1">Driver Category (<MalayalamText text="ഡ്രൈവർ വിഭാഗം" />)</label>
                                             <select
                                                 value={driverCategory}
                                                 onChange={(e) => setDriverCategory(e.target.value)}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                             >
                                                 <option value="">Select Category</option>
                                                 <option value="DC">DC</option>
@@ -912,7 +912,7 @@ const ZerothReport = () => {
                                                     name="driverSearchText"
                                                     placeholder="Search driver by name"
                                                     value={driverSearchText}
-                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                                     onChange={(e) => {
                                                         setDriverSearchText(e.target.value);
                                                         filterDrivers(e.target.value);
@@ -952,7 +952,7 @@ const ZerothReport = () => {
                                                     name="driverPhone"
                                                     value={formData.driverPhone}
                                                     onChange={handleChange}
-                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                                 />
                                             </div>
                                         </div>
@@ -963,7 +963,7 @@ const ZerothReport = () => {
                                                 name="conductorSearchText"
                                                 placeholder="Search conductor by PEN number or name"
                                                 value={conductorSearchText}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                                 onChange={(e) => {
                                                     setConductorSearchText(e.target.value);
                                                     filterConductors(e.target.value);
@@ -1013,7 +1013,7 @@ const ZerothReport = () => {
                                                     name="conductorPhone"
                                                     value={formData.conductorPhone}
                                                     onChange={handleChange}
-                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-white"
                                                 />
                                             </div>
                                         </div>
@@ -1026,14 +1026,14 @@ const ZerothReport = () => {
                         {activeTab === 2 && (
                             <div className="flex flex-col lg:flex-row gap-[6px]">
                                 {/* Left Section - Upload Form */}
-                                <div className="w-full lg:w-1/2 h-full bg-white border border-gray-300 rounded-[4px] p-[16px] overflow-auto md:min-h-[65vh] sm:min-h-[50vh]">
-                                    <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
+                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh] w-[50%] ">
+                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
                                         Accident Documentation (<MalayalamText text="അപകടം സംബന്ധിച്ച ഡോക്യുമെന്റേഷൻ" />)
                                     </h3>
 
                                     <div
-                                        className={`flex-1 border-2 ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-dashed border-gray-300'} 
-                rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer`}
+                                        className={`flex-1 border-2 m-[16px] ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-dashed border-gray-300'} 
+                rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer `}
                                         onDragOver={handleDragOver}
                                         onDragLeave={handleDragLeave}
                                         onDrop={handleDrop}
@@ -1060,7 +1060,7 @@ const ZerothReport = () => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200">
+                                    <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200 m-[16px] ">
                                         <h4 className="text-xs font-semibold mb-2"> Guidelines to Upload Photos (ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുന്നതിനുള്ള മാർഗ്ഗനിർദ്ദേശങ്ങൾ)</h4>
                                         <ul className="text-xs text-gray-600 space-y-1">
                                             <li>• Upload clear photos showing the accident from multiple angles<br />• <MalayalamText text="വിവിധ കോണുകളിൽ നിന്ന് അപകടം കാണിക്കുന്ന വ്യക്തമായ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക" /></li>
@@ -1072,13 +1072,13 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Right Section - Uploaded Images */}
-                                <div className="w-full lg:w-1/2 bg-white border border-gray-300 rounded-[4px] p-[16px] overflow-auto min-h-[50vh] md:min-h-[65vh] mb-[50px] md:mb-2">
-                                    <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
+                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh] w-[50%]">
+                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
                                         Uploaded Images (<MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ" />)
                                     </h3>
 
                                     {mediaFiles.length > 0 ? (
-                                        <div className="mb-4">
+                                        <div className="mb-4 p-[16px]">
                                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                                                 {mediaFiles.map((media) => (
                                                     <div key={media.id} className="relative border rounded-lg overflow-hidden h-32">
@@ -1101,7 +1101,7 @@ const ZerothReport = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-gray-500">No images are uploaded. (<MalayalamText text="ഫോട്ടോകളൊന്നും അപ്‌ലോഡ് ചെയ്തിട്ടില്ല." />)</p>
+                                        <p className="p-[16px] text-sm text-gray-500">No images are uploaded. (<MalayalamText text="ഫോട്ടോകളൊന്നും അപ്‌ലോഡ് ചെയ്തിട്ടില്ല." />)</p>
                                     )}
                                 </div>
 
