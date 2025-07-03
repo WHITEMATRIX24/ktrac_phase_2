@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ReportDataTable } from "@/components/reports/accidents/report_datatable";
+import { ReportDataTable } from "@/components/reports/report_datatable";
 
 type AccidentData = {
   class: string;

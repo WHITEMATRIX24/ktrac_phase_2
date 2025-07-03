@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ReportDataTable } from "@/components/reports/accidents/report_datatable";
+import { ReportDataTable } from "@/components/reports/report_datatable";
 import { ColumnDef } from "@tanstack/react-table";
 
 // Define data type

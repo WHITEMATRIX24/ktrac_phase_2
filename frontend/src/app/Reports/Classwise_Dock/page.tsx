@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { ReportDataTable } from "@/components/report_datatable";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getClasswiseDock } from "@/lib/sql_query";
 import { useEffect, useState } from "react";
+import { ReportDataTable } from "@/components/reports/report_datatable";
 
 // column data
 const columns = [

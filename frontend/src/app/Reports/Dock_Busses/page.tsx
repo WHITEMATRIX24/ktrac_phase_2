@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ReportDataTable } from "@/components/report_datatable";
+import { ReportDataTable } from "@/components/reports/report_datatable";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getDockBusses } from "@/lib/sql_query";
 import { useEffect, useState } from "react";

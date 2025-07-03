@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "../../ui/input";
+import { Input } from "../ui/input";
 import React, { Dispatch, SetStateAction } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -28,9 +28,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
-import { Label } from "../../ui/label";
+} from "../ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Label } from "../ui/label";
 import { Ellipsis, EllipsisVertical } from "lucide-react";
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
