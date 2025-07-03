@@ -73,7 +73,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-4 py-2 text-black border-b border-grey-300">
+    <header className="flex items-center justify-between px-4 py-2 bg-gray-300 text-black border-b border-grey-300">
       <div>
         <h1 className="text-[16px] font-semibold leading-[1.2] mb-0 mt-[10px] uppercase">
           {decodeURIComponent(mainTitle).replace(/[-_]/g, " ")}
@@ -104,7 +104,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Calendar className="w-5 h-5 text-black opacity-70" />
+        {/* <Calendar className="w-5 h-5 text-black opacity-70" />
         <Settings className="w-5 h-5 text-black opacity-70" />
         <div className="relative w-54">
           <Input
@@ -115,7 +115,7 @@ export default function Header() {
           <div className="absolute right-2 top-1/2 -translate-y-1/2 text-black text-xs">
             <SearchIcon className="h-4 w-4" />
           </div>
-        </div>
+        </div> */}
 
         {/* Add Notification System Here */}
         <NotificationSystem />

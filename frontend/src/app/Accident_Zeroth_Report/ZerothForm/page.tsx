@@ -87,7 +87,8 @@ const ZerothReport = () => {
     const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
     const [locationQuery, setLocationQuery] = useState('');
     const [timeSlot, setTimeSlot] = useState('');
-
+    const [driverSearchText, setDriverSearchText] = useState('');
+    const [conductorSearchText, setConductorSearchText] = useState('');
     const policeStations: PoliceStation[] = [
         { id: 1, name: "Central Police Station", district: "Thiruvananthapuram", contact: "0471-2560000" },
         { id: 2, name: "East Police Station", district: "Thiruvananthapuram", contact: "0471-2561111" },
@@ -219,9 +220,7 @@ const ZerothReport = () => {
         }
         const term = searchTerm.toLowerCase();
         const filtered = allDrivers.filter(driver =>
-            driver.pen_no?.toLowerCase().includes(term) ||
-            driver.user_first_name?.toLowerCase().includes(term) ||
-            driver.user_last_name?.toLowerCase().includes(term)
+            `${driver.user_first_name} ${driver.user_last_name}`.toLowerCase().includes(term)
         );
         setFilteredDrivers(filtered);
     };
@@ -233,6 +232,7 @@ const ZerothReport = () => {
             driverName: `${driver.user_first_name} ${driver.user_last_name}`,
             driverPhone: driver.user_phone || '',
         }));
+        setDriverSearchText(`${driver.user_first_name} ${driver.user_last_name}`);
         setSelectedDriver({
             id: 0,
             gNumber: driver.pen_no,
@@ -241,6 +241,7 @@ const ZerothReport = () => {
         });
         setShowDriverDropdown(false);
     };
+
 
     const filterConductors = (searchTerm: string) => {
         if (!searchTerm) {
@@ -263,6 +264,7 @@ const ZerothReport = () => {
             conductorName: `${conductor.user_first_name} ${conductor.user_last_name}`,
             conductorPhone: conductor.user_phone || '',
         }));
+        setConductorSearchText(conductor.pen_no)
         setShowConductorDropdown(false);
     };
 
@@ -611,9 +613,10 @@ const ZerothReport = () => {
                     </button>
                 </div>
 
-                <h2 className="text-[14px] font-semibold py-1 text-[var(--sidebar)]">
-                    Accident Reference Number: {accidentRefernceId}
+                <h2 className="text-[16px] text-center font-semibold py-1 text-[var(--sidebar)]">
+                    {accidentRefernceId?.replaceAll('_', '/')}
                 </h2>
+
             </div>
 
             {/* Main Form Content */}
@@ -650,16 +653,16 @@ const ZerothReport = () => {
 
                     {/* Tab Content */}
                     <div className="flex-1 overflow-auto p-4">
-                        {/* Location Details Tab */}
                         {activeTab === 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full"> {/* Increased outer gap */}
                                 <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh]">
-                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
+                                    <h3 className="text-[14px] font-[600] mb-4 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]"> {/* Increased mb */}
                                         Accident Location Details (<MalayalamText text="അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ" />)
                                     </h3>
-                                    <div className="mb-3 relative">
-                                        <label className="text-[12px]  text-gray-700 mb-1">Accident Place (<MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)</label>
-
+                                    <div className="mb-4 relative"> {/* Increased mb */}
+                                        <label className="text-[12px] text-gray-700 block mb-2"> {/* Increased mb + min-height */}
+                                            Accident Place (<MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)
+                                        </label>
                                         <input
                                             value={locationQuery}
                                             onChange={(e) => {
@@ -667,7 +670,7 @@ const ZerothReport = () => {
                                                 setShowLocationSuggestions(true);
                                             }}
                                             onFocus={() => setShowLocationSuggestions(true)}
-                                            className="w-full py-2 px-3 border border-gray-300 rounded text-xs "
+                                            className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto for alignment */
                                         />
                                         {showLocationSuggestions && locationSuggestions.length > 0 && (
                                             <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
@@ -684,61 +687,71 @@ const ZerothReport = () => {
                                         )}
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> {/* Increased gap and mb */}
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
+                                                Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
+                                            </label>
                                             <input
                                                 name="district"
                                                 value={locationData.district}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
                                             />
                                         </div>
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Accident State  (<MalayalamText text="അപകടം നടന്ന സംസ്ഥാനം" />)</label>
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
+                                                Accident State (<MalayalamText text="അപകടം നടന്ന സംസ്ഥാനം" />)
+                                            </label>
                                             <input
                                                 name="state"
                                                 value={locationData.state}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs "
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
                                             />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Latitude (<MalayalamText text="അക്ഷാംശം" />)</label>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> {/* Increased gap and mb */}
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
+                                                Latitude (<MalayalamText text="അക്ഷാംശം" />)
+                                            </label>
                                             <input
                                                 value={locationData.latitude}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs "
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
                                             />
                                         </div>
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Longitude (<MalayalamText text="രേഖാംശം" />)</label>
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
+                                                Longitude (<MalayalamText text="രേഖാംശം" />)
+                                            </label>
                                             <input
                                                 value={locationData.longitude}
                                                 onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
                                             />
                                         </div>
                                     </div>
                                 </div>
 
+                                {/* Second Column - Nearby Assistance */}
                                 <div className="bg-white border rounded-[4px] p-4 overflow-auto h-full md:min-h-[65vh] mb-[50px] md:mb-0">
-                                    <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
+                                    <h3 className="text-[14px] font-[600] mb-4 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]"> {/* Increased mb */}
                                         Nearby Assistance Details (<MalayalamText text="സമീപ സഹായ വിവരം" />)
                                     </h3>
 
-
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Nearest Police Station (<MalayalamText text="സമീപ പോലീസ് സ്റ്റേഷൻ" />)</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> {/* Increased gap and mb */}
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 min-h-[2rem]"> {/* min-height */}
+                                                Nearest Police Station (<MalayalamText text="സമീപ പോലീസ് സ്റ്റേഷൻ" />)
+                                            </label>
                                             <select
                                                 name="policeStation"
                                                 value={locationData.policeStation}
                                                 onChange={handlePoliceStationSelect}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs "
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
                                             >
                                                 <option value="">Select Police Station</option>
                                                 {filteredPoliceStations.map(station => (
@@ -747,24 +760,28 @@ const ZerothReport = () => {
                                                     </option>
                                                 ))}
                                             </select>
-
                                         </div>
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">police Station Contact Number (<MalayalamText text="പോലീസ് സ്റ്റേഷനിൽ ബന്ധപ്പെടേണ്ട നമ്പർ" />)</label>
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 min-h-[2rem]"> {/* min-height */}
+                                                Police Station Contact (<MalayalamText text="പോലീസ് സ്റ്റേഷനിൽ ബന്ധപ്പെടേണ്ട നമ്പർ" />)
+                                            </label>
                                             <input
                                                 value={locationData.policeStationContact}
                                                 readOnly
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100 mt-auto" /* mt-auto */
                                             />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Nearest Depot to Accident Location (<MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />)</label>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Increased gap */}
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 min-h-[2rem]"> {/* min-height */}
+                                                Nearest Depot (<MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />)
+                                            </label>
                                             <select
                                                 value={formData.nearestDepoName}
                                                 onChange={handleDepotSelect}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto" /* mt-auto */
                                             >
                                                 <option value="">Select Depot</option>
                                                 {filteredDepots.map(depot => (
@@ -774,31 +791,19 @@ const ZerothReport = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Depot Contact (<MalayalamText text="ഡിപ്പോയുമായി ബന്ധപ്പെടാനുള്ള നമ്പർ" />)</label>
+                                        <div className="flex flex-col h-full"> {/* Flex container */}
+                                            <label className="text-[12px] text-gray-700 min-h-[2rem]"> {/* min-height */}
+                                                Depot Contact (<MalayalamText text="ഡിപ്പോയുമായി ബന്ധപ്പെടാനുള്ള നമ്പർ" />)
+                                            </label>
                                             <input
                                                 value={formData.depotContact}
                                                 readOnly
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
+                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100 mt-auto" /* mt-auto */
                                             />
                                         </div>
                                     </div>
-                                    <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
-                                        <p className="text-[11px] text-blue-800">
-                                            {locationPermission ? (
-                                                <>
-                                                    Location data fetched successfully. This information is prefilled based on your current location, but it may contain errors. You can edit it if needed. <br />
-                                                    <MalayalamText text="ലൊക്കേഷൻ ഡാറ്റ വിജയകരമായി ലഭിച്ചു. നിങ്ങളുടെ നിലവിലെ ലൊക്കേഷനെ അടിസ്ഥാനമാക്കി ഈ വിവരങ്ങൾ മുൻകൂട്ടി പൂരിപ്പിച്ചിരിക്കുന്നു, പക്ഷേ അതിൽ പിശകുകൾ അടങ്ങിയിരിക്കാം. ആവശ്യമെങ്കിൽ നിങ്ങൾക്ക് ഇത് എഡിറ്റ് ചെയ്യാൻ കഴിയും." />
-                                                </>
-                                            ) : (
-                                                <>
-                                                    Location permission not granted. Please enable location services for accurate reporting. <br />
-                                                    <MalayalamText text="ലൊക്കേഷൻ അനുമതി ലഭിച്ചില്ല. കൃത്യമായ റിപ്പോർട്ടിംഗിനായി ലൊക്കേഷൻ സേവനങ്ങൾ പ്രാപ്തമാക്കുക." />
-                                                </>
-                                            )}
-                                        </p>
-                                    </div>
 
+                                    {/* Location permission message remains same */}
                                 </div>
                             </div>
                         )}
@@ -864,18 +869,6 @@ const ZerothReport = () => {
                                                 className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
                                             />
                                         </div>
-                                        <div>
-                                            <label className="text-[12px] text-gray-700 mb-1">Schedule Name (<MalayalamText text="ഷെഡ്യൂളിൻ്റെ പേര്" />)</label>
-                                            <input
-                                                name="scheduleName"
-                                                placeholder="Enter Schedule Name"
-                                                value={formData.scheduleName}
-                                                onChange={handleChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
-                                            />
-                                        </div>
-
-
 
                                         <div>
                                             <label className="text-[12px] text-gray-700 mb-1">Accident Description (<MalayalamText text="അപകടത്തെക്കുറിച്ചുള്ള വിവരണം" />)</label>
@@ -908,53 +901,51 @@ const ZerothReport = () => {
                                             </select>
                                         </div>
 
-                                        <div className="relative" ref={driverRef}>
-                                            <label className="text-[12px] text-gray-700 mb-1">Driver PEN Number (<MalayalamText text="ഡ്രൈവർ പെൻ നമ്പർ" />)</label>
-                                            <input
-                                                type="text"
-                                                name='driverPenNo'
-                                                placeholder="Search driver by PEN number or name"
-                                                value={formData.driverPenNo}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
-                                                onChange={(e) => {
-                                                    filterDrivers(e.target.value);
-                                                    setShowDriverDropdown(true);
-                                                }}
-                                                onFocus={() => setShowDriverDropdown(true)}
-                                            />
 
-                                            {showDriverDropdown && (
-                                                <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
-                                                    {filteredDrivers.length === 0 ? (
-                                                        <div className="p-3 text-center text-gray-500">No matching drivers</div>
-                                                    ) : (
-                                                        <ul>
-                                                            {filteredDrivers.map(driver => (
-                                                                <li
-                                                                    key={driver.pen_no}
-                                                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
-                                                                    onClick={() => handleSelectDriver(driver)}
-                                                                >
-                                                                    <div className="font-medium text-xs">{driver.pen_no}</div>
-                                                                    <div className="text-xs text-gray-600">{driver.user_first_name} {driver.user_last_name}</div>
-                                                                    <div className="text-xs text-gray-500">{driver.user_phone}</div>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            <div>
-                                                <label className="text-[12px] text-gray-700 mb-1">Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)</label>
+                                            <div className="relative" ref={driverRef}>
+                                                <label className="text-[12px] text-gray-700 mb-1">
+                                                    Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)
+                                                </label>
                                                 <input
-                                                    value={formData.driverName}
-                                                    readOnly
-                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs bg-gray-100"
+                                                    type="text"
+                                                    name="driverSearchText"
+                                                    placeholder="Search driver by name"
+                                                    value={driverSearchText}
+                                                    className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
+                                                    onChange={(e) => {
+                                                        setDriverSearchText(e.target.value);
+                                                        filterDrivers(e.target.value);
+                                                        setShowDriverDropdown(true);
+                                                    }}
+                                                    onFocus={() => setShowDriverDropdown(true)}
                                                 />
+
+                                                {showDriverDropdown && (
+                                                    <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                                                        {filteredDrivers.length === 0 ? (
+                                                            <div className="p-3 text-center text-gray-500">No matching drivers</div>
+                                                        ) : (
+                                                            <ul>
+                                                                {filteredDrivers.map(driver => (
+                                                                    <li
+                                                                        key={driver.pen_no}
+                                                                        className="px-4 py-2 cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
+                                                                        onClick={() => handleSelectDriver(driver)}
+                                                                    >
+                                                                        <div className="font-medium text-xs">
+                                                                            {driver.user_first_name} {driver.user_last_name}
+                                                                        </div>
+                                                                        <div className="text-xs text-gray-500">{driver.pen_no}</div>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
+
                                             <div>
                                                 <label className="text-[12px] text-gray-700 mb-1">Driver Phone (<MalayalamText text="ഡ്രൈവറുടെ ഫോൺ നമ്പർ" />)</label>
                                                 <input
@@ -970,11 +961,12 @@ const ZerothReport = () => {
                                             <label className="text-[12px] text-gray-700 mb-1">Conductor PEN Number (<MalayalamText text="കണ്ടക്ടർ പെൻ നമ്പർ" />)</label>
                                             <input
                                                 type="text"
-                                                name="conductorPenNo"
+                                                name="conductorSearchText"
                                                 placeholder="Search conductor by PEN number or name"
-                                                value={formData.conductorPenNo || ''}
+                                                value={conductorSearchText}
                                                 className="w-full py-2 px-3 border border-gray-300 rounded text-xs"
                                                 onChange={(e) => {
+                                                    setConductorSearchText(e.target.value);
                                                     filterConductors(e.target.value);
                                                     setShowConductorDropdown(true);
                                                 }}
@@ -1133,6 +1125,17 @@ const ZerothReport = () => {
                                     Previous
                                 </button>
                             )}
+
+                            {activeTab <= 3 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab(activeTab + 1)}
+                                    className="flex items-center justify-center px-5 py-1 text-[12px] font-medium bg-[--sidebar] text-white rounded hover:bg-green-600 transition-all"
+                                >
+                                    Next
+                                    <ChevronLeft className="w-4 h-4 ml-2 rotate-180" />
+                                </button>
+                            )}
                         </div>
 
                         <div className="flex gap-3">
@@ -1141,41 +1144,52 @@ const ZerothReport = () => {
                                 onClick={handleCancel}
                                 className="flex items-center justify-center px-5 py-1 text-[12px] border border-gray-300 rounded hover:bg-gray-100 transition-all"
                             >
-
                                 Cancel
                             </button>
 
-
-
-                            {activeTab === 2 && (
+                            {activeTab === 3 - 1 && (
                                 <button
                                     type="button"
                                     onClick={handleSubmitAccidentDetails}
                                     disabled={isSubmittingDocumentation}
-                                    className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all
-                            ${isSubmittingDocumentation
-                                            ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-[var(--sidebar)] hover:bg-[#001670]'}`}
+                                    className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${isSubmittingDocumentation
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-[var(--sidebar)] hover:bg-[#001670]'
+                                        }`}
                                 >
                                     {isSubmittingDocumentation ? (
                                         <span className="flex items-center">
-                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            <svg
+                                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                ></circle>
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                ></path>
                                             </svg>
                                             Submitting...
                                         </span>
                                     ) : (
-                                        <>
-
-                                            Submit
-                                        </>
+                                        <>Submit</>
                                     )}
                                 </button>
                             )}
                         </div>
                     </div>
                 </div>
+
             </div>
 
             {showSuccessModal && (

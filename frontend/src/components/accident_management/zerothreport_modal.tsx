@@ -1,470 +1,550 @@
-import React, { useEffect, useRef, useState } from "react";
-import { toast } from 'react-toastify';
+"use client";
 
-interface Props {
-    closeHandler: () => void;
-    caseSelectHandler: (selectedData: any) => void;
-}
+import React, { useState, useEffect, useRef } from 'react';
+import { AlertTriangle, LogOut, Plus } from 'lucide-react';
+import { Divider } from "@mui/material";
+import ZerothReport from './zerothReportForm';
 
-interface BusData {
-    bonnetNo: string
-    driver_name: string;
-    driver_phn_no: string;
-    conductor_name: string;
-    conductor_phn_no: string;
-    "operated depot": string;
-    "Schedule Number": string | null;
-}
+type BusData = {
+    bonet_number: string;
+};
 
-interface UserData {
-    pen_no: string;
-    user_first_name: string;
-    user_last_name: string;
-    designation: string;
-    phn_no: string;
-}
+type ApiResponse = {
+    success: boolean;
+    message: string;
+    accident_id: string;
+    bonet_no: string;
+    created_at: string;
+    vehicle_info: {
+        vehicle_id: number;
+        vehicle_type: string;
+        model: string;
+        registration_date: string | null;
+    };
+    details: {
+        depot_name: string;
+        depot_abv: string;
+        month: string;
+        year: string;
+        serial_number: string;
+        format: string;
+    };
+    additional_data: Record<string, unknown>;
+    note: string;
+};
 
-const AddZerothReportModal = ({
-    closeHandler,
-    caseSelectHandler,
-}: Props) => {
+const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: (selectedData: any) => void }) => {
+
+
+    // State for search functionality
+    const [date, setDate] = useState("");
+    const [district, setDistrict] = useState("");
+    const [depo, setDepo] = useState("");
     const [bonnetNo, setBonnetNo] = useState("");
-    const [driverPenNo, setDriverPenNo] = useState("");
-    const [conductorPenNo, setConductorPenNo] = useState("");
-    const [busDetails, setBusDetails] = useState<BusData | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const [allBuses, setAllBuses] = useState<BusData[]>([]);
-    const [filteredBuses, setFilteredBuses] = useState<BusData[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const [allUsers, setAllUsers] = useState<UserData[]>([]);
-    const [allDrivers, setAllDrivers] = useState<UserData[]>([]);
-    const [allConductors, setAllConductors] = useState<UserData[]>([]);
-    const [filteredDrivers, setFilteredDrivers] = useState<UserData[]>([]);
-    const [filteredConductors, setFilteredConductors] = useState<UserData[]>([]);
-    const [userLoading, setUserLoading] = useState(false);
-    const [userError, setUserError] = useState('');
-
-    // Separate states for dropdown visibility
-    const [showBusDropdown, setShowBusDropdown] = useState(false);
-    const [showDriverDropdown, setShowDriverDropdown] = useState(false);
-    const [showConductorDropdown, setShowConductorDropdown] = useState(false);
-
-    // Refs for each dropdown container
+    const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
+    const [accidentList, setAccidentList] = useState<{}[] | null>(null);
+    const [allBusInfo, setAllbusinfo] = useState<BusData[]>([]);
+    const [filteredBusinfo, setFilteredbusInfo] = useState<BusData[]>([]);
+    const [allDepos, setAllDepos] = useState([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [zerothFrom, setZerothForm] = useState<boolean>(false);
+    const depotRef = useRef<HTMLDivElement>(null);
+    const [showRegistrationForm, setShowRegistrationForm] = useState(false);
+    const [formData, setFormData] = useState({
+        bonnetNumber: '',
+        operatedDepot: '',
+    });
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [apiLoading, setApiLoading] = useState(false);
+    const [apiError, setApiError] = useState('');
     const busRef = useRef<HTMLDivElement>(null);
-    const driverRef = useRef<HTMLDivElement>(null);
-    const conductorRef = useRef<HTMLDivElement>(null);
-
+    const [depots, setDepots] = useState<{ name: string; abv: string }[]>([]);
+    const [filteredDepots, setFilteredDepots] = useState<{ name: string; abv: string }[]>([]);
+    const [showDepotDropdown, setShowDepotDropdown] = useState(false);
+    const [accidentReferenceNumber, setAccidentReferencenumber] =
+        useState<string>("");
+    // Common bus data fetch
     useEffect(() => {
         const fetchBusData = async () => {
             try {
-                setLoading(true);
-                setError('');
                 const response = await fetch('/api/getAllBusInfo');
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`Failed to fetch buses: ${response.status}`);
                 const result = await response.json();
                 if (result.data && Array.isArray(result.data)) {
-                    const mappedBuses = result.data.map((bus: any) => ({
-                        bonnetNo: bus.bonet_number,
-                        driver_name: bus.driver_name,
-                        driver_phn_no: bus.driver_phn_no,
-                        conductor_name: bus.conductor_name,
-                        conductor_phn_no: bus.conductor_phn_no,
-                        "operated depot": bus["operated depot"],
-                        "Schedule Number": bus["Schedule Number"]
-                    }));
-                    setAllBuses(mappedBuses);
+                    setAllbusinfo(result.data);
+                    setFilteredbusInfo(result.data);
                 } else {
-                    setError('Invalid bus data format');
-                    setAllBuses([]);
+                    throw new Error('Unexpected bus data format');
                 }
             } catch (err) {
-                console.error('Bus fetch error:', err);
-                setError('Failed to load bus data');
-                setAllBuses([]);
-            } finally {
-                setLoading(false);
+                console.error('Failed to load bus data:', err);
             }
         };
+
+
 
         fetchBusData();
-    }, []);
 
+    }, []);
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchDepots = async () => {
             try {
-                setUserLoading(true);
-                setUserError('');
-                const response = await fetch('/api/getAllUserInfo');
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch: ${response.status}`);
-                }
-
-                const result = await response.json();
-
-                if (result.body && Array.isArray(result.body)) {
-                    setAllUsers(result.body);
-
-                    const drivers = result.body.filter((user: UserData) =>
-                        user.designation.toLowerCase().includes('driver')
-                    );
-
-                    const conductors = result.body.filter((user: UserData) =>
-                        user.designation.toLowerCase().includes('conductor')
-                    );
-
-                    setAllDrivers(drivers);
-                    setAllConductors(conductors);
-                } else {
-                    setUserError('Invalid user data format');
-                    setAllUsers([]);
-                }
+                const res = await fetch('/api/getAllDepo');
+                const json = await res.json();
+                const flatDepots = json.data?.flatMap((dist: any) =>
+                    dist.depot.map((d: any) => ({
+                        name: d["depot-name"],
+                        abv: d["depot-abv"]
+                    }))
+                ) || [];
+                setDepots(flatDepots);
+                setFilteredDepots(flatDepots);
             } catch (err) {
-                console.error('User fetch error:', err);
-                setUserError('Failed to load user data');
-                setAllUsers([]);
-            } finally {
-                setUserLoading(false);
+                console.error("Depot fetch error:", err);
             }
-        };
 
-        fetchUserData();
+        };
+        fetchDepots();
     }, []);
 
-    useEffect(() => {
-        if (bonnetNo.trim() === '') {
-            setFilteredBuses(allBuses.slice(0, 5));
-        } else {
-            const filtered = allBuses.filter(bus =>
-                bus.bonnetNo.toLowerCase().includes(bonnetNo.toLowerCase())
-            ).slice(0, 5);
-            setFilteredBuses(filtered);
-        }
-    }, [bonnetNo, allBuses]);
+    // Search handlers
+    const handleSearch = async () => {
+        try {
+            setIsLoading(true);
 
-    useEffect(() => {
-        if (driverPenNo.trim() === '') {
-            setFilteredDrivers(allDrivers.slice(0, 5));
-        } else {
-            const filtered = allDrivers.filter(driver =>
-                driver.pen_no.toLowerCase().includes(driverPenNo.toLowerCase()) ||
-                `${driver.user_first_name} ${driver.user_last_name}`.toLowerCase().includes(driverPenNo.toLowerCase())
-            ).slice(0, 5);
-            setFilteredDrivers(filtered);
-        }
-    }, [driverPenNo, allDrivers]);
+            if (accidentReferenceNumber) {
+                const response = await fetch(
+                    `/api/searchZerothReportById?accident_reference_number=${accidentReferenceNumber}`
+                );
+                const data = await response.json();
 
-    useEffect(() => {
-        if (conductorPenNo.trim() === '') {
-            setFilteredConductors(allConductors.slice(0, 5));
-        } else {
-            const filtered = allConductors.filter(conductor =>
-                conductor.pen_no.toLowerCase().includes(conductorPenNo.toLowerCase()) ||
-                `${conductor.user_first_name} ${conductor.user_last_name}`.toLowerCase().includes(conductorPenNo.toLowerCase())
-            ).slice(0, 5);
-            setFilteredConductors(filtered);
-        }
-    }, [conductorPenNo, allConductors]);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            // Close bus dropdown if clicked outside
-            if (busRef.current && !busRef.current.contains(event.target as Node)) {
-                setShowBusDropdown(false);
+                setAccidentList([data.data]);
+            } else {
+                const response = await fetch(
+                    `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
+                );
+                const data = await response.json();
+                setAccidentList(data.data || []);
+                // console.log(data);
             }
-            // Close driver dropdown if clicked outside
-            if (driverRef.current && !driverRef.current.contains(event.target as Node)) {
-                setShowDriverDropdown(false);
-            }
-            // Close conductor dropdown if clicked outside
-            if (conductorRef.current && !conductorRef.current.contains(event.target as Node)) {
-                setShowConductorDropdown(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleSelectBus = (busNumber: string) => {
-        setBonnetNo(busNumber);
-        setShowBusDropdown(false);
-    };
-
-    const handleSelectDriver = (penNo: string) => {
-        setDriverPenNo(penNo);
-        setShowDriverDropdown(false);
-    };
-
-    const handleSelectConductor = (penNo: string) => {
-        setConductorPenNo(penNo);
-        setShowConductorDropdown(false);
+        } catch (error) {
+            console.log("error in filtering");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleClear = () => {
+        setAccidentList(null);
+        setDate("");
         setBonnetNo("");
-        setDriverPenNo("");
-        setConductorPenNo("");
-        setBusDetails(null);
-        // Close all dropdowns when clearing
-        setShowBusDropdown(false);
-        setShowDriverDropdown(false);
-        setShowConductorDropdown(false);
+        setDistrict("");
+        setDepo("");
     };
 
-    const handleConfirm = async () => {
-        if (!bonnetNo || !driverPenNo || !conductorPenNo) {
-            toast.error("Please fill all fields");
-            return;
+    const handlecaseSelect = (selectedData: any) => {
+        if (caseSelectHandler) {
+            caseSelectHandler(selectedData);
         }
+    };
 
-        setIsLoading(true);
+    const handleSearchBonnetNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setBonnetNo(value);
+        setFilteredbusInfo(allBusInfo.filter((f) =>
+            f.bonet_number.toLowerCase().includes(value.toLowerCase())
+        ));
+    };
+
+    // Registration form handlers
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+
+        if (name === 'bonnetNumber') {
+            const term = value.toLowerCase();
+            setFilteredbusInfo(allBusInfo.filter(bus =>
+                bus.bonet_number?.toLowerCase().includes(term)
+            ));
+            setShowBonnetDropDown(true);
+        }
+    };
+
+    const handleSelectBus = (bonnetNo: string) => {
+        setFormData(prev => ({ ...prev, bonnetNumber: bonnetNo }));
+        setShowBonnetDropDown(false);
+    };
+
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.bonnetNumber) newErrors.bonnetNumber = 'Bonnet number is required';
+        if (!formData.operatedDepot) newErrors.operatedDepot = 'Operated depot is required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!validate()) return;
 
         try {
+            setApiLoading(true);
+            setApiError('');
+
             const response = await fetch('/api/validate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    bonet_no: bonnetNo,
-                    driver_pen_no: driverPenNo.trim(),
-                    conductor_pen_no: conductorPenNo.trim()
-                })
+                    bonet_no: formData.bonnetNumber,
+                    depot_name: formData.operatedDepot,
+                }),
             });
 
-            const data = await response.json();
-            if (data.status_code === "200") {
-                const busInfo = data.body[0];
-                setBusDetails(busInfo);
-                const combinedData = {
-                    busNumber: bonnetNo,
-                    driver: {
-                        penNumber: driverPenNo,
-                        name: busInfo.driver_name,
-                        phone: busInfo.driver_phn_no,
-                    },
-                    conductor: {
-                        penNumber: conductorPenNo,
-                        name: busInfo.conductor_name,
-                        phone: busInfo.conductor_phn_no,
-                    },
-                    depot: busInfo["operated depot"],
-                    schedule: busInfo["Schedule Number"],
-                };
-
-                caseSelectHandler(combinedData);
-                closeHandler();
-            } else {
-                toast.error(data.message || "An error occurred");
+            if (!response.ok) {
+                throw new Error(`API request failed with status ${response.status}`);
             }
-        } catch (error) {
-            toast.error("Failed to fetch bus details");
-            console.error("API Error:", error);
+
+            const result: ApiResponse = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || 'Validation failed');
+            }
+
+            sessionStorage.setItem('accidentData', JSON.stringify({
+                bonnetNumber: formData.bonnetNumber,
+                operatedDepot: formData.operatedDepot,
+                referenceNumber: result.accident_id,
+            }));
+            setZerothForm(true);
+
+
+        } catch (err) {
+            setApiError('Failed to validate data: ' + (err as Error).message);
+            console.error('Validation error:', err);
         } finally {
-            setIsLoading(false);
+            setApiLoading(false);
         }
     };
+    const MalayalamText = ({ text }: { text: string }) => (
+        <span className="text-[10px]">{text}</span>
+    );
 
+    const toggleForm = () => {
+        setShowRegistrationForm(!showRegistrationForm);
+        setAccidentList(null);
+        setApiError('');
+    };
+    if (zerothFrom) {
+        return <ZerothReport />;
+    }
     return (
-        <div className="fixed top-0 left-0 w-full h-dvh bg-black/30 flex justify-center items-center z-500 p-4">
-            <div className="relative bg-white flex flex-col gap-2 w-full max-w-md md:max-w-2xl lg:max-w-3xl min-h-[20rem] rounded-sm overflow-hidden p-2 max-h-[90vh] overflow-y-auto">
-                <div className="flex gap-3 justify-between items-center bg-slate-50 px-3 py-2 sticky top-0">
-                    <h4 className="font-bold">Add New Accident</h4>
-                    <button
-                        onClick={closeHandler}
-                        className="text-gray-500 hover:text-gray-700"
-                    >
-                        ✕
-                    </button>
-                </div>
+        <div className="min-h-screen  flex flex-col">
+            <div className="flex-1 px-4 w-full h-full">
+                {showRegistrationForm ? (
+                    <div className="bg-white border rounded-sm shadow-sm w-full min-h-[80vh] p-4 sm:p-6">
+                        <div className="text-center mb-6">
+                            <h3 className="text-xl font-semibold text-gray-800">
+                                Enter Vehicle Details <br />
+                                <span className='text-[16px]'>വാഹന വിശദാംശങ്ങൾ നൽകുക</span>
+                            </h3>
+                        </div>
 
-                <div className="w-full flex flex-col gap-5 text-sm px-3 py-2">
-                    {/* Bus Number Field */}
-                    <div className="flex flex-col relative" ref={busRef}>
-                        <label>Bus Number (Bonnet No)</label>
-                        <input
-                            type="text"
-                            value={bonnetNo}
-                            onChange={(e) => {
-                                setBonnetNo(e.target.value);
-                                setShowBusDropdown(true);
-                            }}
-                            onFocus={() => setShowBusDropdown(true)}
-                            placeholder="Enter bus number"
-                            className="w-full px-3 py-2 border rounded-sm"
-                        />
-
-                        {showBusDropdown && (
-                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-sm shadow-lg top-full">
-                                {loading && <div className="p-2 text-center">Loading buses...</div>}
-
-                                {error && (
-                                    <div className="p-2 text-red-500">
-                                        {error} - <button
-                                            onClick={() => window.location.reload()}
-                                            className="text-blue-500 hover:underline"
-                                        >
-                                            Retry
-                                        </button>
-                                    </div>
-                                )}
-
-                                {!loading && !error && filteredBuses.length === 0 && (
-                                    <div className="p-2 text-gray-500">No matching buses found</div>
-                                )}
-
-                                {!loading && !error && filteredBuses.length > 0 && (
-                                    <ul>
-                                        {filteredBuses.map((bus) => (
-                                            <li
-                                                key={bus.bonnetNo}
-                                                className="px-3 py-2 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => handleSelectBus(bus.bonnetNo)}
-                                            >
-                                                {bus.bonnetNo}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+                        {apiError && (
+                            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                {apiError}
                             </div>
                         )}
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="flex flex-col gap-4 md:flex-row">
+                                <div className="flex-1 relative" ref={busRef}>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                        Bus Number (Bonnet No) <span className="text-red-600">*</span>
+                                        <span className="text-xs text-gray-500 block">
+                                            <MalayalamText text="ബസ് നമ്പർ (ബോണറ്റ് നമ്പർ)" />
+                                        </span>
+                                    </label>
+                                    <input
+                                        name="bonnetNumber"
+                                        value={formData.bonnetNumber}
+                                        onChange={handleChange}
+                                        onFocus={() => setShowBonnetDropDown(true)}
+                                        className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.bonnetNumber ? 'border-red-500' : 'border-gray-300'}`}
+                                        placeholder="Search bus number"
+                                        autoComplete="off"
+                                    />
+                                    {errors.bonnetNumber && (
+                                        <p className="text-xs text-red-600 mt-1">{errors.bonnetNumber}</p>
+                                    )}
+                                    {showBonnetDropDown && (
+                                        <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
+                                            {isLoading ? (
+                                                <div className="p-3 text-center text-gray-500">Loading buses... / <MalayalamText text=" ബസുകൾ ലോഡ് ചെയ്യുന്നു..." /></div>
+                                            ) : filteredBusinfo.length === 0 ? (
+                                                <div className="p-3 text-center text-gray-500">No matching buses found / <MalayalamText text=" അനുയോജ്യമായ ബസുകൾ കണ്ടെത്തിയില്ല" /></div>
+                                            ) : (
+                                                <ul>
+                                                    {filteredBusinfo.map((bus, index) => (
+                                                        <li
+                                                            key={`bus-${bus.bonet_number}-${index}`}
+                                                            className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
+                                                            onClick={() => handleSelectBus(bus.bonet_number)}
+                                                        >
+                                                            {bus.bonet_number}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex-1 relative" ref={depotRef}>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                        Operated Depot <span className="text-red-600">*</span>
+                                        <span className="text-[10px] text-gray-500 block">ഓപ്പറേറ്റഡ് ഡിപ്പോ</span>
+                                    </label>
+                                    <input
+                                        name="operatedDepot"
+                                        value={formData.operatedDepot}
+                                        onChange={handleChange}
+                                        onFocus={() => setShowDepotDropdown(true)}
+                                        className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.operatedDepot ? 'border-red-500' : 'border-gray-300'}`}
+                                        placeholder="Search depot by name or abbreviation"
+                                        autoComplete="off"
+                                    />
+                                    {errors.operatedDepot && (
+                                        <p className="text-xs text-red-600 mt-1">{errors.operatedDepot}</p>
+                                    )}
+                                    {showDepotDropdown && (
+                                        <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
+                                            {filteredDepots.length === 0 ? (
+                                                <div className="p-3 text-center text-gray-500">
+                                                    No matching depots / <MalayalamText text=" അനുയോജ്യമായ ഡിപ്പോകൾ കണ്ടെത്തിയില്ല" />
+                                                </div>
+                                            ) : (
+                                                <ul>
+                                                    {filteredDepots.map((d, index) => (
+                                                        <li
+                                                            key={`depot-${d.abv}-${index}`}
+                                                            className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
+                                                            onClick={() => {
+                                                                setFormData(prev => ({ ...prev, operatedDepot: d.name }));
+                                                                setShowDepotDropdown(false);
+                                                            }}
+                                                        >
+                                                            {d.abv.toUpperCase()} - {d.name}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="pt-2 flex justify-between">
+                                <button
+                                    type="button"
+                                    onClick={toggleForm}
+                                    className="py-1 px-4 border text-gray-700 rounded hover:bg-gray-100 transition-colors text-[12px] font-medium"
+                                >
+                                    Back to Search
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={apiLoading}
+                                    className={`py-1 px-4 bg-[var(--sidebar-bg)] text-white rounded hover:bg-[#001670] transition-colors text-[12px] font-medium shadow-md ${apiLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                >
+                                    {apiLoading ? (
+                                        <span>Processing... </span>
+                                    ) : (
+                                        <span>Continue</span>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    {/* Driver PEN Number Field */}
-                    <div className="flex flex-col relative" ref={driverRef}>
-                        <label>Driver PEN Number</label>
-                        <input
-                            type="text"
-                            value={driverPenNo}
-                            onChange={(e) => {
-                                setDriverPenNo(e.target.value);
-                                setShowDriverDropdown(true);
-                            }}
-                            onFocus={() => setShowDriverDropdown(true)}
-                            placeholder="Enter driver PEN number"
-                            className="w-full px-3 py-2 border rounded-sm"
-                        />
-
-                        {showDriverDropdown && (
-                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-sm shadow-lg top-full">
-                                {userLoading && <div className="p-2 text-center">Loading drivers...</div>}
-
-                                {userError && (
-                                    <div className="p-2 text-red-500">
-                                        {userError} - <button
-                                            onClick={() => window.location.reload()}
-                                            className="text-blue-500 hover:underline"
-                                        >
-                                            Retry
-                                        </button>
-                                    </div>
-                                )}
-
-                                {!userLoading && !userError && filteredDrivers.length === 0 && (
-                                    <div className="p-2 text-gray-500">No matching drivers found</div>
-                                )}
-
-                                {!userLoading && !userError && filteredDrivers.length > 0 && (
-                                    <ul>
-                                        {filteredDrivers.map((driver) => (
-                                            <li
-                                                key={driver.pen_no}
-                                                className="px-3 py-2 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => handleSelectDriver(driver.pen_no)}
-                                            >
-                                                {driver.pen_no} - {driver.user_first_name} {driver.user_last_name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                ) : (
+                    <div className="w-full flex flex-col gap-3 px-3 my-5">
+                        <div className="w-full flex flex-col gap-3">
+                            <div className="flex items-center gap-3">
+                                <h6>
+                                    Accident Reference Number <span className="text-red-600">*</span>
+                                </h6>
+                                <input
+                                    type="text"
+                                    placeholder="Enter accident reference"
+                                    value={accidentReferenceNumber}
+                                    onChange={(e) => setAccidentReferencenumber(e.target.value)}
+                                    className="flex-1 border px-3 py-1 bg-white rounded-sm"
+                                />
+                                <button
+                                    onClick={handleSearch}
+                                    className="border px-3 py-1 rounded-sm bg-[var(--sidebar-bg)] text-white"
+                                >
+                                    Search
+                                </button>
+                                {!showRegistrationForm && (
+                                    <button
+                                        onClick={toggleForm}
+                                        className="flex items-center gap-1 bg-[var(--sidebar-bg)] text-white px-3 py-1 rounded text-[12px] hover:bg-[#001670]"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        Add Accident
+                                    </button>
                                 )}
                             </div>
-                        )}
-                    </div>
-
-                    {/* Conductor PEN Number Field */}
-                    <div className="flex flex-col relative" ref={conductorRef}>
-                        <label>Conductor PEN Number</label>
-                        <input
-                            type="text"
-                            value={conductorPenNo}
-                            onChange={(e) => {
-                                setConductorPenNo(e.target.value);
-                                setShowConductorDropdown(true);
-                            }}
-                            onFocus={() => setShowConductorDropdown(true)}
-                            placeholder="Enter conductor PEN number"
-                            className="w-full px-3 py-2 border rounded-sm"
-                        />
-
-                        {showConductorDropdown && (
-                            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-sm shadow-lg top-full">
-                                {userLoading && <div className="p-2 text-center">Loading conductors...</div>}
-
-                                {userError && (
-                                    <div className="p-2 text-red-500">
-                                        {userError} - <button
-                                            onClick={() => window.location.reload()}
-                                            className="text-blue-500 hover:underline"
+                            <div className="flex justify-center items-center gap-3">
+                                <Divider className="w-1/3" />
+                                <p>OR</p>
+                                <Divider className="w-1/3" />
+                            </div>
+                            <div className="relative bg-white flex flex-col gap-5 rounded-sm">
+                                <div className="w-full grid grid-cols-4 gap-5 text-[12px] px-3 py-2">
+                                    <div className="flex flex-col">
+                                        <label> Date /<span className="text-[10px]"> തീയതി</span></label>
+                                        <input
+                                            onChange={(e) => setDate(e.target.value)}
+                                            type="date"
+                                            className="px-3 py-2 border rounded-sm"
+                                            value={date}
+                                        />
+                                    </div>
+                                    <div className="relative flex flex-col">
+                                        <label> Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span></label>
+                                        <input
+                                            type="text"
+                                            placeholder="Search bonnet number"
+                                            className="px-3 py-2 border rounded-sm"
+                                            onClick={() => setShowBonnetDropDown(true)}
+                                            value={bonnetNo}
+                                            onChange={handleSearchBonnetNumber}
+                                        />
+                                        {showBonnetDropDown && (
+                                            <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
+                                                {filteredBusinfo.map((d) => (
+                                                    <button
+                                                        onClick={() => {
+                                                            setBonnetNo(d.bonet_number);
+                                                            setShowBonnetDropDown(false);
+                                                        }}
+                                                        className="py-2 text-start"
+                                                        key={d.bonet_number}
+                                                    >
+                                                        {d.bonet_number}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label>District /<span className="text-[10px]"> ജില്ല</span></label>
+                                        <select
+                                            onChange={(e) => setDistrict(e.target.value)}
+                                            className="px-3 py-2 border rounded-sm"
+                                            value={district}
                                         >
-                                            Retry
+                                            <option value="">Select district</option>
+                                            <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                                            <option value="Kollam">Kollam</option>
+                                            <option value="Pathanamthitta">Pathanamthitta</option>
+                                            <option value="Alappuzha">Alappuzha</option>
+                                            <option value="Kottayam">Kottayam</option>
+                                            <option value="Idukki">Idukki</option>
+                                            <option value="Ernakulam">Ernakulam</option>
+                                            <option value="Thrissur">Thrissur</option>
+                                            <option value="Palakkad">Palakkad</option>
+                                            <option value="Malappuram">Malappuram</option>
+                                            <option value="Kozhikode">Kozhikode</option>
+                                            <option value="Wayanad">Wayanad</option>
+                                            <option value="Kannur">Kannur</option>
+                                            <option value="Kasaragod">Kasaragod</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label>Operated Depo /
+                                            <span className="text-[10px]"> പ്രവർത്തിക്കുന്ന ഡിപ്പോ</span></label>
+                                        <select
+                                            onChange={(e) => setDepo(e.target.value)}
+                                            className="px-3 py-2 border rounded-sm"
+                                            value={depo}
+                                        >
+                                            <option value="" disabled>
+                                                Select Depot
+                                            </option>
+                                            {allDepos.map((depo: any) =>
+                                                depo.depot.map((d: any) => (
+                                                    <option key={d["depot-abv"]} value={d["depot-name"]}>
+                                                        {d["depot-name"]}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex items-center px-3 py-2 bg-slate-50">
+                                    <div className="flex gap-3 ms-auto">
+                                        <button
+                                            onClick={handleClear}
+                                            className="border px-3 py-1 rounded-sm bg-white"
+                                        >
+                                            Clear
+                                        </button>
+                                        <button
+                                            onClick={handleSearch}
+                                            className="border px-3 py-1 rounded-sm bg-[var(--sidebar-bg)] text-white"
+                                        >
+                                            Search
                                         </button>
                                     </div>
-                                )}
+                                </div>
+                            </div>
 
-                                {!userLoading && !userError && filteredConductors.length === 0 && (
-                                    <div className="p-2 text-gray-500">No matching conductors found</div>
-                                )}
-
-                                {!userLoading && !userError && filteredConductors.length > 0 && (
-                                    <ul>
-                                        {filteredConductors.map((conductor) => (
-                                            <li
-                                                key={conductor.pen_no}
-                                                className="px-3 py-2 cursor-pointer hover:bg-gray-100"
-                                                onClick={() => handleSelectConductor(conductor.pen_no)}
-                                            >
-                                                {conductor.pen_no} - {conductor.user_first_name} {conductor.user_last_name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            <div className="flex flex-col gap-3 px-3 py-5">
+                                {isLoading ? (
+                                    <p>loading...</p>
+                                ) : !isLoading && accidentList && accidentList?.length < 1 ? (
+                                    <p>no data found</p>
+                                ) : (
+                                    accidentList &&
+                                    accidentList.map((d: any) => (
+                                        <div
+                                            key={d.accident_id}
+                                            className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer"
+                                            onClick={() => handlecaseSelect(d)}
+                                        >
+                                            <div className="flex justify-between">
+                                                <div>
+                                                    <label>Reference number:</label>
+                                                    <label>{d.accident_id}</label>
+                                                </div>
+                                                <label>{d.accident_details.date_of_accident}</label>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <p>
+                                                    bonnet Number: <span>{d.vehicle_info.bonet_no}</span>
+                                                </p>
+                                                <p>
+                                                    Accident Place: <span>{d.location_info.place}</span>
+                                                </p>
+                                                <p>
+                                                    Operated Depo: <span>{d.location_info.operated_depot}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
                                 )}
                             </div>
-                        )}
+                        </div>
                     </div>
-                </div>
-
-                <div className="flex items-center px-3 py-2 bg-slate-50 mt-auto sticky bottom-0">
-                    <div className="flex gap-3 ms-auto">
-                        <button
-                            onClick={handleClear}
-                            className="border px-3 py-1 rounded-sm bg-white hover:bg-gray-100 text-sm"
-                            disabled={isLoading}
-                        >
-                            Clear All
-                        </button>
-                        <button
-                            onClick={handleConfirm}
-                            className={`border px-3 py-1 rounded-sm text-white text-sm
-                                ${bonnetNo && driverPenNo && conductorPenNo && !isLoading
-                                    ? "bg-green-600 hover:bg-green-700"
-                                    : "bg-gray-400 cursor-not-allowed"}`}
-                            disabled={!bonnetNo || !driverPenNo || !conductorPenNo || isLoading}
-                        >
-                            {isLoading ? "Loading..." : "Confirm Selection"}
-                        </button>
-                    </div>
-                </div>
+                )}
             </div>
         </div>
     );
 };
 
-export default AddZerothReportModal;
+export default CombinedAccidentComponent;

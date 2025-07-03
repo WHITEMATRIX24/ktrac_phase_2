@@ -9,6 +9,7 @@ import ReferenceNumberSearchModal from '@/components/accident_management/search_
 import AddNewAccidentModal from '@/components/accident_management/add_new_accident';
 import AddZerothReportModal from '@/components/accident_management/zerothreport_modal';
 import AccidentReportForm from '@/components/accident_management/zerothReportForm';
+import CombinedAccidentComponent from '@/components/accident_management/zerothreport_modal';
 
 const MapComponent = dynamic(
     () => import('@/components/MapComponent'),
@@ -28,6 +29,10 @@ interface Vehicle {
     conductor: Conductor;
     schedule: string;
     depot: string;
+}
+interface Photo {
+    download_url: string;
+    expires_at: string;
 }
 
 interface AccidentReference {
@@ -53,7 +58,7 @@ interface AccidentReference {
     accidentState: string;
     accidentDistrict: string;
     description: string;
-    photos: string[];
+    photos: Photo[];
     accidentLatitude: string;
     accidentLongitude: string;
 
@@ -183,105 +188,94 @@ const PrimaryAccidentReport: React.FC = () => {
 
         // Recovery Phase
         dockedOrServiceAfter: '',
-        takenForRepair: '',
+        takenForRepair: false,
         gdEntered: '',
         firRegistered: '',
         costOfDamage: '',
         amountSettledWithDriver: '',
-        codSettledWithOtherVehicle: '',
-        codRecovered: '',
-        caseSettled: '',
+        codSettledWithOtherVehicle: false,
+        codRecovered: false,
+        caseSettled: false,
         recoveryRemarks: '',
     };
 
     const [formData, setFormData] = React.useState(initialFormState);
-    const handleSearchSelect = async () => {
-        try {
-            const response = await fetch(
-                'https://d6vs3cus00.execute-api.ap-south-1.amazonaws.com/DEV?action=get_accident_report&accident_id=TVM_06_25_0002'
-            );
+    const handleSearchSelect = (accidentData: any) => {
+        console.log("accident", accidentData);
+        const mappedData: AccidentReference = {
+            id: accidentData.accident_id,
+            refNo: accidentData.accident_id,
+            busNo: accidentData.vehicle_info.bonet_no,
+            regNo: accidentData.vehicle_info.vehicle_register_no,
+            accidentPlace: accidentData.location_info.place,
+            accidentDate: accidentData.accident_details.date_of_accident,
+            policeStation: accidentData.geolocation.nearest_police_station,
+            timeOfAccident: accidentData.accident_details.time_of_accident,
+            ksrcOrKswift: '', // not provided
+            busClass: '', // not provided
+            operatedDepotZone: '', // not provided
+            ageOfBus: 0, // not provided
+            operatedDepot: accidentData.accident_details.operated_depot,
+            homeDepot: '',
+            scheduleNumber: accidentData.accident_details.schedule_number,
+            driverName: accidentData.crew_information.driver_name,
+            driverPhone: accidentData.crew_information.driver_phn_no,
+            conductorName: accidentData.crew_information.conductor_name,
+            conductorPhone: accidentData.crew_information.conductor_phn_no,
+            accidentState: accidentData.location_info.state,
+            accidentDistrict: accidentData.location_info.district,
+            accidentLatitude: accidentData.geolocation.latitude.toString(),
+            accidentLongitude: accidentData.geolocation.longitude.toString(),
+            description: accidentData.accident_details.description,
+            photos: accidentData?.photos?.download_urls?.map((item: any) => ({
+                download_url: item.download_url,
+                expires_at: item.generated_at,
+            })) || [],
+        };
+        console.log("photo check", mappedData);
 
-            if (!response.ok) {
-                throw new Error(`API error! status: ${response.status}`);
-            }
+        setZeroSelectedVehicle(null);
+        setSelectedReference(mappedData);
 
-            const responseData = await response.json();
-            const accidentData = responseData.data;
+        setFormData(prev => ({
+            ...prev,
+            accidentRefNo: mappedData.refNo,
+            bonnetNo: mappedData.busNo,
+            regNo: mappedData.regNo,
+            ksrcOrKswift: mappedData.ksrcOrKswift,
+            busClass: mappedData.busClass,
+            operatedDepotZone: mappedData.operatedDepotZone,
+            ageOfBus: mappedData.ageOfBus,
+            accidentPlace: mappedData.accidentPlace,
+            dateOfAccident: mappedData.accidentDate,
+            policeStation: mappedData.policeStation,
+            timeOfAccident: mappedData.timeOfAccident,
+            homeDepot: mappedData.homeDepot,
+            operatedDepot: mappedData.operatedDepot,
+            scheduleNumber: mappedData.scheduleNumber,
+            driverName: mappedData.driverName,
+            driverPhone: mappedData.driverPhone,
+            conductorName: mappedData.conductorName,
+            conductorPhone: mappedData.conductorPhone,
+            accidentState: mappedData.accidentState,
+            accidentDistrict: mappedData.accidentDistrict,
+            latitude: mappedData.accidentLatitude,
+            longitude: mappedData.accidentLongitude,
+            description: mappedData.description,
+            fatalitiesKsrtcCrew: 0,
+            fatalitiesPassengers: 0,
+            fatalitiesThirdParty: 0,
+            majorInjuriesKsrtcCrew: 0,
+            minorInjuriesKsrtcCrew: 0,
+            majorInjuriesPassengers: 0,
+            minorInjuriesPassengers: 0,
+            majorInjuriesThirdParty: 0,
+            minorInjuriesThirdParty: 0,
+            totalFatalities: 0,
+            totalMajorInjuries: 0,
+            totalMinorInjuries: 0,
+        }));
 
-
-
-            const mappedData: AccidentReference = {
-                id: accidentData.accident_id,
-                refNo: accidentData.accident_id,
-                busNo: accidentData.vehicle_info.bonet_no,
-                regNo: accidentData.vehicle_info.vehicle_register_no,
-                accidentPlace: accidentData.location_info.place,
-                accidentDate: accidentData.accident_details.date_of_accident,
-                policeStation: accidentData.geolocation.nearest_police_station,
-                timeOfAccident: accidentData.accident_details.time_of_accident,
-                ksrcOrKswift: '', // not provided
-                busClass: '', // not provided
-                operatedDepotZone: '', // not provided
-                ageOfBus: 0, // not provided
-                operatedDepot: accidentData.accident_details.operated_depot,
-                homeDepot: accidentData.accident_details.operated_depot,
-                scheduleNumber: accidentData.accident_details.schedule_number,
-                driverName: accidentData.crew_information.driver_name,
-                driverPhone: accidentData.crew_information.driver_phn_no,
-                conductorName: accidentData.crew_information.conductor_name,
-                conductorPhone: accidentData.crew_information.conductor_phn_no,
-                accidentState: accidentData.location_info.state,
-                accidentDistrict: accidentData.location_info.district,
-                accidentLatitude: accidentData.geolocation.latitude.toString(),
-                accidentLongitude: accidentData.geolocation.longitude.toString(),
-                description: accidentData.accident_details.description,
-                photos: accidentData.photo_s3_keys || [],
-            };
-
-            setZeroSelectedVehicle(null);
-            setSelectedReference(mappedData);
-
-            setFormData(prev => ({
-                ...prev,
-                accidentRefNo: mappedData.refNo,
-                bonnetNo: mappedData.busNo,
-                regNo: mappedData.regNo,
-                ksrcOrKswift: mappedData.ksrcOrKswift,
-                busClass: mappedData.busClass,
-                operatedDepotZone: mappedData.operatedDepotZone,
-                ageOfBus: mappedData.ageOfBus,
-                accidentPlace: mappedData.accidentPlace,
-                dateOfAccident: mappedData.accidentDate,
-                policeStation: mappedData.policeStation,
-                timeOfAccident: mappedData.timeOfAccident,
-                homeDepot: mappedData.homeDepot,
-                operatedDepot: mappedData.operatedDepot,
-                scheduleNumber: mappedData.scheduleNumber,
-                driverName: mappedData.driverName,
-                driverPhone: mappedData.driverPhone,
-                conductorName: mappedData.conductorName,
-                conductorPhone: mappedData.conductorPhone,
-                accidentState: mappedData.accidentState,
-                accidentDistrict: mappedData.accidentDistrict,
-                latitude: mappedData.accidentLatitude,
-                longitude: mappedData.accidentLongitude,
-                description: mappedData.description,
-                fatalitiesKsrtcCrew: 0,
-                fatalitiesPassengers: 0,
-                fatalitiesThirdParty: 0,
-                majorInjuriesKsrtcCrew: 0,
-                minorInjuriesKsrtcCrew: 0,
-                majorInjuriesPassengers: 0,
-                minorInjuriesPassengers: 0,
-                majorInjuriesThirdParty: 0,
-                minorInjuriesThirdParty: 0,
-                totalFatalities: 0,
-                totalMajorInjuries: 0,
-                totalMinorInjuries: 0,
-            }));
-        } catch (error) {
-            console.error('Error fetching zeroth report by ID:', error);
-        }
     };
 
 
@@ -320,10 +314,15 @@ const PrimaryAccidentReport: React.FC = () => {
             'totalMajorInjuries',
             'totalMinorInjuries',
         ];
+        const booleanFields = ['takenForRepair', 'codSettledWithOtherVehicle', 'codRecovered', 'caseSettled'];
 
         const updatedFormData = {
             ...formData,
-            [name]: numericFields.includes(name) ? parseInt(value) || 0 : value,
+            [name]: numericFields.includes(name)
+                ? parseInt(value) || 0
+                : booleanFields.includes(name)
+                    ? value === 'true'
+                    : value,
         };
 
         const totalFatalities =
@@ -340,12 +339,27 @@ const PrimaryAccidentReport: React.FC = () => {
             Number(updatedFormData.minorInjuriesKsrtcCrew) +
             Number(updatedFormData.minorInjuriesPassengers) +
             Number(updatedFormData.minorInjuriesThirdParty);
+        const costOfDamage = Number(updatedFormData.costOfDamage) || 0;
+
+        let severity = 'not-defined';
+
+        if (totalFatalities > 0) {
+            severity = 'Fatal';
+        } else if (costOfDamage < 5000) {
+            severity = 'Insignificant';
+        } else if (costOfDamage <= 50000) {
+            severity = 'Minor';
+        } else {
+            severity = 'Major';
+        }
+
 
         setFormData({
             ...updatedFormData,
             totalFatalities,
             totalMajorInjuries,
             totalMinorInjuries,
+            severity,
         });
     };
 
@@ -369,24 +383,6 @@ const PrimaryAccidentReport: React.FC = () => {
         setActiveTab(0);
     };
 
-
-    const fetchBusByBonnetNumber = async (bonnetNumber: string): Promise<Bus | null> => {
-        try {
-            const response = await fetch('/api/getAllBusInfo');
-            if (!response.ok) throw new Error('Failed to fetch bus data');
-
-            const result: { data: Bus[] } = await response.json();
-
-            // Find bus with matching bonnet number
-            const bus = result.data.find((b: Bus) => b.bonet_number === bonnetNumber);
-
-            return bus || null;
-        } catch (error) {
-            console.error('Error fetching bus data:', error);
-            return null;
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Stop page refresh
 
@@ -396,101 +392,113 @@ const PrimaryAccidentReport: React.FC = () => {
 
         const primaryPayload = {
             accident_id: formData.accidentRefNo,
-            bonnet_no: formData.bonnetNo,
-            registration_no: formData.regNo,
-            transport_type: formData.ksrcOrKswift,
-            bus_class: formData.busClass,
-            operated_depot: formData.operatedDepot,
             operated_depot_zone: formData.operatedDepotZone,
-            home_depot: formData.operatedDepot,
-            age_of_bus: Number(formData.ageOfBus),
+            operated_schedule_name: formData.operatedScheduleName,
             type_of_other_vehicle: formData.typeOfOtherVehicle,
             involved_vehicle_reg_numbers: formData.involvedVehicleRegNumbers,
+            home_depot: formData.homeDepot,
+            jurisdiction_depot: formData.jurisdictionDepot,
+            police_station_jurisdiction: formData.nearestPoliceStation,
             accident_state: formData.accidentState,
             accident_district: formData.accidentDistrict,
             accident_place: formData.accidentPlace,
-            gps_latitude: formData.latitude ? parseFloat(formData.latitude) : "",
-            gps_longitude: formData.longitude ? parseFloat(formData.longitude) : "",
-            jurisdiction_depot: formData.jurisdictionDepot,
-            police_station_jurisdiction: formData.nearestPoliceStation,
-            time_of_accident: combinedDateTime,
-            description: formData.description,
-            created_by: "Home Depo",
+            created_by: "adminksrtc"
+        };
+        const damagePayload = {
+            accident_id: formData.accidentRefNo,
+            damage_description: formData.damageToBus,
+            third_party_properties_damaged: formData.thirdPartyPropertiesDamaged,
+            created_by: "admin@ktrac"
+        };
+        const accidentDetailsPayload = {
+            accident_id: formData.accidentRefNo,
+            accident_occurred: formData.accidentOccurred,
+            accident_type: formData.accidentType,
+            type_of_collision: formData.typeOfCollision,
+            primary_cause_of_accident: formData.primaryCause,
+            primary_responsibilities: formData.primaryResponsibility,
+            fatalities_ksrtc_crew: formData.fatalitiesKsrtcCrew,
+            fatalities_passengers: formData.fatalitiesPassengers,
+            fatalities_third_party: formData.fatalitiesThirdParty,
+            major_injuries_ksrtc_crew: formData.majorInjuriesKsrtcCrew,
+            minor_injuries_ksrtc_crew: formData.minorInjuriesKsrtcCrew,
+            major_injuries_passengers: formData.majorInjuriesPassengers,
+            minor_injuries_passengers: formData.minorInjuriesPassengers,
+            major_injuries_third_party: formData.majorInjuriesThirdParty,
+            minor_injuries_third_party: formData.minorInjuriesThirdParty
+        };
+        const inspectorPayload = {
+            accident_id: formData.accidentRefNo,
+            inspector_name: formData.inquiryInspectorName,
+            inspector_phone: formData.inspectorPhone,
+            created_by: "admin@ksrtc"
+        };
+        const onRoadPayload = {
+            accident_id: formData.accidentRefNo,
+            road_classification_code: formData.roadClassification,
+            road_condition_code: formData.roadCondition,
+            weather_condition_code: formData.weatherCondition,
+            traffic_density_code: formData.trafficDensity,
+            created_by: "admin@ksrtc"
+        };
+        const recoveryPayload = {
+            accident_id: formData.accidentRefNo,
+            docked_or_service: formData.dockedOrServiceAfter,
+            taken_for_repair: formData.takenForRepair,
+            gd_enter_police_station: formData.gdEntered,
+            cost_damage_assessed_amount: Number(formData.costOfDamage),
+            amount_settled_with_driver: Number(formData.amountSettledWithDriver),
+            cod_settled_other_vehicle: formData.codSettledWithOtherVehicle,
+            cod_recovered: formData.codRecovered,
+            case_settled: formData.caseSettled,
+            severity: formData.severity,
+            remarks: "remarks is hardcoded",
+            created_by: "admin@ksrtc",
+            created_at: "2025-06-27T04:50:01.332672"
         };
 
+
         try {
-            const primaryResponse = await fetch("/api/addPrimaryDetails", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(primaryPayload),
-            });
-
-            if (!primaryResponse.ok) throw new Error("Primary details submission failed");
-
-            const damageResponse = await fetch("/api/addDamageDetails", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    accident_id: formData.accidentRefNo,
-                    severity: formData.severity,
-                    accident_type: formData.accidentType,
-                    type_of_collision: formData.typeOfCollision,
-                    primary_cause_of_accident: formData.primaryCause,
-                    primary_responsibility_for_accident: formData.primaryResponsibility,
-                    fatalities_ksrtc_crew: formData.fatalitiesKsrtcCrew,
-                    fatalities_passengers: formData.fatalitiesPassengers,
-                    fatalities_third_party: formData.fatalitiesThirdParty,
-                    major_injuries_ksrtc_crew: formData.majorInjuriesKsrtcCrew,
-                    major_injuries_passengers: formData.majorInjuriesPassengers,
-                    major_injuries_third_party: formData.majorInjuriesThirdParty,
-                    minor_injuries_ksrtc_crew: formData.minorInjuriesKsrtcCrew,
-                    minor_injuries_passengers: formData.minorInjuriesPassengers,
-                    minor_injuries_third_party: formData.minorInjuriesThirdParty,
-
-                    created_by: "home depo",
+            await Promise.all([
+                fetch("/api/addPrimaryDetails", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(primaryPayload)
                 }),
-            });
-
-            if (!damageResponse.ok) throw new Error("Damage details submission failed");
-
-            const serviceResponse = await fetch("/api/addServiceDetails", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    accident_id: formData.accidentRefNo,
-                    schedule_number_cdit: formData.scheduleNumber,
-                    operated_schedule_name: formData.operatedScheduleName,
-                    accident_occurred: formData.accidentOccurred,
-                    road_classification: formData.roadClassification,
-                    road_condition: formData.roadCondition,
-                    weather_condition: formData.weatherCondition,
-                    traffic_density: formData.trafficDensity,
-                    damage_to_the_bus: formData.damageToBus,
-                    third_party_properties_damaged: formData.thirdPartyPropertiesDamaged,
-                    driver_dc_name: formData.driverName,
-                    driver_category: formData.driverName,
-                    driver_pen_id_no: formData.driverName,
-                    driver_phone_no: formData.driverPhone,
-                    conductor_name: formData.conductorName,
-                    cdr_pen_id_no: formData.conductorName,
-                    cdr_phone_no: formData.conductorPhone,
-                    inquiry_inspector_name_ksrtc: formData.inquiryInspectorName,
-                    inspector_phone_no: formData.inspectorPhone,
-                    created_by: "Home depo",
+                fetch("/api/addDamageDetails", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(damagePayload)
                 }),
-            });
+                fetch("/api/addAccidentDetails", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(accidentDetailsPayload)
+                }),
+                fetch("/api/addPrimaryInspectorDetails", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(inspectorPayload)
+                }),
+                fetch("/api/addOnRoadDetails", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(onRoadPayload)
+                }),
+                fetch("/api/addRecoveryDetails", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(recoveryPayload)
+                })
+            ]);
 
-            if (!serviceResponse.ok) throw new Error("Service details submission failed");
-
-
-            alert("Primary report submitted successfully.");
-            window.location.reload(); // Refresh page after closing popup
-
+            alert("All accident details submitted successfully.");
+            window.location.reload();
         } catch (error) {
-            console.error("Submission error:", error);
-            alert("Error submitting details.");
-            // Page won't refresh
+            console.error("Submission failed", error);
+            alert("Error during submission. Please check logs.");
         }
+
     };
 
 
@@ -591,7 +599,7 @@ const PrimaryAccidentReport: React.FC = () => {
         ];
 
     return (
-        <div className="my-4 text-xs">
+        <div className="my-0 text-xs">
             {showSuccessPopup && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-500">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -610,7 +618,7 @@ const PrimaryAccidentReport: React.FC = () => {
                             </div>
                             <button
                                 onClick={handlePopupClose}
-                                className="px-4 py-2 bg-[var(--sidebar)] text-white rounded hover:bg-blue-700 transition"
+                                className="px-4 py-2 bg-[var(--sidebar-bg)] text-white rounded hover:bg-blue-700 transition"
                             >
                                 Close
                             </button>
@@ -619,7 +627,7 @@ const PrimaryAccidentReport: React.FC = () => {
                 </div>
             )}
             {selectedReference === null ? (
-                <ReferenceNumberSearchModal caseSelectHandler={handleSearchSelect} />
+                <CombinedAccidentComponent caseSelectHandler={handleSearchSelect} />
             ) : (
 
                 <div className="flex flex-wrap py-2">
@@ -630,22 +638,23 @@ const PrimaryAccidentReport: React.FC = () => {
                                     <div>
                                         <div className="flex flex-col">
                                             {/* Tab Navigation */}
-                                            <div className="flex border-b border-gray-200 bg-white overflow-x-auto flex-shrink-0">
+                                            <h2 className="text-[24px] font-[600] text-[var(--themeRed)] px-4 mb-2 text-right"> {formData.accidentRefNo?.replaceAll('_', '/')}</h2>
+                                            <div className="flex border-b border-gray-200 bg-[var(--sidebar-bg)] overflow-x-auto flex-shrink-0">
+
                                                 {tabLabels.map((tab, index) => {
-                                                    const isDisabled = formData.severity === "Insignificant" && (index === tabLabels.length - 1 || index === tabLabels.length - 2);
+
                                                     return (
                                                         <button
                                                             key={index}
                                                             type="button"
-                                                            disabled={isDisabled}
-                                                            className={`flex items-center px-4 py-2.5 text-[12px] font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
+
+                                                            className={`flex items-center px-4 py-2.5 text-[12px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
                                                                 ${activeTab === index
-                                                                    ? 'text-[var(--sidebar)] border-[var(--sidebar)] bg-white'
-                                                                    : isDisabled
-                                                                        ? 'text-gray-400 border-transparent cursor-not-allowed'
-                                                                        : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
+                                                                    ? 'text-[var(--sidebar-bg)] border-white bg-gray-500'
+
+                                                                    : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
                                                             onClick={() => {
-                                                                if (!isDisabled) setActiveTab(index);
+                                                                setActiveTab(index);
                                                             }}
                                                         >
                                                             {tab.label}
@@ -658,7 +667,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                             {/* Progress Bar */}
                                             <div className="h-0.5 bg-gray-200 flex-shrink-0">
                                                 <div
-                                                    className="h-full bg-[var(--sidebar)] transition-all duration-300 ease-in-out"
+                                                    className="h-full bg-[var(--sidebar-bg)] transition-all duration-300 ease-in-out"
                                                     style={{
                                                         width: `${((activeTab + 1) / tabLabels.length) * 100}%`
                                                     }}
@@ -676,7 +685,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                     {/* Left Section: Accident Details */}
                                                     <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
+                                                        <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar-bg)]">
                                                             Accident Details
                                                         </h3>
                                                         <div className="space-y-4">
@@ -749,7 +758,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                                                     {/* Right Section: Personnel & Location */}
                                                     <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
+                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar-bg)]">
                                                             Crew & Location
                                                         </h4>
                                                         <div className="space-y-4">
@@ -884,7 +893,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                 </div>
                                                             </div>
                                                             <div>
-                                                                <label className="text-[12px] font-[600] text-[#374151] mb-[6px]">Nearest Police Station</label>
+                                                                <label className="text-[12px] text-[#374151] mb-[6px]">Nearest Police Station</label>
                                                                 <input
                                                                     name="nearestPoliceStation"
                                                                     value={formData.nearestPoliceStation}
@@ -954,123 +963,154 @@ const PrimaryAccidentReport: React.FC = () => {
                                         )}
                                         {zerothReportFilled && activeTab === 0 && (
                                             <div className="mb-4 p-2">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[64vh] sm:gap-6 mb-4">
+                                                <div className="flex gap-2 min-h-[64vh] mb-4">
                                                     {/* Left: Report Details Card */}
-                                                    <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto ">
-                                                        <h3 className="text-[14px] font-[600] mb-3 text-[#1a202c] pb-2 border-b-2 border-[var(--sidebar)]">
-                                                            Accident Spot Report Details (അപകട സ്ഥല റിപ്പോർട്ട് വിവരങ്ങൾ)
+                                                    <div className="w-[70%] bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Accident Spot Report Details <span className="text-[10px]">(അപകട സ്ഥല റിപ്പോർട്ട് വിവരങ്ങൾ)</span>
                                                         </h3>
 
-                                                        <div className="space-y-4">
+                                                        <div className="space-y-4 bg-gray-100 p-[16px]">
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Time of Accident (അപകട സമയം)</label>
-                                                                    <div className="text-[12px]">{formData.timeOfAccident}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Time of Accident <span className="text-[10px]">(അപകട സമയം)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.timeOfAccident}</div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Date of Accident (അപകട തീയതി)</label>
-                                                                    <div className="text-[12px]">{formData.dateOfAccident}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Date of Accident <span className="text-[10px]">(അപകട തീയതി)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.dateOfAccident}</div>
                                                                 </div>
                                                             </div>
 
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Bonnet No (ബോണറ്റ് നമ്പർ)</label>
-                                                                    <div className="text-[12px]">{formData.bonnetNo}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Bonnet No <span className="text-[10px]">(ബോണറ്റ് നമ്പർ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.bonnetNo}</div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Schedule Number (ഷെഡ്യൂൾ നമ്പർ)</label>
-                                                                    <div className="text-[12px]">{formData.scheduleNumber}</div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Operated Depot (പ്രവർത്തിക്കുന്ന ഡിപ്പോ)</label>
-                                                                    <div className="text-[12px]">{formData.operatedDepot}</div>
-                                                                </div>
-                                                                <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Home Depot (ഹോം ഡിപ്പോ)</label>
-                                                                    <div className="text-[12px]">{formData.homeDepot}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Schedule Number <span className="text-[10px]">(ഷെഡ്യൂൾ നമ്പർ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.scheduleNumber}</div>
                                                                 </div>
                                                             </div>
 
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Driver Name (ഡ്രൈവറുടെ പേര്)</label>
-                                                                    <div className="text-[12px]">{formData.driverName}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Operated Depot <span className="text-[10px]">(പ്രവർത്തിക്കുന്ന ഡിപ്പോ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.operatedDepot}</div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Driver Phone (ഡ്രൈവറുടെ ഫോൺ നമ്പർ)</label>
-                                                                    <div className="text-[12px]">{formData.driverPhone}</div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Conductor Name (കണ്ടക്ടറുടെ പേര്)</label>
-                                                                    <div className="text-[12px]">{formData.conductorName}</div>
-                                                                </div>
-                                                                <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Conductor Phone (കണ്ടക്ടറുടെ ഫോൺ നമ്പർ)</label>
-                                                                    <div className="text-[12px]">{formData.conductorPhone}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Home Depot <span className="text-[10px]">(ഹോം ഡിപ്പോ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.homeDepot}</div>
                                                                 </div>
                                                             </div>
 
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Accident Location (അപകട സ്ഥലം)</label>
-                                                                    <div className="text-[12px]">{formData.accidentPlace}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Driver Name <span className="text-[10px]">(ഡ്രൈവറുടെ പേര്)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.driverName}</div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">Police Station (പോലീസ് സ്റ്റേഷൻ)</label>
-                                                                    <div className="text-[12px]">{formData.nearestPoliceStation}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Driver Phone <span className="text-[10px]">(ഡ്രൈവറുടെ ഫോൺ നമ്പർ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.driverPhone}</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Conductor Name <span className="text-[10px]">(കണ്ടക്ടറുടെ പേര്)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.conductorName}</div>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Conductor Phone <span className="text-[10px]">(കണ്ടക്ടറുടെ ഫോൺ നമ്പർ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.conductorPhone}</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Accident Location <span className="text-[10px]">(അപകട സ്ഥലം)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.accidentPlace}</div>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        Police Station <span className="text-[10px]">(പോലീസ് സ്റ്റേഷൻ)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.nearestPoliceStation}</div>
                                                                 </div>
                                                             </div>
 
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">State (സംസ്ഥാനം)</label>
-                                                                    <div className="text-[12px]">{formData.accidentState}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        State <span className="text-[10px]">(സംസ്ഥാനം)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.accidentState}</div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">District (ജില്ല)</label>
-                                                                    <div className="text-[12px]">{formData.accidentDistrict}</div>
+                                                                    <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                        District <span className="text-[10px]">(ജില്ല)</span>
+                                                                    </label>
+                                                                    <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.accidentDistrict}</div>
                                                                 </div>
                                                             </div>
 
                                                             <div>
-                                                                <label className="text-xs font-semibold text-gray-700 mb-0 block">Description (വിവരണം)</label>
-                                                                <div className="text-[12px]">{formData.description}</div>
+                                                                <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                                                    Description <span className="text-[10px]">(വിവരണം)</span>
+                                                                </label>
+                                                                <div className="text-[12px] text-[var(--sidebar-bg)]">{formData.description}</div>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Right: Images Card */}
-                                                    <div className="bg-white border border-gray-300 rounded-[4px] p-4">
-                                                        <h3 className="text-[14px] font-semibold mb-3 text-gray-900 pb-2 border-b-2 border-[var(--sidebar)]">
-                                                            Uploaded Images (അപ്ലോഡ് ചെയ്ത ചിത്രങ്ങൾ)
+                                                    <div className="w-[30%] bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-y-scroll max-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Uploaded Images <span className="text-[10px]">(അപ്ലോഡ് ചെയ്ത ചിത്രങ്ങൾ)</span>
                                                         </h3>
 
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            {selectedReference?.photos?.map((photo: any, index: number) => (
+                                                        <div className="grid grid-cols-1 gap-3 p-[16px]">
+                                                            {selectedReference?.photos?.map((photo: Photo, index: number) => (
                                                                 <div
                                                                     key={index}
                                                                     className="cursor-pointer"
-                                                                    onClick={() => setPreviewImage(photo.url)}
+                                                                    onClick={() => setPreviewImage(photo.download_url)}
                                                                 >
-                                                                    <div className="bg-gray-200 border border-gray-300 rounded h-24 flex items-center justify-center">
-                                                                        <div className="text-gray-500 text-center h-full w-full">
-                                                                            <img
-                                                                                src={photo.url}
-                                                                                alt={`accident-${index + 1}`}
-                                                                                className="h-full w-full object-cover"
-                                                                            />
-                                                                        </div>
+                                                                    <div className="bg-gray-200 border border-gray-300 rounded h-auto flex items-center justify-center">
+                                                                        <img
+                                                                            src={photo.download_url}
+                                                                            alt="accident image"
+                                                                            className="h-full w-full object-cover"
+                                                                        />
                                                                     </div>
+
                                                                 </div>
                                                             ))}
                                                         </div>
+
+
                                                     </div>
                                                 </div>
 
@@ -1107,58 +1147,62 @@ const PrimaryAccidentReport: React.FC = () => {
                                             </div>
                                         )}
 
+
                                         {/* Primary Details Tab */}
 
                                         {activeTab === 1 && (
-                                            <div className=" h-full ">
+                                            <div className="h-full">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
 
                                                     {/* LEFT: Basic Details */}
-                                                    <div className='bg-white border-1 border-grey-600 rounded-[4px] min-h-[65vh] p-[16px] overflow-auto'>
-                                                        <h3 className="text-[14px]   mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Basic Details (അടിസ്ഥാന വിവരങ്ങൾ)
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Basic Details <span className="text-[10px]">(അടിസ്ഥാന വിവരങ്ങൾ)</span>
                                                         </h3>
-                                                        <div className="space-y-4">
+                                                        <div className="space-y-4 p-[16px]">
                                                             <div className="grid gird-cols-2 md:grid-cols-2 gap-2">
                                                                 <div>
-                                                                    <label className="text-[12px]   text-[#374151] mb-[6px]">
-                                                                        Schedule Number (Cdit) (ഷെഡ്യൂൾ നമ്പർ (സിഡിറ്റ്))
+                                                                    <label className="text-[12px] text-[#374151] mb-[6px] ">
+                                                                        Schedule Number (Cdit) <span className="text-[10px]">(ഷെഡ്യൂൾ നമ്പർ (സിഡിറ്റ്))</span>
                                                                     </label>
                                                                     <input
                                                                         type="text"
                                                                         name="scheduleNumber"
-                                                                        className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                        value={formData.scheduleNumber}
+                                                                        readOnly
+                                                                        className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] bg-gray-50 rounded text-xs"
                                                                     />
                                                                 </div>
 
                                                                 <div>
-                                                                    <label className="text-[12px]   text-[#374151] mb-[6px]">
-                                                                        Operated Schedule Name (പ്രവർത്തിച്ച ഷെഡ്യൂൾ പേര്)
+                                                                    <label className="text-[12px] text-[#374151] mb-[6px]">
+                                                                        Schedule Name <span className="text-[10px]">(ഷെഡ്യൂൾ പേര്)</span>
                                                                     </label>
                                                                     <input
                                                                         type="text"
                                                                         name="operatedScheduleName"
-                                                                        className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                        className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
                                                             </div>
+
                                                             <div>
-                                                                <label className="text-[12px]   text-[#374151] mb-[6px]">
-                                                                    Home Depo (ഹോം ഡിപ്പോ)
+                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
+                                                                    Home Depot <span className="text-[10px]">(ഹോം ഡിപ്പോ)</span>
                                                                 </label>
                                                                 <input
                                                                     type="text"
                                                                     name="homeDepot"
                                                                     value={formData.homeDepot}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
 
                                                             {/* Location Input + Map */}
                                                             <div>
-                                                                <label className="text-[12px]   text-[#374151] mb-[6px]">
-                                                                    Accident Location (Lat, Long) (അപകട സ്ഥലം (ലാറ്റിറ്റ്യൂഡ്, ലോംഗിറ്റ്യൂഡ്))
+                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
+                                                                    Accident Location (Lat, Long) <span className="text-[10px]">(അപകട സ്ഥലം (ലാറ്റിറ്റ്യൂഡ്, ലോംഗിറ്റ്യൂഡ്))</span>
                                                                 </label>
                                                                 <div className="flex gap-2">
                                                                     <input
@@ -1167,7 +1211,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="latitude"
                                                                         value={formData.latitude}
                                                                         onChange={handleChange}
-                                                                        className="w-1/2 py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                        className="w-1/2 py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                     <input
                                                                         type="text"
@@ -1175,7 +1219,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         name="longitude"
                                                                         value={formData.longitude}
                                                                         onChange={handleChange}
-                                                                        className="w-1/2 py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                        className="w-1/2 py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                     />
                                                                 </div>
 
@@ -1197,7 +1241,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                         />
                                                                     ) : (
                                                                         <div className="flex items-center justify-center h-full text-sm text-gray-500">
-                                                                            Location not selected (സ്ഥലം തിരഞ്ഞെടുത്തിട്ടില്ല)
+                                                                            Location not selected <span className="text-[10px]">(സ്ഥലം തിരഞ്ഞെടുത്തിട്ടില്ല)</span>
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -1206,33 +1250,31 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* RIGHT: Other Vehicle Involved */}
-                                                    <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Other Vehicle Involved (മറ്റ് വാഹനം ഉൾപ്പെട്ടത്)
-                                                        </h4>
-                                                        <div className="space-y-4">
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Other Vehicle Involved <span className="text-[10px]">(മറ്റ് വാഹനം ഉൾപ്പെട്ടത്)</span>
+                                                        </h3>
+                                                        <div className="space-y-4 p-[16px]">
                                                             <div>
-                                                                <label className="text-[12px]   text-[#374151] mb-[6px]">
-                                                                    Type of Other Vehicle Involved (മറ്റ് വാഹനത്തിന്റെ തരം)
+                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
+                                                                    Type of Other Vehicle Involved <span className="text-[10px]">(മറ്റ് വാഹനത്തിന്റെ തരം)</span>
                                                                 </label>
                                                                 <input
                                                                     name="typeOfOtherVehicle"
-
                                                                     value={formData.typeOfOtherVehicle}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[12px]   text-[#374151] mb-[6px]">
-                                                                    Vehicle Reg. Number (വാഹന രജിസ്ട്രേഷൻ നമ്പർ)
+                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
+                                                                    Vehicle Reg. Number <span className="text-[10px]">(വാഹന രജിസ്ട്രേഷൻ നമ്പർ)</span>
                                                                 </label>
                                                                 <input
                                                                     name="involvedVehicleRegNumbers"
-
                                                                     value={formData.involvedVehicleRegNumbers}
                                                                     onChange={handleChange}
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1242,22 +1284,21 @@ const PrimaryAccidentReport: React.FC = () => {
                                         )}
 
 
+
                                         {/* Damages Happened Tab */}
                                         {activeTab === 2 && (
                                             <div className="h-full">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5 min-h-[65vh]">
 
                                                     {/* LEFT: Accident Details */}
-                                                    <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                        <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Accident Details (അപകട വിവരങ്ങൾ)
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Accident Details <span className="text-[10px]">(അപകട വിവരങ്ങൾ)</span>
                                                         </h3>
-                                                        <div className="space-y-4">
-
-                                                            {/* Accident Type */}
+                                                        <div className="space-y-4 p-[16px]">
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Accident Type (അപകടത്തിന്റെ തരം)
+                                                                    Accident Type <span className="text-[10px]">(അപകടത്തിന്റെ തരം)</span>
                                                                 </label>
                                                                 <input
                                                                     type="text"
@@ -1267,9 +1308,10 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
+
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Accident Occurred (അപകടം സംഭവിച്ചത്)
+                                                                    Accident Occurred <span className="text-[10px]">(അപകടം സംഭവിച്ചത്)</span>
                                                                 </label>
                                                                 <select
                                                                     name="accidentOccurred"
@@ -1277,13 +1319,13 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                 >
                                                                     <option value="">Select Status (സ്ഥിതി തിരഞ്ഞെടുക്കുക)</option>
                                                                     <option value="Middle of Service">Middle of Service (സേവനത്തിന്റെ മധ്യത്തിൽ)</option>
-                                                                    <option value="Start of Service">Start of Service (സേവനത്തിന്റെ തുടക്കത്തിൽ)</option>
+                                                                    <option value="Start of Service">Start of Service(സേവനത്തിന്റെ തുടക്കത്തിൽ)</option>
                                                                 </select>
                                                             </div>
-                                                            {/* Type of Collision */}
+
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Type of Collision (ഘർഷണത്തിന്റെ തരം)
+                                                                    Type of Collision <span className="text-[10px]">(ഘർഷണത്തിന്റെ തരം)</span>
                                                                 </label>
                                                                 <select
                                                                     name="typeOfCollision"
@@ -1294,7 +1336,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     {collisionOptions.map((opt) => (
                                                                         <option key={opt} value={opt}>{opt}</option>
                                                                     ))}
-                                                                    <option value="custom">Add custom... (ഇഷ്ടാനുസൃതം ചേർക്കുക)</option>
+                                                                    <option value="custom">Add custom... (ഇഷ്ടാനുസൃതം ചേർക്കുക) </option>
                                                                 </select>
 
                                                                 {formData.typeOfCollision === 'custom' && (
@@ -1308,10 +1350,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                 )}
                                                             </div>
 
-                                                            {/* Primary Cause of Accident */}
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Primary Cause of Accident (അപകടത്തിന്റെ പ്രാഥമിക കാരണം)
+                                                                    Primary Cause of Accident <span className="text-[10px]">(അപകടത്തിന്റെ പ്രാഥമിക കാരണം)</span>
                                                                 </label>
                                                                 <input
                                                                     type="text"
@@ -1322,10 +1363,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                 />
                                                             </div>
 
-                                                            {/* Primary Responsibility */}
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Primary Responsibility for the Accident (അപകടത്തിനുള്ള പ്രാഥമിക ഉത്തരവാദിത്തം)
+                                                                    Primary Responsibility for the Accident <span className="text-[10px]">(അപകടത്തിനുള്ള പ്രാഥമിക ഉത്തരവാദിത്തം)</span>
                                                                 </label>
                                                                 <input
                                                                     type="text"
@@ -1339,78 +1379,86 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* RIGHT: Service Information */}
-                                                    <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Service Information (സേവന വിവരങ്ങൾ)
-                                                        </h4>
-                                                        <div className="space-y-4">
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Service Information <span className="text-[10px]">(സേവന വിവരങ്ങൾ)</span>
+                                                        </h3>
+                                                        <div className="space-y-4 p-[16px]">
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Road Classification (റോഡ് വർഗ്ഗീകരണം)
+                                                                    Road Classification <span className="text-[10px]">(റോഡ് വർഗ്ഗീകരണം)</span>
                                                                 </label>
                                                                 <select
                                                                     name="roadClassification"
+                                                                    value={formData.roadClassification}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 >
-                                                                    <option value="">Select Classification (വർഗ്ഗീകരണം തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="National Highway">National Highway (ദേശീയ പാത)</option>
-                                                                    <option value="State Highway">State Highway (സംസ്ഥാന പാത)</option>
-                                                                    <option value="District Road">District Road (ജില്ലാ റോഡ്)</option>
-                                                                    <option value="Rural Road">Rural Road (ഗ്രാമീണ റോഡ്)</option>
+                                                                    <option value="">Select Classification</option>
+                                                                    <option value="NH_ROAD">National Highway (ദേശീയ പാത)</option>
+                                                                    <option value="SH_ROAD">State Highway (സംസ്ഥാന പാത)</option>
+                                                                    <option value="DR_ROAD">District Road (ജില്ലാ റോഡ്)</option>
+                                                                    <option value="RR_ROAD">Rural Road (ഗ്രാമീണ റോഡ്)</option>
                                                                 </select>
                                                             </div>
 
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Road Condition (റോഡിന്റെ അവസ്ഥ)
+                                                                    Road Condition <span className="text-[10px]">(റോഡിന്റെ അവസ്ഥ)</span>
                                                                 </label>
                                                                 <select
                                                                     name="roadCondition"
+                                                                    value={formData.roadCondition}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 >
                                                                     <option value="">Select Condition (അവസ്ഥ തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="Good">Good (നല്ലത്)</option>
-                                                                    <option value="Average">Average (ശരാശരി)</option>
-                                                                    <option value="Poor">Poor (മോശം)</option>
-                                                                    <option value="Under Construction">Under Construction (നിർമ്മാണത്തിലുള്ള)</option>
+                                                                    <option value="DOWN_HILL">Good (നല്ലത്)</option>
+                                                                    <option value="FLAT">Average (ശരാശരി)</option>
+                                                                    <option value="FLOOD">Poor (മോശം)</option>
+                                                                    <option value="U_TURN">Under Construction (നിർമ്മാണത്തിലുള്ള)</option>
                                                                 </select>
                                                             </div>
 
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Weather Condition (കാലാവസ്ഥ)
+                                                                    Weather Condition <span className="text-[10px]">(കാലാവസ്ഥ)</span>
                                                                 </label>
                                                                 <select
                                                                     name="weatherCondition"
+                                                                    value={formData.weatherCondition}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 >
                                                                     <option value="">Select Condition (അവസ്ഥ തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="Clear">Clear (വെളിച്ചം)</option>
-                                                                    <option value="Rainy">Rainy (മഴ)</option>
-                                                                    <option value="Foggy">Foggy (മൂടൽമഞ്ഞ്)</option>
-                                                                    <option value="Stormy">Stormy (കൊടുങ്കാറ്റ്)</option>
+                                                                    <option value="SUNNY">Clear (വെളിച്ചം)</option>
+                                                                    <option value="RAINY">Rainy (മഴ)</option>
+                                                                    <option value="FOGGY">Foggy (മൂടൽമഞ്ഞ്)</option>
+                                                                    <option value="NIGHT">Stormy (കൊടുങ്കാറ്റ്)</option>
                                                                 </select>
                                                             </div>
 
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Traffic Density (ട്രാഫിക് സാന്ദ്രത)
+                                                                    Traffic Density <span className="text-[10px]">(ട്രാഫിക് സാന്ദ്രത)</span>
                                                                 </label>
                                                                 <select
                                                                     name="trafficDensity"
+                                                                    value={formData.trafficDensity}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 >
                                                                     <option value="">Select Density (സാന്ദ്രത തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="Low">Low (കുറഞ്ഞ)</option>
-                                                                    <option value="Medium">Medium (ഇടത്തരം)</option>
-                                                                    <option value="High">High (കൂടുതൽ)</option>
-                                                                    <option value="Congested">Congested (നിറഞ്ഞ)</option>
+                                                                    <option value="LIGHT">Low (കുറഞ്ഞ)</option>
+                                                                    <option value="MODERATE">Medium (ഇടത്തരം)</option>
+                                                                    <option value="HEAVY">High (കൂടുതൽ)</option>
+
                                                                 </select>
                                                             </div>
 
-                                                            <div>
+                                                            {/* <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Description (വിവരണം)
+                                                                    Description <span className="text-[10px]">(വിവരണം)</span>
                                                                 </label>
                                                                 <textarea
                                                                     name="primarydescription"
@@ -1419,7 +1467,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                     rows={5}
                                                                 />
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1427,83 +1475,73 @@ const PrimaryAccidentReport: React.FC = () => {
                                         )}
 
 
+
                                         {/* Service Details Tab */}
                                         {activeTab === 3 && (
                                             <div>
-
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[65vh] sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
-                                                    <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Damage & Inspection (നാശനഷ്ടവും പരിശോധനയും)
-                                                        </h4>
-                                                        <div className="space-y-4">
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Damage & Inspection <span className="text-[10px]">(നാശനഷ്ടവും പരിശോധനയും)</span>
+                                                        </h3>
+                                                        <div className="space-y-2 p-[16px]">
                                                             <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Damage To The Bus (ബസ്സിനുണ്ടായ നാശനഷ്ടം)
+                                                                <label className="text-[12px] text-[#374151] mb-2 block">
+                                                                    Damage to the Bus <span className="text-[10px]">(ബസ്സിനുണ്ടായ നാശനഷ്ടം)</span>
                                                                 </label>
-                                                                <select
+
+                                                                <textarea
                                                                     name="damageToBus"
+                                                                    value={formData.damageToBus}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
-                                                                >
-                                                                    <option value="">Select Severity (തീവ്രത തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="Minor">Minor (ചെറിയ)</option>
-                                                                    <option value="Moderate">Moderate (മിതമായ)</option>
-                                                                    <option value="Severe">Severe (കടുത്ത)</option>
-                                                                    <option value="Totaled">Totaled (പൂർണ്ണമായും നശിച്ച)</option>
-                                                                </select>
+                                                                    rows={3}
+                                                                />
                                                             </div>
 
+
                                                             <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    3rd Party Properties Damaged (മൂന്നാം കക്ഷിയുടെ സ്വത്തുക്കൾക്കുണ്ടായ നാശനഷ്ടം)
+                                                                <label className="text-[12px] text-[#374151] mb-2 block">
+                                                                    3rd Party Properties Damaged <span className="text-[10px]">(മൂന്നാം കക്ഷിയുടെ സ്വത്തുക്കൾക്കുണ്ടായ നാശനഷ്ടം)</span>
                                                                 </label>
                                                                 <input
                                                                     type="text"
                                                                     name="thirdPartyPropertiesDamaged"
+                                                                    value={formData.thirdPartyPropertiesDamaged}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
 
                                                             <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Category (വിഭാഗം)
-                                                                </label>
-                                                                <select
-                                                                    name="category"
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
-                                                                >
-                                                                    <option value="">Select Category (വിഭാഗം തിരഞ്ഞെടുക്കുക)</option>
-                                                                    <option value="Collision">Collision (ഘർഷണം)</option>
-                                                                    <option value="Non-Collision">Non-Collision (ഘർഷണമില്ലാത്ത)</option>
-                                                                    <option value="Passenger Injury">Passenger Injury (യാത്രക്കാർക്കുണ്ടായ പരിക്ക്)</option>
-                                                                    <option value="Property Damage">Property Damage (സ്വത്ത് നഷ്ടം)</option>
-                                                                </select>
-                                                            </div>
-
-                                                            <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Inquiry Inspector Name (Ksrtc) (വിചാരണ പരിശോധകരുടെ പേര് (കെ.എസ്.ആർ.ടി.സി))
+                                                                <label className="text-[12px] text-[#374151] mb-2 block">
+                                                                    Inquiry Inspector Name (Ksrtc) <span className="text-[10px]">(വിചാരണ പരിശോധകരുടെ പേര് (കെ.എസ്.ആർ.ടി.സി))</span>
                                                                 </label>
                                                                 <input
                                                                     type="text"
-                                                                    name="inspectorName"
+                                                                    name="inquiryInspectorName"
+                                                                    value={formData.inquiryInspectorName}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
 
                                                             <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Inspector Phone No. (പരിശോധകരുടെ ഫോൺ നമ്പർ)
+                                                                <label className="text-[12px] text-[#374151] mb-2 block">
+                                                                    Inspector Phone No. <span className="text-[10px]">(പരിശോധകരുടെ ഫോൺ നമ്പർ)</span>
                                                                 </label>
                                                                 <input
-                                                                    type="tel"
+                                                                    type="text"
                                                                     name="inspectorPhone"
+                                                                    value={formData.inspectorPhone}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
+
                                                             <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Jurisdiction (Depot) (അധികാരപരിധി (ഡിപ്പോ))
+                                                                <label className="text-[12px] text-[#374151] mb-2 block">
+                                                                    Jurisdiction (Depot) <span className="text-[10px]">(അധികാരപരിധി (ഡിപ്പോ))</span>
                                                                 </label>
                                                                 <input
                                                                     name="jurisdictionDepot"
@@ -1512,23 +1550,34 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
+                                                            <div>
+                                                                <label className="text-xs text-gray-700 mb-0 block">
+                                                                    Police Station <span className="text-[10px]">(പോലീസ് സ്റ്റേഷൻ)</span>
+                                                                </label>
+                                                                <input
+                                                                    name="nearestPoliceStation"
+                                                                    value={formData.nearestPoliceStation}
+                                                                    onChange={handleChange}
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <div className="bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto">
-                                                        <h3 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Injury & Fatality Details (പരിക്കുകളും മരണങ്ങളും)
+                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
+                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                            Injury & Fatality Details <span className="text-[10px]">(പരിക്കുകളും മരണങ്ങളും)</span>
                                                         </h3>
 
-                                                        {formData.severity === "Insignificant" ? (
+                                                        {formData.severity === "Insignificantiou" ? (
                                                             <div className="text-sm text-gray-500">
-                                                                No injury or fatality details required for insignificant severity. (ചെറിയ തീവ്രതയ്ക്ക് പരിക്ക് അല്ലെങ്കിൽ മരണ വിവരങ്ങൾ ആവശ്യമില്ല)
+                                                                No injury or fatality details required for insignificant severity. <span className="text-[10px]">(ചെറിയ തീവ്രതയ്ക്ക് പരിക്ക് അല്ലെങ്കിൽ മരണ വിവരങ്ങൾ ആവശ്യമില്ല)</span>
                                                             </div>
                                                         ) : (
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-[16px]">
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Fatalities (KSRTC Crew) (മരണങ്ങൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Fatalities (KSRTC Crew) <span className="text-[10px]">(മരണങ്ങൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1539,8 +1588,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Fatalities (Passengers) (മരണങ്ങൾ (യാത്രക്കാർ))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Fatalities (Passengers) <span className="text-[10px]">(മരണങ്ങൾ (യാത്രക്കാർ))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1551,8 +1600,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Fatalities (3rd Party) (മരണങ്ങൾ (മൂന്നാം കക്ഷി))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Fatalities (3rd Party) <span className="text-[10px]">(മരണങ്ങൾ (മൂന്നാം കക്ഷി))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1563,8 +1612,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Major Injuries (KSRTC Crew) (കടുത്ത പരിക്കുകൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Major Injuries (KSRTC Crew) <span className='text-[10px]'>(കടുത്ത പരിക്കുകൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1575,8 +1624,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Major Injuries (Passengers) (കടുത്ത പരിക്കുകൾ (യാത്രക്കാർ))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Major Injuries (Passengers) <span className="text-[10px]">(കടുത്ത പരിക്കുകൾ (യാത്രക്കാർ))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1587,8 +1636,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Major Injuries (3rd Party) (കടുത്ത പരിക്കുകൾ (മൂന്നാം കക്ഷി))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Major Injuries (3rd Party) <span className="text-[10px]">(കടുത്ത പരിക്കുകൾ (മൂന്നാം കക്ഷി))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1599,8 +1648,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Minor Injuries (KSRTC Crew) (ചെറിയ പരിക്കുകൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Minor Injuries (KSRTC Crew) <span className="text-[10px]">(ചെറിയ പരിക്കുകൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1611,8 +1660,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Minor Injuries (Passengers) (ചെറിയ പരിക്കുകൾ (യാത്രക്കാർ))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Minor Injuries (Passengers) <span className="text-[10px]">(ചെറിയ പരിക്കുകൾ (യാത്രക്കാർ))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1623,8 +1672,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Minor Injuries (3rd Party) (ചെറിയ പരിക്കുകൾ (മൂന്നാം കക്ഷി))
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Minor Injuries (3rd Party) <span className="text-[10px]">(ചെറിയ പരിക്കുകൾ (മൂന്നാം കക്ഷി))</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1635,8 +1684,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Total Fatalities (ആകെ മരണങ്ങൾ)
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Total Fatalities <span className="text-[10px]">(ആകെ മരണങ്ങൾ)</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
@@ -1647,25 +1696,25 @@ const PrimaryAccidentReport: React.FC = () => {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Total Major Injuries (ആകെ കടുത്ത പരിക്കുകൾ)
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Total Major Injuries <span className="text-[10px]">(ആകെ കടുത്ത പരിക്കുകൾ)</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
                                                                         name="totalMajorInjuries"
-                                                                        value={formData.totalMajorInjuries || ''}
+                                                                        value={formData.totalMajorInjuries}
                                                                         onChange={handleChange}
                                                                         className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                        Total Minor Injuries (ആകെ ചെറിയ പരിക്കുകൾ)
+                                                                    <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                                                        Total Minor Injuries <span className="text-[10px]">(ആകെ ചെറിയ പരിക്കുകൾ)</span>
                                                                     </label>
                                                                     <input
                                                                         type="number"
                                                                         name="totalMinorInjuries"
-                                                                        value={formData.totalMinorInjuries || ''}
+                                                                        value={formData.totalMinorInjuries}
                                                                         onChange={handleChange}
                                                                         className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs"
                                                                     />
@@ -1677,236 +1726,266 @@ const PrimaryAccidentReport: React.FC = () => {
                                             </div>
                                         )}
 
+
                                         {/* Recovery Phase Tab */}
                                         {activeTab === 4 && (
                                             <div>
-
-
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                     {/* LEFT: Recovery Details */}
                                                     <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Recovery Details (പുനരുപയോഗ വിവരങ്ങൾ)
+                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar-bg)]">
+                                                            Recovery Details <span className="text-[10px]">(പുനരുപയോഗ വിവരങ്ങൾ)</span>
                                                         </h4>
-                                                        <div className="space-y-4">
-                                                            {/* Docked/Service After Accident - Radio Group */}
-                                                            <div>
+                                                        <div className="space-y-5">
+                                                            {/* Docked/Service After Accident */}
+                                                            <div className="mb-3">
                                                                 <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                    Docked/Service After Accident (ഡോക്ക് ചെയ്തത്/അപകടത്തിന് ശേഷം സേവനം)
+                                                                    Docked/Service after Accident <span className="text-[10px]">(ഡോക്ക് ചെയ്തത്/അപകടത്തിന് ശേഷം സേവനം)</span>
                                                                 </label>
-                                                                <div className="flex gap-3 mt-1.5 flex-wrap">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="dockedService"
+                                                                            name="dockedOrServiceAfter"
                                                                             value="Docked"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.dockedOrServiceAfter === "Docked"}
                                                                         />
-                                                                        <span className="text-xs font-medium">Docked (ഡോക്ക് ചെയ്തത്)</span>
+                                                                        <span className="text-xs font-medium">Docked <span className="text-[10px]">(ഡോക്ക് ചെയ്തത്)</span></span>
                                                                     </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="dockedService"
+                                                                            name="dockedOrServiceAfter"
                                                                             value="Service After Accident"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.dockedOrServiceAfter === "Service After Accident"}
                                                                         />
-                                                                        <span className="text-xs font-medium">Service After Accident (അപകടത്തിന് ശേഷം സേവനം)</span>
+                                                                        <span className="text-xs font-medium">
+                                                                            Service after Accident <span className="text-[10px]">(അപകടത്തിന് ശേഷം സേവനം)</span>
+                                                                        </span>
                                                                     </label>
                                                                 </div>
                                                             </div>
 
-                                                            {/* Taken For Repair Work - Radio Group */}
-                                                            <div>
+
+                                                            {/* Taken For Repair Work */}
+                                                            <div className="mb-3">
                                                                 <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                    Taken For Repair Work (റിപ്പയർ ജോലിക്കായി എടുത്തത്)
+                                                                    Taken for Repair Work <span className="text-[10px]">(റിപ്പയർ ജോലിക്കായി എടുത്തത്)</span>
                                                                 </label>
-                                                                <div className="flex gap-3 mt-1.5 flex-wrap">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="repairWork"
-                                                                            value="Yes"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="takenForRepair"
+                                                                            value="true"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.takenForRepair === true}
                                                                         />
-                                                                        <span className="text-xs font-medium">Yes (അതെ)</span>
+                                                                        <span className="text-xs font-medium">Yes <span className="text-[10px]">(അതെ)</span></span>
                                                                     </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="repairWork"
-                                                                            value="No"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="takenForRepair"
+                                                                            value="false"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.takenForRepair === false}
                                                                         />
-                                                                        <span className="text-xs font-medium">No (ഇല്ല)</span>
+                                                                        <span className="text-xs font-medium">No <span className="text-[10px]">(ഇല്ല)</span></span>
                                                                     </label>
                                                                 </div>
                                                             </div>
 
-                                                            {/* GD Entered - Radio Group */}
-                                                            <div>
+
+                                                            {/* GD Entered */}
+                                                            <div className="mb-3">
                                                                 <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                    GD Entered In Police Station (പോലീസ് സ്റ്റേഷനിൽ ജി.ഡി. എൻറർ ചെയ്തത്)
+                                                                    GD entered in Police Station <span className="text-[10px]">(പോലീസ് സ്റ്റേഷനിൽ ജി.ഡി. എൻറർ ചെയ്തത്)</span>
                                                                 </label>
-                                                                <div className="flex gap-3 mt-1.5 flex-wrap">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
                                                                             name="gdEntered"
-                                                                            value="Yes"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            value="Entered"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.gdEntered === "Entered"}
                                                                         />
-                                                                        <span className="text-xs font-medium">Yes (അതെ)</span>
+                                                                        <span className="text-xs font-medium">Yes <span className="text-[10px]">(അതെ)</span></span>
                                                                     </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
                                                                             name="gdEntered"
-                                                                            value="No"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            value="Not Entered"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.gdEntered === "Not Entered"}
                                                                         />
-                                                                        <span className="text-xs font-medium">No (ഇല്ല)</span>
+                                                                        <span className="text-xs font-medium">No <span className="text-[10px]">(ഇല്ല)</span></span>
                                                                     </label>
                                                                 </div>
                                                             </div>
 
-                                                            {/* FIR Registered - Radio Group */}
-                                                            <div>
+                                                            <div className="mb-3">
                                                                 <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                    FIR Registered (എഫ്.ഐ.ആർ. രജിസ്റ്റർ ചെയ്തത്)
+                                                                    Case Settled or Not <span className="text-[10px]">(കേസ് തീർന്നതാണോ?)</span>
                                                                 </label>
-                                                                <div className="flex gap-3 mt-1.5 flex-wrap">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="firRegistered"
-                                                                            value="Yes"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="caseSettled"
+                                                                            value="true"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px]"
+                                                                            checked={formData.caseSettled === true}
                                                                         />
-                                                                        <span className="text-xs font-medium">Yes (അതെ)</span>
+                                                                        <span className="text-xs font-medium">Yes <span className="text-[10px]">(തീർന്നു)</span></span>
                                                                     </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="firRegistered"
-                                                                            value="No"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="caseSettled"
+                                                                            value="false"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px]"
+                                                                            checked={formData.caseSettled === false}
                                                                         />
-                                                                        <span className="text-xs font-medium">No (ഇല്ല)</span>
+                                                                        <span className="text-xs font-medium">No <span className="text-[10px]">(ഇനിയും തീരാനുണ്ട്)</span></span>
                                                                     </label>
                                                                 </div>
                                                             </div>
+
+                                                            {/* FIR Registered */}
+
                                                         </div>
                                                     </div>
 
                                                     {/* RIGHT: Cost & Settlement */}
                                                     <div className='bg-white border-1 border-grey-600 rounded-[4px] p-[16px] overflow-auto'>
-                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar)]">
-                                                            Cost & Settlement (ചെലവും തീർപ്പും)
+                                                        <h4 className="text-[14px] font-[600] mb-[12px] text-[#1a202c] pb-[12px] border-b-2 border-[var(--sidebar-bg)]">
+                                                            Cost & Settlement <span className="text-[10px]">(ചെലവും തീർപ്പും)</span>
                                                         </h4>
                                                         <div className="space-y-4">
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Cost Of Damage Assessed Amount (₹) (നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം (₹))
+                                                                    Cost of Damage Assessed Amount (₹) <span className="text-[10px]">(നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം)</span>
                                                                 </label>
                                                                 <input
                                                                     type="number"
-                                                                    name="damageCost"
+                                                                    name="costOfDamage"
+                                                                    value={formData.costOfDamage}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
 
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Amount Settled With KSRTC Driver (₹) (കെ.എസ്.ആർ.ടി.സി ഡ്രൈവറുമായി തീർപ്പാക്കിയ തുക (₹))
+                                                                    Amount Settled with KSRTC Driver (₹) <span className="text-[10px]">(കെ.എസ്.ആർ.ടി.സി ഡ്രൈവറുമായി തീർപ്പാക്കിയ തുക)</span>
                                                                 </label>
                                                                 <input
                                                                     type="number"
-                                                                    name="settledWithDriver"
+                                                                    name="amountSettledWithDriver"
+                                                                    value={formData.amountSettledWithDriver}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                 />
                                                             </div>
+                                                            <div>
+                                                                <label className="text-[12px] text-[#374151] ">
+                                                                    Severity  <span className="text-[10px]">(നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം)</span>
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    name="severity"
+                                                                    value={formData.severity}
+                                                                    readOnly
 
+                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] bg-gray-100 rounded text-xs"
+                                                                />
+                                                            </div>
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    COD Settled With Other Vehicle (₹) (മറ്റ് വാഹനവുമായി തീർപ്പാക്കിയ സി.ഒ.ഡി. (₹))
+                                                                    COD Settled with Other Vehicle (₹) <span className="text-[10px]">(മറ്റ് വാഹനവുമായി തീർപ്പാക്കിയ സി.ഒ.ഡി.)</span>
                                                                 </label>
-                                                                <input
-                                                                    type="number"
-                                                                    name="codOtherVehicle"
-                                                                    className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
-                                                                />
-                                                            </div>
-
-                                                            {/* COD Recovered - Radio Group */}
-                                                            <div>
-                                                                <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                    COD Recovered (സി.ഒ.ഡി. വീണ്ടെടുത്തത്)
-                                                                </label>
-                                                                <div className="flex gap-3 mt-1.5 flex-wrap">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="codRecovered"
-                                                                            value="Yes"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="codSettledWithOtherVehicle"
+                                                                            value="true"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.codSettledWithOtherVehicle === true}
                                                                         />
-                                                                        <span className="text-xs font-medium">Yes (അതെ)</span>
+                                                                        <span className="text-xs font-medium">Yes <span className="text-[10px]">(അതെ)</span></span>
                                                                     </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="codRecovered"
-                                                                            value="No"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="codSettledWithOtherVehicle"
+                                                                            value="false"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px] mb-2"
+                                                                            checked={formData.codSettledWithOtherVehicle === false}
                                                                         />
-                                                                        <span className="text-xs font-medium">No (ഇല്ല)</span>
+                                                                        <span className="text-xs font-medium">No <span className="text-[10px]">(ഇല്ല)</span></span>
                                                                     </label>
                                                                 </div>
                                                             </div>
 
-                                                            {/* Case Settled - Radio Group */}
-                                                            <div>
+                                                            {/* COD Recovered */}
+                                                            <div className="mb-3">
                                                                 <label className="text-[12px] text-[#374151] mb-[6px] block">
-                                                                    Case Settled Or Not (കേസ് തീർന്നതോ ഇല്ലയോ)
+                                                                    COD Recovered <span className="text-[10px]">(സി.ഒ.ഡി. വീണ്ടെടുത്തത്)</span>
                                                                 </label>
-                                                                <div className="flex gap-3 mt-1.5 flex-wrap">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="caseSettled"
-                                                                            value="Settled"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="codRecovered"
+                                                                            value="true"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px]"
+                                                                            checked={formData.codRecovered === true}
                                                                         />
-                                                                        <span className="text-xs font-medium">Settled (തീർന്നു)</span>
+                                                                        <span className="text-xs font-medium">Yes <span className="text-[10px]">(അതെ)</span></span>
                                                                     </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                                                    <label className="flex items-center gap-2 cursor-pointer">
                                                                         <input
                                                                             type="radio"
-                                                                            name="caseSettled"
-                                                                            value="Not Settled"
-                                                                            className="w-[14px] h-[14px] m-0"
+                                                                            name="codRecovered"
+                                                                            value="false"
+                                                                            onChange={handleChange}
+                                                                            className="w-[14px] h-[14px]"
+                                                                            checked={formData.codRecovered === false}
                                                                         />
-                                                                        <span className="text-xs font-medium">Not Settled (തീരാത്തത്)</span>
-                                                                    </label>
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer">
-                                                                        <input
-                                                                            type="radio"
-                                                                            name="caseSettled"
-                                                                            value="In Progress"
-                                                                            className="w-[14px] h-[14px] m-0"
-                                                                        />
-                                                                        <span className="text-xs font-medium">In Progress (പുരോഗതിയിൽ)</span>
+                                                                        <span className="text-xs font-medium">No <span className="text-[10px]">(ഇല്ല)</span></span>
                                                                     </label>
                                                                 </div>
                                                             </div>
 
+
+                                                            {/* Case Settled */}
+
+
                                                             <div>
                                                                 <label className="text-[12px] text-[#374151] mb-[6px]">
-                                                                    Remarks (അഭിപ്രായങ്ങൾ)
+                                                                    Remarks <span className="text-[10px]">(അഭിപ്രായങ്ങൾ)</span>
                                                                 </label>
                                                                 <textarea
                                                                     name="remarks"
+                                                                    value={formData.remarks}
+                                                                    onChange={handleChange}
                                                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
                                                                     rows={3}
                                                                 />
@@ -1916,6 +1995,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 </div>
                                             </div>
                                         )}
+
                                         <div className="border-t-1 border-grey-500 py-[10px] px-[16px] flex justify-between">
                                             <div className='flex gap-[16px]'>
                                                 {activeTab > 0 && (
@@ -1929,11 +2009,11 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 )}
 
                                                 {activeTab < tabLabels.length - 1 && (
-                                                    formData.severity === "Insignificant" && activeTab === 2 ? null : (
+                                                    formData.severity === "Insignificantui" && activeTab === 2 ? null : (
                                                         <button
                                                             type="button"
                                                             onClick={() => setActiveTab(activeTab + 1)}
-                                                            className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+                                                            className="bg-sidebar font-[500] text-white px-5 py-1 rounded disabled:bg-gray-400"
                                                         >
                                                             Next
                                                         </button>
@@ -1945,7 +2025,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 <button
                                                     type="button"
                                                     onClick={handleCancel}
-                                                    className="px-5 py-1 font-[500] bg-white text-sm border border-[#d1d5db] rounded flex items-center"
+                                                    className="px-5 py-1 font-[500] text-sm border ] text-white bg-[var(--themeRed)] rounded flex items-center"
                                                 >
                                                     Cancel
                                                 </button>
@@ -1954,14 +2034,14 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => setActiveTab(activeTab + 1)}
-                                                        className="px-5 py-1 font-[500] bg-white text-sm border border-[#d1d5db] rounded flex items-center"
+                                                        className="px-5 py-1 font-[500] bg-white text-sm border rounded flex items-center"
                                                     >
                                                         Save Draft
                                                     </button>
                                                 )}
 
                                                 {/* Submit if severity is insignificant and on tab 2 */}
-                                                {activeTab === 2 && formData.severity === "Insignificant" && (
+                                                {activeTab === 2 && formData.severity === "Insignificantuio" && (
                                                     <button
                                                         type="submit"
                                                         className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
@@ -1971,7 +2051,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 )}
 
                                                 {/* Submit on last tab if severity is not insignificant */}
-                                                {formData.severity !== "Insignificant" && activeTab === tabLabels.length - 1 && (
+                                                {activeTab === tabLabels.length - 1 && (
                                                     <button
                                                         type="submit"
                                                         className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
@@ -1987,10 +2067,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                 </form>
                             )}
                             {zeroSelectedVehicle && (
-                                <AccidentReportForm
-                                    selectedVehicle={zeroSelectedVehicle}
-
-                                />
+                                <AccidentReportForm />
                             )}
                         </div>
 
@@ -2003,8 +2080,7 @@ const PrimaryAccidentReport: React.FC = () => {
                 />
             )}
             {isVehicleSearchOpen && (
-                <AddZerothReportModal
-                    closeHandler={handleVehicleModalClose}
+                <CombinedAccidentComponent
                     caseSelectHandler={handleVehicleSelect}
                 />
             )}
