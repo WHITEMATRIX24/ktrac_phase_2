@@ -99,6 +99,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                 ) || [];
                 setDepots(flatDepots);
                 setFilteredDepots(flatDepots);
+                setAllDepos(flatDepots);
             } catch (err) {
                 console.error("Depot fetch error:", err);
             }
@@ -111,6 +112,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
     const handleSearch = async () => {
         try {
             setIsLoading(true);
+            setZerothForm(false);
 
             if (accidentReferenceNumber) {
                 const response = await fetch(
@@ -369,7 +371,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                 <button
                                     type="submit"
                                     disabled={apiLoading}
-                                    className={`py-1 px-4 bg-[var(--sidebar-bg)] text-white rounded hover:bg-[#001670] transition-colors text-[12px] font-medium shadow-md ${apiLoading ? 'opacity-70 cursor-not-allowed' : ''
+                                    className={`py-1 px-4 bg-[var(--sidebar-bg)] text-white rounded transition-colors text-[12px] font-medium shadow-md ${apiLoading ? 'opacity-70 cursor-not-allowed' : ''
                                         }`}
                                 >
                                     {apiLoading ? <span>Processing... </span> : <span>Continue</span>}
@@ -378,8 +380,8 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                         </form>
                     </div>
                 ) : (
-                    <div className="w-full flex flex-col px-3 my-5">
-                        <div className="relative bg-white flex flex-col gap-5 rounded-sm">
+                    <div className="w-full flex flex-col px-1 my-5">
+                        <div className="relative bg-white flex flex-col gap-5 rounded-sm p-2">
                             <div className="flex items-start gap-5 w-[79vw]">
                                 <div className="grid grid-cols-2 gap-5 items-end text-[12px] w-[60%]">
                                     <div className="flex flex-col">
@@ -447,17 +449,18 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                             <option value="" disabled>
                                                 Select Depot
                                             </option>
-                                            {allDepos.map((depo: any) =>
-                                                depo.depot.map((d: any) => (
-                                                    <option key={d['depot-abv']} value={d['depot-name']}>
-                                                        {d['depot-name']}
+                                            {Array.isArray(allDepos) &&
+                                                allDepos.map((d: any) => (
+                                                    <option key={d.name} value={d.name}>
+                                                        {`${d.abv.toUpperCase()} - ${d.name}`}
                                                     </option>
                                                 ))
-                                            )}
+                                            }
                                         </select>
                                     </div>
                                 </div>
-                                <div className="w-[1px] bg-gray-300" />
+                                <div className="w-[1px] bg-gray-300 self-stretch" />
+
                                 <div className="flex flex-col gap-3 w-[40%]">
                                     <h6>
                                         Accident Reference Number <span className="text-red-600">*</span>
@@ -486,7 +489,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                     {!showRegistrationForm && (
                                         <button
                                             onClick={toggleForm}
-                                            className="flex items-center gap-2 bg-[var(--sidebar-bg)] text-white px-4 py-2 rounded hover:bg-[#001670] text-sm"
+                                            className="flex items-center gap-2 bg-[var(--sidebar-bg)] text-white px-3 py-2 rounded text-[12px]"
                                         >
                                             <Plus className="w-4 h-4" />
                                             Add Accident

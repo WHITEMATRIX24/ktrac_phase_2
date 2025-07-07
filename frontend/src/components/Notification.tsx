@@ -37,16 +37,27 @@ const NotificationSystem = () => {
     const [wsStatus, setWsStatus] = useState<"connecting" | "connected" | "reconnecting" | "failed">("connecting");
 
     useEffect(() => {
-        fetch("/api/notifications")
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.data) { // Changed from data.notifications to data.data
+        const fetchNotifications = async () => {
+            try {
+                const res = await fetch("/api/notifications");
+                const data = await res.json();
+
+                if (Array.isArray(data?.data)) {
                     const parsed = parseNotifications(data.data);
                     setNotifications(parsed);
                     const newCount = parsed.filter((msg) => msg.isNew).length;
                     setUnreadCount(newCount);
+                } else {
+                    console.warn("Notification API did not return an array:", data);
+                    setNotifications([]); // Ensure it's set to empty
                 }
-            });
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+                setNotifications([]); // Safe fallback
+            }
+        };
+
+        fetchNotifications();
 
         const timeout = setTimeout(() => {
             connectWebSocket();
@@ -54,6 +65,7 @@ const NotificationSystem = () => {
 
         return () => clearTimeout(timeout);
     }, []);
+
 
     const connectWebSocket = () => {
         let attempts = 0;
@@ -134,20 +146,22 @@ const NotificationSystem = () => {
     }, [wsStatus]);
 
     const parseNotifications = (data: any[]): AccidentNotification[] => {
+        if (!Array.isArray(data)) return [];
         return data.map((item, index) => ({
             id: item.accident_id ?? `${index + 1}`,
-            description: item.description,
-            busNumber: item.bonet_no,
-            scheduleNumber: item.schedule_number,
-            operatedDepot: item.operated_depot,
-            conductorContact: item.conductor_phn_no,
-            location: `${item.location_info?.address ?? ""}, ${item.location_info?.place ?? ""}`,
-            date: item.date_of_accident,
-            time: item.time_of_accident,
+            description: item.description ?? "No description provided",
+            busNumber: item.bonet_no ?? "N/A",
+            scheduleNumber: item.schedule_number ?? "N/A",
+            operatedDepot: item.operated_depot ?? "Unknown",
+            conductorContact: item.conductor_phn_no ?? "N/A",
+            location: `${item.location_info?.address ?? "Unknown"}, ${item.location_info?.place ?? ""}`,
+            date: item.date_of_accident ?? "Unknown date",
+            time: item.time_of_accident ?? "Unknown time",
             isNew: item.isNew ?? true,
-            timestamp: new Date(`${item.date_of_accident}T${item.time_of_accident}`),
+            timestamp: new Date(`${item.date_of_accident ?? "1970-01-01"}T${item.time_of_accident ?? "00:00:00"}`),
         }));
     };
+
 
     const toggleNotifications = () => setShowNotifications((prev) => !prev);
     const toggleMute = () => setMuted((prev) => !prev);

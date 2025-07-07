@@ -606,7 +606,7 @@ const ZerothReport = () => {
     }
     return (
         <div className="min-h-screen bg-gray-50 text-xs flex flex-col">
-            <h2 className="text-[16px] px-4 font-semibold py-1 text-[var(--sidebar)]">
+            <h2 className="text-[16px] px-4 font-semibold py-1 text-[var(--themeRed)] text-center">
                 {accidentRefernceId?.replaceAll('_', '/')}
             </h2>
             {/* Main Form Content */}
@@ -614,15 +614,15 @@ const ZerothReport = () => {
                 <div className="flex flex-col flex-1">
                     {/* Tabs */}
                     <div className='flex flex-col'>
-                        <div className="flex border-b border-t border-gray-200 bg-white overflow-x-auto flex-shrink-0">
+                        <div className="flex border-b border-t border-gray-200 bg-[var(--sidebar)] overflow-x-auto flex-shrink-0">
                             {tabLabels.map((tab, index) => {
                                 return (
                                     <button
                                         key={index}
                                         type="button"
-                                        className={`flex items-center px-4 py-2.5 text-[12px] font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
+                                        className={`flex items-center px-4 py-2.5 text-[14px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
                                             ${activeTab === index
-                                                ? 'text-[var(--sidebar)] border-[var(--sidebar)] bg-white'
+                                                ? 'text-[var(--sidebar-bg)] border-white bg-gray-500'
                                                 : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'}`}
                                         onClick={() => setActiveTab(index)}
                                     >
@@ -644,10 +644,10 @@ const ZerothReport = () => {
                     {/* Tab Content */}
                     <div className="flex-1 overflow-auto p-4">
                         {activeTab === 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full"> {/* Increased outer gap */}
-                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full min-h-[64vh]"> {/* Increased outer gap */}
+                                <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                                     <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]"> {/* Increased mb */}
-                                        Accident Location Details (<MalayalamText text="അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ" />)
+                                        Accident Location Details (<span className='text-[12px] font-[600]'>അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ</span>)
                                     </h3>
                                     <div className="mb-4 relative p-[16px]"> {/* Increased mb */}
                                         <label className="text-[12px] text-gray-700 block mb-2"> {/* Increased mb + min-height */}
@@ -736,9 +736,9 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Second Column - Nearby Assistance */}
-                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                                     <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]"> {/* Increased mb */}
-                                        Nearby Assistance Details (<MalayalamText text="സമീപ സഹായ വിവരം" />)
+                                        Nearby Assistance Details (<span className='text-[12px] font-[600]'>സമീപ സഹായ വിവരം</span>)
                                     </h3>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-[16px]"> {/* Increased gap and mb */}
@@ -809,10 +809,12 @@ const ZerothReport = () => {
 
                         {/* Accident & Crew Tab */}
                         {activeTab === 1 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full ">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full min-h-[64vh] ">
                                 {/* Accident Details */}
-                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
-                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">Accident Details (<MalayalamText text="അപകടത്തിന്റെ വിശദാംശങ്ങൾ" />)</h3>
+                                <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
+                                        Accident Details (<span className='text-[12px] font-[600]'>അപകടത്തിന്റെ വിശദാംശങ്ങൾ</span>)
+                                    </h3>
 
                                     <div className="space-y-4 p-[16px]">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -883,8 +885,8 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Crew Information */}
-                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
-                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">Crew Information (<MalayalamText text="ക്രൂ വിവരങ്ങൾ" />)</h3>
+                                <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">Crew Information (<span className='text-[12px]'>ക്രൂ വിവരങ്ങൾ </span>)</h3>
 
                                     <div className="space-y-4 p-[16px]">
                                         <div>
@@ -1024,11 +1026,11 @@ const ZerothReport = () => {
 
                         {/* Documentation Tab */}
                         {activeTab === 2 && (
-                            <div className="flex flex-col lg:flex-row gap-[6px]">
+                            <div className="flex flex-col lg:flex-row gap-[6px] min-h-[64vh]">
                                 {/* Left Section - Upload Form */}
-                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                                     <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
-                                        Accident Documentation (<MalayalamText text="അപകടം സംബന്ധിച്ച ഡോക്യുമെന്റേഷൻ" />)
+                                        Accident Documentation (<span className='text-[12px] font-[600]'>അപകടം സംബന്ധിച്ച ഡോക്യുമെന്റേഷൻ</span>)
                                     </h3>
 
                                     <div
@@ -1072,9 +1074,9 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Right Section - Uploaded Images */}
-                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                <div className="w-[50%] bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                                     <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
-                                        Uploaded Images (<MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ" />)
+                                        Uploaded Images (<span className='text-[12px] font-[600]'>അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ </span>)
                                     </h3>
 
                                     {mediaFiles.length > 0 ? (
