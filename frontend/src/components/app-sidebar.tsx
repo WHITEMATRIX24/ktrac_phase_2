@@ -363,8 +363,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: ClipboardList,
           items: [
             { title: "Daily Inspection Log", url: "#" },
-            { title: "Vehicle Condition Report", url: "#" },
-            { title: "Pending Maintenance Follow-up", url: "#" },
+            { title: "Vehicle Report", url: "#" },
+            { title: "Maintenance Follow-up", url: "#" },
           ],
         },
         {

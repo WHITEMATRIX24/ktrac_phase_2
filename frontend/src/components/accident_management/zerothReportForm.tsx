@@ -645,8 +645,8 @@ const ZerothReport = () => {
                     <div className="flex-1 overflow-auto p-4">
                         {activeTab === 0 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full"> {/* Increased outer gap */}
-                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500"> {/* Increased mb */}
+                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]"> {/* Increased mb */}
                                         Accident Location Details (<MalayalamText text="അപകടം നടന്ന സ്ഥലം സംബന്ധിച്ച വിശദാംശങ്ങൾ" />)
                                     </h3>
                                     <div className="mb-4 relative p-[16px]"> {/* Increased mb */}
@@ -736,8 +736,8 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Second Column - Nearby Assistance */}
-                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500"> {/* Increased mb */}
+                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]"> {/* Increased mb */}
                                         Nearby Assistance Details (<MalayalamText text="സമീപ സഹായ വിവരം" />)
                                     </h3>
 
@@ -811,8 +811,8 @@ const ZerothReport = () => {
                         {activeTab === 1 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full ">
                                 {/* Accident Details */}
-                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">Accident Details (<MalayalamText text="അപകടത്തിന്റെ വിശദാംശങ്ങൾ" />)</h3>
+                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">Accident Details (<MalayalamText text="അപകടത്തിന്റെ വിശദാംശങ്ങൾ" />)</h3>
 
                                     <div className="space-y-4 p-[16px]">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -883,8 +883,8 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Crew Information */}
-                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">Crew Information (<MalayalamText text="ക്രൂ വിവരങ്ങൾ" />)</h3>
+                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">Crew Information (<MalayalamText text="ക്രൂ വിവരങ്ങൾ" />)</h3>
 
                                     <div className="space-y-4 p-[16px]">
                                         <div>
@@ -1026,8 +1026,8 @@ const ZerothReport = () => {
                         {activeTab === 2 && (
                             <div className="flex flex-col lg:flex-row gap-[6px]">
                                 {/* Left Section - Upload Form */}
-                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh] w-[50%] ">
-                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                         Accident Documentation (<MalayalamText text="അപകടം സംബന്ധിച്ച ഡോക്യുമെന്റേഷൻ" />)
                                     </h3>
 
@@ -1072,8 +1072,8 @@ const ZerothReport = () => {
                                 </div>
 
                                 {/* Right Section - Uploaded Images */}
-                                <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh] w-[50%]">
-                                    <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                    <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                         Uploaded Images (<MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ" />)
                                     </h3>
 

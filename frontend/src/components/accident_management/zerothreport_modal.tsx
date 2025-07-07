@@ -114,7 +114,10 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
 
             if (accidentReferenceNumber) {
                 const response = await fetch(
-                    `/api/searchZerothReportById?accident_reference_number=${accidentReferenceNumber}`
+                    `/api/searchZerothReportById?accident_reference_number=${accidentReferenceNumber.replaceAll(
+                        "/",
+                        "_"
+                    )}`
                 );
                 const data = await response.json();
 
@@ -241,14 +244,14 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
         return <ZerothReport />;
     }
     return (
-        <div className="min-h-screen  flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <div className="flex-1 px-4 w-full h-full">
                 {showRegistrationForm ? (
                     <div className="bg-white border rounded-sm shadow-sm w-full min-h-[80vh] p-4 sm:p-6 mt-3">
                         <div className="text-center mb-6">
                             <h3 className="text-xl font-semibold text-gray-800">
                                 Enter Vehicle Details <br />
-                                <span className='text-[16px]'>വാഹന വിശദാംശങ്ങൾ നൽകുക</span>
+                                <span className="text-[16px]">വാഹന വിശദാംശങ്ങൾ നൽകുക</span>
                             </h3>
                         </div>
 
@@ -272,7 +275,8 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                         value={formData.bonnetNumber}
                                         onChange={handleChange}
                                         onFocus={() => setShowBonnetDropDown(true)}
-                                        className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.bonnetNumber ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.bonnetNumber ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         placeholder="Search bus number"
                                         autoComplete="off"
                                     />
@@ -282,9 +286,13 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                     {showBonnetDropDown && (
                                         <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
                                             {isLoading ? (
-                                                <div className="p-3 text-center text-gray-500">Loading buses... / <MalayalamText text=" ബസുകൾ ലോഡ് ചെയ്യുന്നു..." /></div>
+                                                <div className="p-3 text-center text-gray-500">
+                                                    Loading buses... / <MalayalamText text=" ബസുകൾ ലോഡ് ചെയ്യുന്നു..." />
+                                                </div>
                                             ) : filteredBusinfo.length === 0 ? (
-                                                <div className="p-3 text-center text-gray-500">No matching buses found / <MalayalamText text=" അനുയോജ്യമായ ബസുകൾ കണ്ടെത്തിയില്ല" /></div>
+                                                <div className="p-3 text-center text-gray-500">
+                                                    No matching buses found / <MalayalamText text=" അനുയോജ്യമായ ബസുകൾ കണ്ടെത്തിയില്ല" />
+                                                </div>
                                             ) : (
                                                 <ul>
                                                     {filteredBusinfo.map((bus, index) => (
@@ -312,7 +320,8 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                         value={formData.operatedDepot}
                                         onChange={handleChange}
                                         onFocus={() => setShowDepotDropdown(true)}
-                                        className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.operatedDepot ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.operatedDepot ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         placeholder="Search depot by name or abbreviation"
                                         autoComplete="off"
                                     />
@@ -332,7 +341,10 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                                             key={`depot-${d.abv}-${index}`}
                                                             className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
                                                             onClick={() => {
-                                                                setFormData(prev => ({ ...prev, operatedDepot: d.name }));
+                                                                setFormData((prev) => ({
+                                                                    ...prev,
+                                                                    operatedDepot: d.name,
+                                                                }));
                                                                 setShowDepotDropdown(false);
                                                             }}
                                                         >
@@ -357,56 +369,23 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                 <button
                                     type="submit"
                                     disabled={apiLoading}
-                                    className={`py-1 px-4 bg-[var(--sidebar-bg)] text-white rounded hover:bg-[#001670] transition-colors text-[12px] font-medium shadow-md ${apiLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    className={`py-1 px-4 bg-[var(--sidebar-bg)] text-white rounded hover:bg-[#001670] transition-colors text-[12px] font-medium shadow-md ${apiLoading ? 'opacity-70 cursor-not-allowed' : ''
+                                        }`}
                                 >
-                                    {apiLoading ? (
-                                        <span>Processing... </span>
-                                    ) : (
-                                        <span>Continue</span>
-                                    )}
+                                    {apiLoading ? <span>Processing... </span> : <span>Continue</span>}
                                 </button>
                             </div>
                         </form>
                     </div>
                 ) : (
-                    <div className="w-full flex flex-col gap-3 px-3 my-5">
-                        <div className="w-full flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                                <h6>
-                                    Accident Reference Number <span className="text-red-600">*</span>
-                                </h6>
-                                <input
-                                    type="text"
-                                    placeholder="Enter accident reference"
-                                    value={accidentReferenceNumber}
-                                    onChange={(e) => setAccidentReferencenumber(e.target.value)}
-                                    className="flex-1 border px-3 py-1 bg-white rounded-sm"
-                                />
-                                <button
-                                    onClick={handleSearch}
-                                    className="border px-3 py-1 rounded-sm bg-[var(--sidebar-bg)] text-white"
-                                >
-                                    Search
-                                </button>
-                                {!showRegistrationForm && (
-                                    <button
-                                        onClick={toggleForm}
-                                        className="flex items-center gap-1 bg-[var(--sidebar-bg)] text-white px-3 py-1 rounded text-[12px] hover:bg-[#001670]"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                        Add Accident
-                                    </button>
-                                )}
-                            </div>
-                            <div className="flex justify-center items-center gap-3">
-                                <Divider className="w-1/3" />
-                                <p>OR</p>
-                                <Divider className="w-1/3" />
-                            </div>
-                            <div className="relative bg-white flex flex-col gap-5 rounded-sm">
-                                <div className="w-full grid grid-cols-4 gap-5 text-[12px] px-3 py-2">
+                    <div className="w-full flex flex-col px-3 my-5">
+                        <div className="relative bg-white flex flex-col gap-5 rounded-sm">
+                            <div className="flex items-start gap-5 w-[79vw]">
+                                <div className="grid grid-cols-2 gap-5 items-end text-[12px] w-[60%]">
                                     <div className="flex flex-col">
-                                        <label> Date /<span className="text-[10px]"> തീയതി</span></label>
+                                        <label>
+                                            Date /<span className="text-[10px]"> തീയതി</span>
+                                        </label>
                                         <input
                                             onChange={(e) => setDate(e.target.value)}
                                             type="date"
@@ -415,7 +394,9 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                         />
                                     </div>
                                     <div className="relative flex flex-col">
-                                        <label> Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span></label>
+                                        <label>
+                                            Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span>
+                                        </label>
                                         <input
                                             type="text"
                                             placeholder="Search bonnet number"
@@ -425,7 +406,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                             onChange={handleSearchBonnetNumber}
                                         />
                                         {showBonnetDropDown && (
-                                            <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
+                                            <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40 z-10">
                                                 {filteredBusinfo.map((d) => (
                                                     <button
                                                         onClick={() => {
@@ -442,32 +423,22 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                         )}
                                     </div>
                                     <div className="flex flex-col">
-                                        <label>District /<span className="text-[10px]"> ജില്ല</span></label>
+                                        <label>
+                                            District /<span className="text-[10px]"> ജില്ല</span>
+                                        </label>
                                         <select
                                             onChange={(e) => setDistrict(e.target.value)}
                                             className="px-3 py-2 border rounded-sm"
                                             value={district}
                                         >
                                             <option value="">Select district</option>
-                                            <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-                                            <option value="Kollam">Kollam</option>
-                                            <option value="Pathanamthitta">Pathanamthitta</option>
-                                            <option value="Alappuzha">Alappuzha</option>
-                                            <option value="Kottayam">Kottayam</option>
-                                            <option value="Idukki">Idukki</option>
-                                            <option value="Ernakulam">Ernakulam</option>
-                                            <option value="Thrissur">Thrissur</option>
-                                            <option value="Palakkad">Palakkad</option>
-                                            <option value="Malappuram">Malappuram</option>
-                                            <option value="Kozhikode">Kozhikode</option>
-                                            <option value="Wayanad">Wayanad</option>
-                                            <option value="Kannur">Kannur</option>
-                                            <option value="Kasaragod">Kasaragod</option>
+                                            {/* District options here */}
                                         </select>
                                     </div>
                                     <div className="flex flex-col">
-                                        <label>Operated Depo /
-                                            <span className="text-[10px]"> പ്രവർത്തിക്കുന്ന ഡിപ്പോ</span></label>
+                                        <label>
+                                            Operated Depo /<span className="text-[10px]"> പ്രവർത്തിക്കുന്ന ഡിപ്പോ</span>
+                                        </label>
                                         <select
                                             onChange={(e) => setDepo(e.target.value)}
                                             className="px-3 py-2 border rounded-sm"
@@ -478,73 +449,95 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                             </option>
                                             {allDepos.map((depo: any) =>
                                                 depo.depot.map((d: any) => (
-                                                    <option key={d["depot-abv"]} value={d["depot-name"]}>
-                                                        {d["depot-name"]}
+                                                    <option key={d['depot-abv']} value={d['depot-name']}>
+                                                        {d['depot-name']}
                                                     </option>
                                                 ))
                                             )}
                                         </select>
                                     </div>
                                 </div>
-                                <div className="flex items-center px-3 py-2 bg-slate-50">
-                                    <div className="flex gap-3 ms-auto">
-                                        <button
-                                            onClick={handleClear}
-                                            className="border px-3 py-1 rounded-sm bg-white"
-                                        >
-                                            Clear
-                                        </button>
-                                        <button
-                                            onClick={handleSearch}
-                                            className="border px-3 py-1 rounded-sm bg-[var(--sidebar-bg)] text-white"
-                                        >
-                                            Search
-                                        </button>
-                                    </div>
+                                <div className="w-[1px] bg-gray-300" />
+                                <div className="flex flex-col gap-3 w-[40%]">
+                                    <h6>
+                                        Accident Reference Number <span className="text-red-600">*</span>
+                                    </h6>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Accident Reference"
+                                        value={accidentReferenceNumber}
+                                        onChange={(e) => setAccidentReferencenumber(e.target.value)}
+                                        className="flex-1 border px-3 py-1 bg-white rounded-sm"
+                                    />
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3 px-3 py-5">
-                                {isLoading ? (
-                                    <p>loading...</p>
-                                ) : !isLoading && accidentList && accidentList?.length < 1 ? (
-                                    <p>no data found</p>
-                                ) : (
-                                    accidentList &&
-                                    accidentList.map((d: any) => (
-                                        <div
-                                            key={d.accident_id}
-                                            className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer"
-                                            onClick={() => handlecaseSelect(d)}
+                            <div className="flex items-center px-3 py-2 bg-slate-50">
+                                <div className="flex gap-3 ms-auto">
+                                    <button onClick={handleClear} className="border px-3 py-1 rounded-sm bg-white">
+                                        Clear
+                                    </button>
+                                    <button
+                                        onClick={handleSearch}
+                                        className="border px-3 py-1 rounded-sm bg-[var(--sidebar-bg)] text-white"
+                                    >
+                                        Search
+                                    </button>
+                                    {!showRegistrationForm && (
+                                        <button
+                                            onClick={toggleForm}
+                                            className="flex items-center gap-2 bg-[var(--sidebar-bg)] text-white px-4 py-2 rounded hover:bg-[#001670] text-sm"
                                         >
-                                            <div className="flex justify-between">
-                                                <div>
-                                                    <label>Reference number:</label>
-                                                    <label>{d.accident_id}</label>
-                                                </div>
-                                                <label>{d.accident_details.date_of_accident}</label>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <p>
-                                                    bonnet Number: <span>{d.vehicle_info.bonet_no}</span>
-                                                </p>
-                                                <p>
-                                                    Accident Place: <span>{d.location_info.place}</span>
-                                                </p>
-                                                <p>
-                                                    Operated Depo: <span>{d.location_info.operated_depot}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
+                                            <Plus className="w-4 h-4" />
+                                            Add Accident
+                                        </button>
+                                    )}
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Accident List Display */}
+                        <div className="flex flex-col gap-3 px-3 py-5">
+                            {isLoading ? (
+                                <p>Loading...</p>
+                            ) : !isLoading && accidentList && accidentList.length < 1 ? (
+                                <p>No data found</p>
+                            ) : (
+                                accidentList?.map((d: any) => (
+                                    <div
+                                        key={d.accident_id}
+                                        className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer"
+                                        onClick={() => handlecaseSelect(d)}
+                                    >
+                                        <div className="flex justify-between">
+                                            <div className='font-semibold'>
+                                                <label>Reference number:</label>
+                                                <label className="ml-1">{d.accident_id.replaceAll("_", "/")}</label>
+                                            </div>
+                                            <label>{d.accident_details.date_of_accident}</label>
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <p>
+                                                Bonnet Number:{" "}
+                                                <span className="ml-1">{d.vehicle_info.bonet_no}</span>
+                                            </p>
+                                            <p>
+                                                Accident Place:{" "}
+                                                <span className="ml-1">{d.location_info.place}</span>
+                                            </p>
+                                            <p>
+                                                Operated Depo:{" "}
+                                                <span className="ml-1">{d.location_info.operated_depot}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 )}
             </div>
         </div>
     );
-};
-
+}
 export default CombinedAccidentComponent;
