@@ -43,6 +43,31 @@ const lineChartData = [
   { month: "June", all: 214, primary: 140, inProgress: 90, completed: 80 },
 ];
 
+const formatDateForAPI = (input: string): string => {
+  const [year, month, day] = input.split("-");
+  return `${day}/${month}/${year}`;
+};
+
+const getSameDayFromPastSixMonth = () => {
+  const today = new Date();
+  const lastMonth = new Date(today);
+
+  lastMonth.setMonth(today.getMonth() - 6);
+
+  // Handle cases where previous month had fewer days
+  if (
+    lastMonth.getMonth() === today.getMonth() - 1 + (12 % 12) &&
+    lastMonth.getDate() !== today.getDate()
+  ) {
+    lastMonth.setDate(0);
+  }
+  const year = lastMonth.getFullYear();
+  const month = String(lastMonth.getMonth() + 1).padStart(2, "0");
+  const day = String(lastMonth.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 const AccidentsDashboard = () => {
   const [dashboardData, setDashboardData] = useState<{
     cardData: CardModel[];
@@ -62,7 +87,7 @@ const AccidentsDashboard = () => {
         value: 0,
       },
       {
-        name: "completed",
+        name: "Completed",
         value: 0,
       },
     ],
@@ -73,6 +98,12 @@ const AccidentsDashboard = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedFuelType, setSelectedFuelType] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>(
+    getSameDayFromPastSixMonth()
+  );
+  const [endDate, setEndDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
   const [isLoading, setIsloading] = useState<boolean>(true);
 
   // bonnet number search handler
@@ -90,17 +121,23 @@ const AccidentsDashboard = () => {
   const fetchData = async () => {
     try {
       !isLoading && setIsloading(true);
-      const response = await fetch("/api/dashboard/accidents");
+
+      const formatedStartDate = formatDateForAPI(startDate);
+      const formatedEndDate = formatDateForAPI(endDate);
+
+      const response = await fetch(
+        `/api/dashboard/accidents?start_date=${formatedStartDate}&end_date=${formatedEndDate}&bonnet_no=${bonnetSearchNo}&district=${selectedDistrict}&category=${selectedCategory}&fuel_type=${selectedFuelType}`
+      );
 
       if (!response.ok) {
         console.log("error in accident dashboard");
         alert("something went wrong");
       }
       const data = await response.json();
-      // console.log(data);
+      console.log(data);
 
       // cards
-      const finalCardData = data.data.cards.map(
+      const finalCardData = data.cards.map(
         (v: { name: string; value: number }) => {
           return {
             ...v,
@@ -113,7 +150,7 @@ const AccidentsDashboard = () => {
       const updatedPieChartData = pieChartData.map((d) => {
         return {
           ...d,
-          data: data.data.fir_based_chart[d.key],
+          data: data.fir_chart[d.key],
         };
       });
       // console.log(updatedPieChartData);
@@ -139,14 +176,24 @@ const AccidentsDashboard = () => {
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-3 md:gap-6 md:py-2">
           <div className="flex gap-2 justify-end pr-6">
-            {/* <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center">
               <label>From</label>
-              <Input type="date" className="bg-white h-8 w-fit" />
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-white h-8 w-fit"
+              />
             </div>
             <div className="flex gap-2 items-center">
               <label>To</label>
-              <Input type="date" className="bg-white h-8 w-fit" />
-            </div> */}
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="bg-white h-8 w-fit"
+              />
+            </div>
             <div className="relative">
               <Input
                 onChange={(e) => handleSearchBonnetnumber(e.target.value)}

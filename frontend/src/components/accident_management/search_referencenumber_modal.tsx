@@ -1,4 +1,5 @@
 "use client";
+import { dateToLocaleFormater } from "@/utils/dateFormater";
 import { Divider } from "@mui/material";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
@@ -258,7 +259,9 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                     {d.accident_id.replaceAll("_", "/")}
                   </label>
                 </div>
-                <label>{d.accident_details.date_of_accident}</label>
+                <label>
+                  {dateToLocaleFormater(d.accident_details.date_of_accident)}
+                </label>
               </div>
               <div className="flex flex-col gap-1">
                 <p>

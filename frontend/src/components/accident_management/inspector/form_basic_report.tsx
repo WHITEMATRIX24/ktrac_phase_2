@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { InspectorReportData } from "@/models/AccidentData";
 import { fileToBase64 } from "@/utils/convertToBase64";
+import { dateToLocaleFormater } from "@/utils/dateFormater";
 import React, { useState } from "react";
 
 interface Props {
@@ -52,7 +53,7 @@ const FormBasicReport = ({
           Date / <span className="text-[10px]"> തീയതി</span>
         </label>
         <Input
-          value={fetchedDetails?.date}
+          value={dateToLocaleFormater(fetchedDetails?.date)}
           readOnly
           className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
         />

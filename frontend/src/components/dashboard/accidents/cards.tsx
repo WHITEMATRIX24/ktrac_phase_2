@@ -16,6 +16,7 @@ interface Props {
 
 export function AccidentDashboardCards({ data }: Props) {
   if (!data) return;
+
   return (
     // <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-b *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
     <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
@@ -25,11 +26,11 @@ export function AccidentDashboardCards({ data }: Props) {
       >
         <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] tabular-nums text-black font-medium">
-            {data[0].name || ""}
+            {(data[0] && data[0].name) || "Total Accidents"}
           </CardTitle>
 
           <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-Black drop-shadow-md">
-            {data[0].value || 0}
+            {(data[0] && data[0].value) || 0}
           </CardDescription>
         </CardHeader>
         <div className="absolute top-5 right-3">
@@ -42,10 +43,10 @@ export function AccidentDashboardCards({ data }: Props) {
       >
         <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
-            {data[1].name || ""}
+            {(data[1] && data[1].name) || "Primary Stage"}
           </CardTitle>
           <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-black drop-shadow-md">
-            {data[1].value || 0}
+            {(data[1] && data[1].value) || 0}
           </CardDescription>
         </CardHeader>
         <div className="absolute border-black top-5  right-3">
@@ -58,10 +59,10 @@ export function AccidentDashboardCards({ data }: Props) {
       >
         <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
-            {data[2].name || ""}
+            {(data[2] && data[2].name) || "In Progress"}
           </CardTitle>
           <CardDescription className="text-[38px] text-center tabular-nums text-black drop-shadow-md">
-            {data[2].value || 0}
+            {(data[2] && data[2].value) || 0}
           </CardDescription>
         </CardHeader>
         <div className="absolute top-5 right-3">
@@ -74,10 +75,10 @@ export function AccidentDashboardCards({ data }: Props) {
       >
         <CardHeader className="flex flex-col gap-0 w-10/12">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
-            {data[3].name || ""}
+            {(data[3] && data[3].name) || "Completed"}
           </CardTitle>
           <CardDescription className="text-[38px] text-center tabular-nums text-black drop-shadow-md">
-            {data[3].value || 0}
+            {(data[3] && data[3].value) || 0}
           </CardDescription>
         </CardHeader>
         <div className="absolute top-5 right-3">
