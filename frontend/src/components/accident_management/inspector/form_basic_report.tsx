@@ -49,7 +49,7 @@ const FormBasicReport = ({
     <div className="relative grid grid-cols-4 gap-x-3 gap-y-5 overflow-auto h-full mx-3 rounded-m bg-white px-3 py-3 rounded-sm">
       <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
-          Date' / <span className="text-[10px]"> തീയതി</span>
+          Date / <span className="text-[10px]"> തീയതി</span>
         </label>
         <Input
           value={fetchedDetails?.date}
@@ -59,7 +59,8 @@ const FormBasicReport = ({
       </div>
       <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
-          {"Inquiry inspector name (KSRTC) / അന്വേഷണ ഇൻസ്പെക്ടറുടെ പേര്"}
+          Iquiry inspector name (KSRTC) /
+          <span className="text-[10px]">അന്വേഷണ ഇൻസ്പെക്ടറുടെ പേര്</span>
         </label>
         <Input
           value={accidentData?.inquiry_inspector_name}

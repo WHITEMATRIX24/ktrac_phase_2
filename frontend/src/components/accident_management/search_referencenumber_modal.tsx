@@ -108,7 +108,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-3 px-3 my-5">
+    <div className="w-full flex flex-col px-3 my-5">
       <div className="relative bg-white flex flex-col gap-5 rounded-sm">
         <div className="flex items-start gap-5 w-[79vw]">
           <div className="grid grid-cols-2 gap-5 items-end text-[12px] w-[60%]">
@@ -129,7 +129,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               </label>
               <input
                 type="text"
-                placeholder="Search bonnet number"
+                placeholder="Bonnet number"
                 className="px-3 py-2 border rounded-sm"
                 onClick={() => setShowBonnetDropDown(true)}
                 value={bonnetNo}
@@ -180,7 +180,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             </div>
             <div className="flex flex-col">
               <label>
-                Operated Depo /
+                Operated Depot /
                 <span className="text-[10px]">
                   {" "}
                   പ്രവർത്തിപ്പിക്കുന്ന ഡിപ്പോ
@@ -192,7 +192,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                 value={depo}
               >
                 <option value="" disabled>
-                  Select Depo
+                  Select Depot
                 </option>
                 {allDepos &&
                   allDepos.length > 1 &&
@@ -213,7 +213,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             </h6>
             <input
               type="text"
-              placeholder="Enter accident reference"
+              placeholder="Enter Accident Reference"
               value={accidentReferenceNumber}
               onChange={(e) => setAccidentReferencenumber(e.target.value)}
               className="flex-1 border px-3 py-1 bg-white rounded-sm"
@@ -252,21 +252,26 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               onClick={() => handlecaseSelect(d)}
             >
               <div className="flex justify-between">
-                <div>
+                <div className="font-semibold">
                   <label>Reference number:</label>
-                  <label>{d.accident_id.replaceAll("_", "/")}</label>
+                  <label className="ml-1">
+                    {d.accident_id.replaceAll("_", "/")}
+                  </label>
                 </div>
                 <label>{d.accident_details.date_of_accident}</label>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-1">
                 <p>
-                  bonnet Number: <span>{d.vehicle_info.bonet_no}</span>
+                  Bonnet number:{" "}
+                  <span className="ml-1">{d.vehicle_info.bonet_no}</span>
                 </p>
                 <p>
-                  Accident Place: <span>{d.location_info.place}</span>
+                  Accident Place:{" "}
+                  <span className="ml-1">{d.location_info.place}</span>
                 </p>
                 <p>
-                  Operated Depo: <span>{d.location_info.operated_depot}</span>
+                  Operated Depot:{" "}
+                  <span className="ml-1">{d.location_info.operated_depot}</span>
                 </p>
               </div>
             </div>
