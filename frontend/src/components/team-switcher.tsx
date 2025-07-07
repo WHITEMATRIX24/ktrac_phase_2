@@ -15,7 +15,7 @@ export function TeamSwitcherStatic({
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton size="lg" className="bg-white">
+        <SidebarMenuButton size="lg" className="border-1 border-white">
           <div
             className=" text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
             onClick={toggleSidebar}
@@ -27,10 +27,10 @@ export function TeamSwitcherStatic({
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium text-black">{team.name}</span>
-            <span className="truncate text-xs text-black">{team.plan}</span>
+            <span className="truncate font-medium text-white">{team.name}</span>
+            <span className="truncate text-xs text-white">{team.plan}</span>
           </div>
-          <Menu onClick={toggleSidebar} className="ml-auto text-black" />
+          <Menu onClick={toggleSidebar} className="ml-auto text-white" />
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

@@ -40,8 +40,8 @@ const NotificationSystem = () => {
         fetch("/api/notifications")
             .then((res) => res.json())
             .then((data) => {
-                if (data.notifications) {
-                    const parsed = parseNotifications(data.notifications);
+                if (data.data) { // Changed from data.notifications to data.data
+                    const parsed = parseNotifications(data.data);
                     setNotifications(parsed);
                     const newCount = parsed.filter((msg) => msg.isNew).length;
                     setUnreadCount(newCount);
@@ -61,7 +61,7 @@ const NotificationSystem = () => {
 
         const connect = () => {
             setWsStatus(attempts > 0 ? "reconnecting" : "connecting");
-            socket = new WebSocket("wss://jwuxenad2k.execute-api.ap-south-1.amazonaws.com/prod");
+            socket = new WebSocket("wss://jwuxenad2k.execute-api.ap-south-1.amazonaws.com/DEV");
 
             socket.onopen = () => {
                 console.log("✅ WebSocket connected");

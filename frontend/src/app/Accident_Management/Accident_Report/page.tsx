@@ -638,7 +638,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                     <div>
                                         <div className="flex flex-col">
                                             {/* Tab Navigation */}
-                                            <h2 className="text-[24px] font-[600] text-[var(--themeRed)] px-4 mb-2 text-right"> {formData.accidentRefNo?.replaceAll('_', '/')}</h2>
+                                            <h2 className="text-[18px] font-[600] text-[var(--themeRed)] px-4 mb-2 text-center"> {formData.accidentRefNo?.replaceAll('_', '/')}</h2>
                                             <div className="flex border-b border-gray-200 bg-[var(--sidebar-bg)] overflow-x-auto flex-shrink-0">
 
                                                 {tabLabels.map((tab, index) => {
@@ -648,7 +648,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                                             key={index}
                                                             type="button"
 
-                                                            className={`flex items-center px-4 py-2.5 text-[12px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
+                                                            className={`flex items-center px-4 py-2.5 text-[14px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
                                                                 ${activeTab === index
                                                                     ? 'text-[var(--sidebar-bg)] border-white bg-gray-500'
 
@@ -963,14 +963,14 @@ const PrimaryAccidentReport: React.FC = () => {
                                         )}
                                         {zerothReportFilled && activeTab === 0 && (
                                             <div className="mb-4 p-2">
-                                                <div className="flex gap-2 min-h-[64vh] mb-4">
+                                                <div className="flex gap-2 min-h-[67vh] mb-1">
                                                     {/* Left: Report Details Card */}
-                                                    <div className="w-[70%] bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="w-[70%] border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Accident Spot Report Details <span className="text-[10px]">(അപകട സ്ഥല റിപ്പോർട്ട് വിവരങ്ങൾ)</span>
                                                         </h3>
 
-                                                        <div className="space-y-4 bg-gray-100 p-[16px]">
+                                                        <div className="space-y-4 p-[16px]">
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div>
                                                                     <label className="text-xs font-semibold text-gray-700 mb-0 block">
@@ -1086,8 +1086,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* Right: Images Card */}
-                                                    <div className="w-[30%] bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-y-scroll max-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="w-[30%] border-2 border-gray-400 rounded-[8px] overflow-y-scroll max-h-[67vh]">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Uploaded Images <span className="text-[10px]">(അപ്ലോഡ് ചെയ്ത ചിത്രങ്ങൾ)</span>
                                                         </h3>
 
@@ -1155,8 +1155,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
 
                                                     {/* LEFT: Basic Details */}
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Basic Details <span className="text-[10px]">(അടിസ്ഥാന വിവരങ്ങൾ)</span>
                                                         </h3>
                                                         <div className="space-y-4 p-[16px]">
@@ -1250,8 +1250,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* RIGHT: Other Vehicle Involved */}
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Other Vehicle Involved <span className="text-[10px]">(മറ്റ് വാഹനം ഉൾപ്പെട്ടത്)</span>
                                                         </h3>
                                                         <div className="space-y-4 p-[16px]">
@@ -1291,8 +1291,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5 min-h-[65vh]">
 
                                                     {/* LEFT: Accident Details */}
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Accident Details <span className="text-[10px]">(അപകട വിവരങ്ങൾ)</span>
                                                         </h3>
                                                         <div className="space-y-4 p-[16px]">
@@ -1380,8 +1380,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* RIGHT: Service Information */}
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Service Information <span className="text-[10px]">(സേവന വിവരങ്ങൾ)</span>
                                                         </h3>
                                                         <div className="space-y-4 p-[16px]">
@@ -1483,8 +1483,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                         {activeTab === 3 && (
                                             <div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[65vh] sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Damage & Inspection <span className="text-[10px]">(നാശനഷ്ടവും പരിശോധനയും)</span>
                                                         </h3>
                                                         <div className="space-y-2 p-[16px]">
@@ -1567,8 +1567,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Injury & Fatality Details <span className="text-[10px]">(പരിക്കുകളും മരണങ്ങളും)</span>
                                                         </h3>
 
@@ -1735,8 +1735,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                             <div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-4 md:p-2 mb-1.5">
                                                     {/* LEFT: Recovery Details */}
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className=" border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Recovery Details <span className="text-[10px]">(പുനരുപയോഗ വിവരങ്ങൾ)</span>
                                                         </h3>
                                                         <div className="space-y-5 p-[16px]">
@@ -1873,8 +1873,8 @@ const PrimaryAccidentReport: React.FC = () => {
                                                     </div>
 
                                                     {/* RIGHT: Cost & Settlement */}
-                                                    <div className="bg-gray-100 border-1 border-grey-600 rounded-[8px] overflow-auto min-h-[64vh]">
-                                                        <h3 className="text-[14px] font-[600] text-white pb-2 border-b-2 border-[var(--sidebar)] p-[16px] bg-gray-500">
+                                                    <div className=" border-2 border-gray-400 rounded-[8px] overflow-auto">
+                                                        <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                                                             Cost & Settlement <span className="text-[10px]">(ചെലവും തീർപ്പും)</span>
                                                         </h3>
                                                         <div className="space-y-4 p-[16px]">

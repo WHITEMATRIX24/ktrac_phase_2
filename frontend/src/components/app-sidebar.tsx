@@ -396,7 +396,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcherStatic
-          team={{ name: "KTRAC", logo: "/logo.png", plan: "Enroute Kerala" }}
+          team={{ name: "KTRAC", logo: "/ksrtclogo.png", plan: "Enroute Kerala" }}
         />
       </SidebarHeader>
       <SidebarContent>
