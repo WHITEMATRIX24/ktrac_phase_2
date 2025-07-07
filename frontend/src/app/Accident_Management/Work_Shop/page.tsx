@@ -128,7 +128,7 @@ const AccedentWorkshop = () => {
           <>
             <div className="pt-5 px-3 flex justify-end">
               <h6 className="text-[16px] font-semibold">
-                {selectedAccedentData.accident_id}
+                {selectedAccedentData.accident_id.replaceAll("_", "/")}
               </h6>
             </div>
             {/* main */}

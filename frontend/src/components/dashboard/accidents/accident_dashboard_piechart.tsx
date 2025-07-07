@@ -56,7 +56,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function PieChartComponet({
+export function AccidentDashboardPieChart({
   chartData,
   chartTitle,
   description,

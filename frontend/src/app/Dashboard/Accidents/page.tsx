@@ -1,9 +1,6 @@
 "use client";
 import { AccidentLineChart } from "@/components/accident_dashboard_linechart";
-import { PieChartComponet } from "@/components/accident_dashboard_piechart";
-import { SectionCards } from "@/components/section-cards";
-import { Ambulance, File, FileCheck2, FileClock } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -13,37 +10,28 @@ import {
 } from "../../../components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AccidentDashboardCards } from "@/components/dashboard/accidents/cards";
+import { AccidentDashboardPieChart } from "@/components/dashboard/accidents/accident_dashboard_piechart";
 
-const dummyData = [
-  {
-    title: "Total Accidents",
-    value: 135230,
-    change: "0",
-    icon: <Ambulance className="w-12 h-12 text-grey opacity-40" />,
-  },
-  {
-    title: "Primary Stage",
-    value: 87990,
-    change: "0",
-    icon: <File className="w-12 h-12 text-grey opacity-40" />,
-  },
-  {
-    title: "In Progress",
-    value: 47240,
-    change: "0",
-    icon: <FileClock className="w-12 h-12 text-grey opacity-40" />,
-  },
-  {
-    title: "Completed",
-    value: 53340,
-    change: "0",
-    icon: <FileCheck2 className="w-12 h-12 text-grey opacity-40" />,
-  },
-];
+type CardModel = {
+  name: string;
+  value: number;
+};
+
+type PieChartModel = {
+  labelData: String;
+  data: number;
+  fill: String;
+};
 
 const pieChartData = [
-  { labelData: "FIR", data: 275, fill: "var(--color-chrome)" },
-  { labelData: "No FIR", data: 200, fill: "var(--color-safari)" },
+  { labelData: "FIR", key: "with_fir", data: 0, fill: "var(--color-chrome)" },
+  {
+    labelData: "No FIR",
+    data: 0,
+    key: "no_fir",
+    fill: "var(--color-safari)",
+  },
 ];
 
 const lineChartData = [
@@ -56,8 +44,36 @@ const lineChartData = [
 ];
 
 const AccidentsDashboard = () => {
+  const [dashboardData, setDashboardData] = useState<{
+    cardData: CardModel[];
+    fir_based_chart: PieChartModel[];
+  }>({
+    cardData: [
+      {
+        name: "Total Accidents",
+        value: 0,
+      },
+      {
+        name: "Primary Stage",
+        value: 0,
+      },
+      {
+        name: "In Progress ",
+        value: 0,
+      },
+      {
+        name: "completed",
+        value: 0,
+      },
+    ],
+    fir_based_chart: [],
+  });
   const [bonnetSearchNo, setBonnetSearchNo] = useState<string>("");
   const [bonnetNumberList, setBonnetNumberList] = useState<string[]>([]);
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedFuelType, setSelectedFuelType] = useState<string>("");
+  const [isLoading, setIsloading] = useState<boolean>(true);
 
   // bonnet number search handler
   const handleSearchBonnetnumber = (searchValue: string) => {
@@ -70,17 +86,73 @@ const AccidentsDashboard = () => {
     setBonnetNumberList(["RF1574", "RF1575"]);
   };
 
+  // fetch dashboard data
+  const fetchData = async () => {
+    try {
+      !isLoading && setIsloading(true);
+      const response = await fetch("/api/dashboard/accidents");
+
+      if (!response.ok) {
+        console.log("error in accident dashboard");
+        alert("something went wrong");
+      }
+      const data = await response.json();
+      // console.log(data);
+
+      // cards
+      const finalCardData = data.data.cards.map(
+        (v: { name: string; value: number }) => {
+          return {
+            ...v,
+            name: convertToTitleCase(v.name),
+          };
+        }
+      );
+
+      // pie chart
+      const updatedPieChartData = pieChartData.map((d) => {
+        return {
+          ...d,
+          data: data.data.fir_based_chart[d.key],
+        };
+      });
+      // console.log(updatedPieChartData);
+
+      setDashboardData({
+        cardData: finalCardData,
+        fir_based_chart: updatedPieChartData,
+      });
+    } catch (error) {
+      console.log(error);
+      console.log("error in accident dashboard");
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-3 md:gap-6 md:py-2">
           <div className="flex gap-2 justify-end pr-6">
+            {/* <div className="flex gap-2 items-center">
+              <label>From</label>
+              <Input type="date" className="bg-white h-8 w-fit" />
+            </div>
+            <div className="flex gap-2 items-center">
+              <label>To</label>
+              <Input type="date" className="bg-white h-8 w-fit" />
+            </div> */}
             <div className="relative">
               <Input
                 onChange={(e) => handleSearchBonnetnumber(e.target.value)}
                 value={bonnetSearchNo}
                 placeholder="bonnet no"
-                className="bg-white h-8"
+                className="bg-white h-8 w-36"
               />
               {bonnetNumberList.length > 0 && (
                 <div className="absolute border-2 rounded-sm top-10 w-48 h-52 bg-white z-10 flex flex-col px-3 py-3 gap-3">
@@ -139,19 +211,25 @@ const AccidentsDashboard = () => {
               Search
             </Button>
           </div>
-          <SectionCards data={dummyData} />
-          <div className="grid grid-cols-2 gap-4">
-            <div className="pl-4 lg:pl-6">
-              <AccidentLineChart chartData={lineChartData} />
-            </div>
-            <div className="pr-4 lg:pr-6">
-              <PieChartComponet
-                chartTitle="Accident FIR"
-                description="Ratio of accident data with FIR & without FIR"
-                chartData={pieChartData}
-              />
-            </div>
-          </div>
+          {isLoading ? (
+            <p>loading...</p>
+          ) : (
+            <>
+              <AccidentDashboardCards data={dashboardData.cardData} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="pl-4 lg:pl-6">
+                  <AccidentLineChart chartData={lineChartData} />
+                </div>
+                <div className="pr-4 lg:pr-6">
+                  <AccidentDashboardPieChart
+                    chartTitle="Accident FIR"
+                    description="Ratio of accident data with FIR & without FIR"
+                    chartData={dashboardData.fir_based_chart}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -159,3 +237,7 @@ const AccidentsDashboard = () => {
 };
 
 export default AccidentsDashboard;
+
+const convertToTitleCase = (str: string): string => {
+  return str.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};

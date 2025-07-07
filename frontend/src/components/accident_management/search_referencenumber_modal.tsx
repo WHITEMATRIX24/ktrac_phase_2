@@ -25,12 +25,18 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
     if (!date && !bonnetNo && !district && !depo && !accidentReferenceNumber)
       return;
 
+    if ((date || bonnetNo || district || depo) && accidentReferenceNumber)
+      return alert("select either filter or reference number");
+
     try {
       setIsLoading(true);
 
       if (accidentReferenceNumber) {
         const response = await fetch(
-          `/api/searchZerothReportById?accident_reference_number=${accidentReferenceNumber}`
+          `/api/searchZerothReportById?accident_reference_number=${accidentReferenceNumber.replaceAll(
+            "/",
+            "_"
+          )}`
         );
         const data = await response.json();
 
@@ -103,114 +109,115 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
 
   return (
     <div className="w-full flex flex-col gap-3 px-3 my-5">
-      <div className="flex items-center gap-3">
-        <h6>
-          Accident Reference Number <span className="text-red-600">*</span>
-        </h6>
-        <input
-          type="text"
-          placeholder="Enter accident reference"
-          value={accidentReferenceNumber}
-          onChange={(e) => setAccidentReferencenumber(e.target.value)}
-          className="flex-1 border px-3 py-1 bg-white rounded-sm"
-        />
-      </div>
-      <div className="flex justify-center items-center gap-3">
-        <Divider className="w-1/3" />
-        <p>OR</p>
-        <Divider className="w-1/3" />
-      </div>
       <div className="relative bg-white flex flex-col gap-5 rounded-sm">
-        <div className="w-full grid grid-cols-4 gap-5 items-end text-[12px] px-3 py-2">
-          <div className="flex flex-col">
-            <label>
-              Date /<span className="text-[10px]"> തീയതി</span>
-            </label>
-            <input
-              onChange={(e) => setDate(e.target.value)}
-              type="date"
-              className="px-3 py-2 border rounded-sm"
-              value={date}
-            />
+        <div className="flex items-start gap-5 w-[79vw]">
+          <div className="grid grid-cols-2 gap-5 items-end text-[12px] w-[60%]">
+            <div className="flex flex-col">
+              <label>
+                Date /<span className="text-[10px]"> തീയതി</span>
+              </label>
+              <input
+                onChange={(e) => setDate(e.target.value)}
+                type="date"
+                className="px-3 py-2 border rounded-sm"
+                value={date}
+              />
+            </div>
+            <div className="relative flex flex-col">
+              <label>
+                Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Search bonnet number"
+                className="px-3 py-2 border rounded-sm"
+                onClick={() => setShowBonnetDropDown(true)}
+                value={bonnetNo}
+                onChange={handleSearchBonnetNumber}
+              />
+              {showBonnetDropDown && (
+                <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
+                  {filteredBusinfo.map((d: any) => (
+                    <button
+                      onClick={() => {
+                        setBonnetNo(d.bonet_number);
+                        setShowBonnetDropDown(false);
+                      }}
+                      className="py-2 text-start"
+                      key={d.bonet_number}
+                    >
+                      {d.bonet_number}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <label>
+                District /<span className="text-[10px]"> ജില്ല</span>
+              </label>
+              <select
+                onChange={(e) => setDistrict(e.target.value)}
+                className="px-3 py-2 border rounded-sm"
+                value={district}
+              >
+                <option value="">Select District</option>
+                <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                <option value="Kollam">Kollam</option>
+                <option value="Pathanamthitta">Pathanamthitta</option>
+                <option value="Alappuzha">Alappuzha</option>
+                <option value="Kottayam">Kottayam</option>
+                <option value="Idukki">Idukki</option>
+                <option value="Ernakulam">Ernakulam</option>
+                <option value="Thrissur">Thrissur</option>
+                <option value="Palakkad">Palakkad</option>
+                <option value="Malappuram">Malappuram</option>
+                <option value="Kozhikode">Kozhikode</option>
+                <option value="Wayanad">Wayanad</option>
+                <option value="Kannur">Kannur</option>
+                <option value="Kasaragod">Kasaragod</option>
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label>
+                Operated Depo /
+                <span className="text-[10px]">
+                  {" "}
+                  പ്രവർത്തിപ്പിക്കുന്ന ഡിപ്പോ
+                </span>
+              </label>
+              <select
+                onChange={(e) => setDepo(e.target.value)}
+                className="px-3 py-2 border rounded-sm"
+                value={depo}
+              >
+                <option value="" disabled>
+                  Select Depo
+                </option>
+                {allDepos &&
+                  allDepos.length > 1 &&
+                  allDepos.map((depo: any) =>
+                    depo.depot.map((d: any) => (
+                      <option key={d["depot-abv"]} value={d["depot-name"]}>
+                        {d["depot-name"]}
+                      </option>
+                    ))
+                  )}
+              </select>
+            </div>
           </div>
-          <div className="relative flex flex-col">
-            <label>
-              Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span>
-            </label>
+          <div className="h-full border w-0"></div>
+          <div className="flex flex-col gap-3 w-[40%]">
+            <h6>
+              Accident Reference Number <span className="text-red-600">*</span>
+            </h6>
             <input
               type="text"
-              placeholder="Search bonnet number"
-              className="px-3 py-2 border rounded-sm"
-              onClick={() => setShowBonnetDropDown(true)}
-              value={bonnetNo}
-              onChange={handleSearchBonnetNumber}
+              placeholder="Enter accident reference"
+              value={accidentReferenceNumber}
+              onChange={(e) => setAccidentReferencenumber(e.target.value)}
+              className="flex-1 border px-3 py-1 bg-white rounded-sm"
             />
-            {showBonnetDropDown && (
-              <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
-                {filteredBusinfo.map((d: any) => (
-                  <button
-                    onClick={() => {
-                      setBonnetNo(d.bonet_number);
-                      setShowBonnetDropDown(false);
-                    }}
-                    className="py-2 text-start"
-                    key={d.bonet_number}
-                  >
-                    {d.bonet_number}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label>
-              District /<span className="text-[10px]"> ജില്ല</span>
-            </label>
-            <select
-              onChange={(e) => setDistrict(e.target.value)}
-              className="px-3 py-2 border rounded-sm"
-              value={district}
-            >
-              <option value="">Select District</option>
-              <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-              <option value="Kollam">Kollam</option>
-              <option value="Pathanamthitta">Pathanamthitta</option>
-              <option value="Alappuzha">Alappuzha</option>
-              <option value="Kottayam">Kottayam</option>
-              <option value="Idukki">Idukki</option>
-              <option value="Ernakulam">Ernakulam</option>
-              <option value="Thrissur">Thrissur</option>
-              <option value="Palakkad">Palakkad</option>
-              <option value="Malappuram">Malappuram</option>
-              <option value="Kozhikode">Kozhikode</option>
-              <option value="Wayanad">Wayanad</option>
-              <option value="Kannur">Kannur</option>
-              <option value="Kasaragod">Kasaragod</option>
-            </select>
-          </div>
-          <div className="flex flex-col">
-            <label>
-              Operated Depo /
-              <span className="text-[10px]"> പ്രവർത്തിപ്പിക്കുന്ന ഡിപ്പോ</span>
-            </label>
-            <select
-              onChange={(e) => setDepo(e.target.value)}
-              className="px-3 py-2 border rounded-sm"
-              value={depo}
-            >
-              <option value="" disabled>
-                Select Depo
-              </option>
-              {allDepos &&
-                allDepos.length > 1 &&
-                allDepos.map((depo: any) =>
-                  depo.depot.map((d: any) => (
-                    <option key={d["depot-abv"]} value={d["depot-name"]}>
-                      {d["depot-name"]}
-                    </option>
-                  ))
-                )}
-            </select>
           </div>
         </div>
         <div className="flex items-center px-3 py-2 bg-slate-50">
@@ -247,7 +254,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               <div className="flex justify-between">
                 <div>
                   <label>Reference number:</label>
-                  <label>{d.accident_id}</label>
+                  <label>{d.accident_id.replaceAll("_", "/")}</label>
                 </div>
                 <label>{d.accident_details.date_of_accident}</label>
               </div>

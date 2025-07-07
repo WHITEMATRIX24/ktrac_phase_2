@@ -199,7 +199,7 @@ const AccedentInspectorForm = () => {
           <>
             <div className="pt-5 px-3 flex justify-end">
               <h6 className="text-2xl font-semibold text-themeRed">
-                {fetchedDetails.accident_id}
+                {fetchedDetails.accident_id.replaceAll("_", "/")}
               </h6>
             </div>
             {/* tab */}
