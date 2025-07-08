@@ -433,13 +433,26 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                             className="px-3 py-2 border rounded-sm"
                                             value={district}
                                         >
-                                            <option value="">Select district</option>
-                                            {/* District options here */}
+                                            <option value="">Select District</option>
+                                            <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                                            <option value="Kollam">Kollam</option>
+                                            <option value="Pathanamthitta">Pathanamthitta</option>
+                                            <option value="Alappuzha">Alappuzha</option>
+                                            <option value="Kottayam">Kottayam</option>
+                                            <option value="Idukki">Idukki</option>
+                                            <option value="Ernakulam">Ernakulam</option>
+                                            <option value="Thrissur">Thrissur</option>
+                                            <option value="Palakkad">Palakkad</option>
+                                            <option value="Malappuram">Malappuram</option>
+                                            <option value="Kozhikode">Kozhikode</option>
+                                            <option value="Wayanad">Wayanad</option>
+                                            <option value="Kannur">Kannur</option>
+                                            <option value="Kasaragod">Kasaragod</option>
                                         </select>
                                     </div>
                                     <div className="flex flex-col">
                                         <label>
-                                            Operated Depo /<span className="text-[10px]"> പ്രവർത്തിക്കുന്ന ഡിപ്പോ</span>
+                                            Operated Depot /<span className="text-[10px]"> പ്രവർത്തിക്കുന്ന ഡിപ്പോ</span>
                                         </label>
                                         <select
                                             onChange={(e) => setDepo(e.target.value)}
@@ -449,13 +462,16 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                             <option value="" disabled>
                                                 Select Depot
                                             </option>
-                                            {Array.isArray(allDepos) &&
+                                            {allDepos.length === 0 ? (
+                                                <option disabled>No depots available</option>
+                                            ) : (
                                                 allDepos.map((d: any) => (
                                                     <option key={d.name} value={d.name}>
                                                         {`${d.abv.toUpperCase()} - ${d.name}`}
                                                     </option>
                                                 ))
-                                            }
+                                            )}
+
                                         </select>
                                     </div>
                                 </div>
