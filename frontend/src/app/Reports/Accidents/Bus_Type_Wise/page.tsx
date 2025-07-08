@@ -96,6 +96,7 @@ const ParentAccidentReport = () => {
       fetchReportData();
     }
   }, [startDate, endDate]);
+  console.log(tableData);
 
   return (
     <div className="px-5 pt-5 flex flex-col gap-1 h-[85vh] overflow-auto">

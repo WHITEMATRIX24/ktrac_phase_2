@@ -101,10 +101,25 @@ export function ReportDataTable<TData, TValue>({
   // export pdf
   const exportPdfHandler = async () => {
     const doc = new jsPDF();
-    const header: string[] = columns.map((val) => val.id as string).splice(1);
+    const header: string[] = columns.map(
+      (val: any) => val.accessorKey as string
+    );
+    // .splice(1);
+    console.log(`header: ${header}`);
 
     const pdfData: RowData[] = data.map((val) => val as RowData);
-    const body = pdfData.map((row) => header.map((col) => row[col] || "nill"));
+    const body = pdfData.map((row) => {
+      return header.map((col) => {
+        const smallLetterCols = col.toLowerCase();
+        const value = row[smallLetterCols];
+        if (value === undefined) {
+          console.warn(`Missing value for column: ${col} in row:`, row);
+          return "nill";
+        }
+        return value;
+      });
+    });
+    console.log(`data: ${body}`);
 
     autoTable(doc, {
       head: [header],

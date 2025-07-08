@@ -33,37 +33,36 @@ export default function Home() {
       password: "hr@ktrac#",
       role: "Employee",
       depo: "Admin",
-
     },
     {
       username: "accident",
       password: "accident@ktrac#",
       role: "Accident_Management",
-      depo: "Admin"
+      depo: "Admin",
     },
     {
       username: "accidentreport",
       password: "accidentreport@ktrac#",
       role: "Accident_Report",
-      depo: "Admin"
+      depo: "Admin",
     },
     {
       username: "tvmdepo",
       password: "tvmdepo@ktrac#",
       role: "Depo",
-      depo: "ernakulam"
+      depo: "ernakulam",
     },
     {
       username: "inspector",
       password: "inspector@ktrac#",
       role: "Inspector",
-      depo: "ernakulam"
+      depo: "ernakulam",
     },
     {
       username: "workshop",
       password: "workshop@ktrac#",
       role: "Workshop",
-      depo: "ernakulam"
+      depo: "ernakulam",
     },
   ];
 
@@ -77,7 +76,7 @@ export default function Home() {
       localStorage.setItem("userRole", user.role);
       localStorage.setItem("userDepo", user.depo);
       if (user.role === "Admin") {
-        router.replace("/Dashboard/Revenue");
+        router.replace("/Dashboard/Accidents");
       } else if (user.role === "Finance") {
         router.replace("/Finance/Overview");
       } else if (user.role === "Maintenance") {
@@ -103,7 +102,7 @@ export default function Home() {
       <div className="relative bg-[url(/landing_bus_2.jpg)] bg-center bg-cover bg-no-repeat col-span-4 flex flex-col justify-between py-10 px-10">
         <div className="absolute inset-0 bg-black/5"></div>
         <div className="flex gap-5 items-center">
-          <Image src="/logo.png" alt="logo" width={100} height={100} />
+          <Image src="/ksrtclogo.png" alt="logo" width={100} height={100} />
           <div>
             <h6 className="text-2xl font-extrabold text-white">KTRAC</h6>
             <p className="text-themeBlue text-xs">v2.0</p>

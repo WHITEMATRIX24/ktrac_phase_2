@@ -110,6 +110,7 @@ const AccedentWorkshop = () => {
         const responseData = await response.json();
         // console.log(responseData);
         alert("create successufully");
+        setSelectedAccedentData(null);
       } else {
         const errorData = await response.json();
         alert(errorData.error.error || "something went wrong");
@@ -158,7 +159,7 @@ const AccedentWorkshop = () => {
               <div className="flex gap-3">
                 {selectedTab !== 0 && (
                   <button
-                    className="bg-[#059669] font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+                    className="bg-[#059669] font-[500] text-white px-5 py-2 rounded-xs disabled:bg-gray-400"
                     onClick={() => setSelectedtab((prevValue) => prevValue - 1)}
                   >
                     Previous
@@ -166,7 +167,7 @@ const AccedentWorkshop = () => {
                 )}
                 {selectedTab !== tabs.length - 1 && (
                   <button
-                    className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
+                    className="bg-sidebar font-[500] text-white px-5 py-2 rounded-xs disabled:bg-gray-400"
                     onClick={() => setSelectedtab((prevValue) => prevValue + 1)}
                   >
                     Next
@@ -174,7 +175,7 @@ const AccedentWorkshop = () => {
                 )}
               </div>
               <div className="flex gap-3">
-                <button className="border font-[500] px-5 py-1 rounded-xs bg-themeRed">
+                <button className="border font-[500] px-5 py-2 rounded-xs bg-themeRed">
                   Cancel
                 </button>
                 {/* <button className="border font-[500] px-5 py-1 rounded-xs">
@@ -183,7 +184,7 @@ const AccedentWorkshop = () => {
                 {selectedTab === tabs.length - 1 && (
                   <button
                     onClick={handleSubmit}
-                    className="border font-[500] px-5 py-1 rounded-xs bg-sidebar text-white"
+                    className="border font-[500] px-5 py-2 rounded-xs bg-sidebar text-white"
                   >
                     Submit
                   </button>

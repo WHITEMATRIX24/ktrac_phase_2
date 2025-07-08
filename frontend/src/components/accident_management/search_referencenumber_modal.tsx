@@ -13,7 +13,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
   const [depo, setDepo] = useState("");
   const [bonnetNo, setBonnetNo] = useState("");
   const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
-  const [accidentList, setAccidentList] = useState<{}[] | null>(null);
+  const [accidentList, setAccidentList] = useState<{}[] | null>([]);
   const [allBusInfo, setAllbusinfo] = useState([]);
   const [filteredBusinfo, setFilteredbusInfo] = useState([]);
   const [allDepos, setAllDepos] = useState([]);
@@ -40,15 +40,15 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           )}`
         );
         const data = await response.json();
+        // console.log(data);
 
-        setAccidentList([data.data]);
+        setAccidentList(data.data ? [data.data] : []);
       } else {
         const response = await fetch(
           `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
         );
         const data = await response.json();
         setAccidentList(data.data || []);
-        // console.log(data);
       }
     } catch (error) {
       console.log("error in filtering");
@@ -192,9 +192,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                 className="px-3 py-2 border rounded-sm"
                 value={depo}
               >
-                <option value="" disabled>
-                  Select Depot
-                </option>
+                <option value="">Select Depot</option>
                 {allDepos &&
                   allDepos.length > 1 &&
                   allDepos.map((depo: any) =>

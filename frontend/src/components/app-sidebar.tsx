@@ -46,9 +46,9 @@ interface NavItem {
 
 // Utility to mark subitems with url "#" as disabled
 function markDisabledUrls(items: NavItem[]): NavItem[] {
-  return items.map(item => ({
+  return items.map((item) => ({
     ...item,
-    items: item.items?.map(subItem => ({
+    items: item.items?.map((subItem) => ({
       ...subItem,
       disabled: subItem.url === "#",
     })),
@@ -61,6 +61,7 @@ const defaultNavItems: NavItem[] = [
     icon: LayoutDashboard,
     isActive: true,
     items: [
+      { title: "Accidents", url: "/Dashboard/Accidents" },
       { title: "Revenue", url: "/Dashboard/Revenue" },
       { title: "Bus Position", url: "/Dashboard/Bus_Position" },
       // {
@@ -396,7 +397,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcherStatic
-          team={{ name: "KTRAC", logo: "/ksrtclogo.png", plan: "Enroute Kerala" }}
+          team={{
+            name: "KTRAC",
+            logo: "/ksrtclogo.png",
+            plan: "Enroute Kerala",
+          }}
         />
       </SidebarHeader>
       <SidebarContent>
