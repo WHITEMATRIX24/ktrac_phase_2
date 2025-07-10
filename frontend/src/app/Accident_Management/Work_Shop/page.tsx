@@ -1,25 +1,34 @@
 "use client";
 import ReferenceNumberSearchModal from "@/components/accident_management/search_referencenumber_modal";
+import BasicDetails from "@/components/accident_management/workshop/basic_details";
 import AdditionalInfoForm from "@/components/accident_management/workshop/form_additional";
 import BasicAndWorkShopForm from "@/components/accident_management/workshop/form_basicWorkshop";
 import InsuranceAndCostForm from "@/components/accident_management/workshop/form_insuranceCost";
 import { AccidentWorkshopReport } from "@/models/AccidentData";
 import React, { useEffect, useState } from "react";
 
-const tabs = ["Basic & Workshop", "Insurance & Cost", "Additional info"];
+const tabs = [
+  "Basic Details",
+  "Basic & Workshop",
+  "Insurance & Cost",
+  "Additional info",
+];
 
-interface SelectedAccedentModel {
-  accedent_ref_no: string;
-  accedent_date: string;
-  bus_no: string;
+export interface SelectedAccidentWorkshopModel {
+  accident_id: string;
+  bonet_no: string;
+  date_of_accident: string;
+  description: string;
+  district: string;
+  operated_depot: string;
+  photos: {
+    download_url: string;
+  }[];
 }
 
 const AccedentWorkshop = () => {
-  const [selectedAccedentData, setSelectedAccedentData] = useState<{
-    accident_id: string;
-    bonet_no: string;
-    date_of_accident: string;
-  } | null>(null);
+  const [selectedAccedentData, setSelectedAccedentData] =
+    useState<SelectedAccidentWorkshopModel | null>(null);
   const [workShopForm, setWorkshopForm] = useState<AccidentWorkshopReport>({
     accident_id: "",
     bonet_no: "",
@@ -54,10 +63,14 @@ const AccedentWorkshop = () => {
     final_inspection_report: "",
     remarks: "",
   });
+  const [depot, setDepot] = useState<[]>([]);
+
   const tabList = [
+    <BasicDetails basicDetails={selectedAccedentData} />,
     <BasicAndWorkShopForm
       workShopFormData={workShopForm}
       formUpdateController={setWorkshopForm}
+      depot={depot}
     />,
     <InsuranceAndCostForm
       formUpdateController={setWorkshopForm}
@@ -75,11 +88,19 @@ const AccedentWorkshop = () => {
     const accidentId = selectedData.accident_id;
     const bonnetNo = selectedData.vehicle_info.bonet_no;
     const accidentDate = selectedData.accident_details.date_of_accident;
+    const description = selectedData.accident_details.description;
+    const district = selectedData.location_info.district;
+    const operatedDepot = selectedData.location_info.operated_depot;
+    const photos = selectedData.photos.download_urls;
 
     setSelectedAccedentData({
       accident_id: accidentId,
       bonet_no: bonnetNo,
       date_of_accident: accidentDate,
+      description,
+      district,
+      operated_depot: operatedDepot,
+      photos,
     });
   };
   // progressbar
@@ -87,6 +108,30 @@ const AccedentWorkshop = () => {
     const progressValuePerTab = 100 / tabs.length;
     setProgressStatus(progressValuePerTab * (selectedTab + 1));
   }, [selectedTab]);
+
+  // FETCH DEPO
+  const getAllDepoHandler = async () => {
+    try {
+      const response = await fetch("/api/getAllDepos");
+      const data = await response.json();
+
+      // format
+      const flatenedData = data.data.flatMap((d: any) =>
+        d.depot.map((d: any) => ({
+          name: d["depot-name"],
+          abv: d["depot-abv"],
+        }))
+      );
+
+      setDepot(flatenedData);
+    } catch (error) {
+      console.log("error on getting depo details");
+    }
+  };
+
+  useEffect(() => {
+    getAllDepoHandler();
+  }, []);
 
   // submit handler
   const handleSubmit = async () => {

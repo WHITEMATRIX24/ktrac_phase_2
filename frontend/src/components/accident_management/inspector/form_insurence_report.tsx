@@ -148,16 +148,21 @@ const FormInsurenceReport = ({
               Insurance Company Name /
               <span className="text-[10px]">ഇൻഷുറൻസ് കമ്പനിയുടെ പേര്</span>
             </label>
-            <Input
-              value={insuranceForm?.insurance_company_name}
+            <select
               onChange={(e) =>
                 stateUpdateHandler((prev) => ({
                   ...prev,
                   insurance_company_name: e.target.value,
                 }))
               }
-              className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
-            />
+              className="px-3 py-2 border rounded-sm"
+              value={insuranceForm?.insurance_company_name}
+            >
+              <option value="" disabled>
+                Select Insurance Company
+              </option>
+              <option value="National Insurance">National Insurance</option>
+            </select>
           </div>
           <div className="flex flex-col justify-between gap-2">
             <label className="text-[12px] text-[#374151] mb-[6px]">

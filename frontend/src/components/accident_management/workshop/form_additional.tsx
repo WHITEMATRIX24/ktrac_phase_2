@@ -57,43 +57,6 @@ const AdditionalInfoForm = ({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-[12px]">
-            Towed /<span className="text-[10px]">വലിച്ചിഴച്ചതാണോ</span>
-          </label>
-          <div className="flex items-center gap-8">
-            <label htmlFor="#is_towed" className="text-[12px]">
-              Yes
-            </label>
-            <Input
-              type="radio"
-              checked={workShopFormData?.vehicle_towed_status === true}
-              onChange={() =>
-                formUpdateController((prev) => ({
-                  ...prev,
-                  vehicle_towed_status: true,
-                }))
-              }
-              name="is_towed"
-              className="w-[14px] h-[14px]"
-            />
-            <label htmlFor="#isFir" className="text-[12px]">
-              No
-            </label>
-            <Input
-              type="radio"
-              checked={workShopFormData?.vehicle_towed_status === false}
-              onChange={() =>
-                formUpdateController((prev) => ({
-                  ...prev,
-                  vehicle_towed_status: false,
-                }))
-              }
-              name="is_towed"
-              className="w-[14px] h-[14px]"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
           <label className="text-[12px] text-[#374151] mb-[6px]">
             Remarks /<span className="text-[10px]">അഭിപ്രായങ്ങൾ</span>
           </label>

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { ReportDataTable } from "@/components/reports/report_datatable";
+import { dateToLocaleFormater } from "@/utils/dateFormater";
 
 // Data type
 export type TimePeriodAccidentData = {
@@ -125,7 +126,9 @@ const TimePeriodAccidentReport = () => {
         columns={timePeriodColumns}
         data={tableData}
         searchKey="time_period"
-        tableLabel="Time Period Accident Table"
+        tableLabel={`Time Period Accident Report (${dateToLocaleFormater(
+          startDate
+        )}) - (${dateToLocaleFormater(endDate)})`}
         startDate={startDate}
         startDateSetter={setStartDate}
         endDate={endDate}

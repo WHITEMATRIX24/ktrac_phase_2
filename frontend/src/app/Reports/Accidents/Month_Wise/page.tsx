@@ -13,9 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { dateToLocaleFormater } from "@/utils/dateFormater";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { EllipsisVertical } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 type MonthwiseReport = {
   fatal_accident: string;
@@ -83,11 +86,98 @@ const MonthWiseReport = () => {
       "Minor Accidents": row.minor_accident,
       "Total Accidents": row.total,
     }));
+    console.log(formattedData);
 
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "MonthWiseReport");
-    XLSX.writeFile(workbook, "MonthWiseReport.xlsx");
+    const columnCount = Object.keys(formattedData[0]).length;
+
+    const ws_data = [
+      ["KSRTC REPORT"],
+      ["Monthly Accident Report"],
+      [],
+      [
+        "Month",
+        "Fatal Accidents",
+        "Major Accidents",
+        "Minor Accidents",
+        "Total Accidents",
+      ],
+      ...formattedData.map((item) => [
+        item.Month,
+        item["Fatal Accidents"],
+        item["Major Accidents"],
+        item["Minor Accidents"],
+        item["Total Accidents"],
+      ]),
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(ws_data);
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16 },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "FFFF00" } },
+    };
+    worksheet["A2"].s = {
+      font: { italic: true, sz: 12 },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "FFCC99" } },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: columnCount - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: columnCount - 1 } },
+    ];
+
+    // const workbook = XLSX.utils.book_new();
+    // XLSX.utils.book_append_sheet(workbook, worksheet, "MonthWiseReport");
+    // XLSX.writeFile(workbook, "MonthWiseReport.xlsx");
+  };
+
+  // export pdf
+  const exportPdfHandler = async () => {
+    const doc = new jsPDF();
+    const header = [
+      "Month",
+      "Year",
+      "Fatal Accident",
+      "Major Accident",
+      "Minor Accident",
+      "Total",
+    ];
+
+    const body = reportData.map((row) => [
+      row.month,
+      row.year,
+      row.fatal_accident,
+      row.major_accident,
+      row.minor_accident,
+      row.total,
+    ]);
+
+    // Add the title (main heading)
+    doc.setFontSize(20);
+    doc.text("KSRTC REPORT", 105, 10, { align: "center" });
+
+    doc.setFontSize(14);
+    const tableLabel = `Accident Month Wise Report (${dateToLocaleFormater(
+      date
+    )})`;
+    doc.text(tableLabel, 13, 30, { align: "left" });
+
+    // Add the table using autoTable
+    autoTable(doc, {
+      head: [header],
+      body: body,
+      startY: 40,
+      margin: { horizontal: 13, vertical: 10 },
+      theme: "striped",
+      styles: {
+        fontSize: 10,
+        halign: "center",
+        valign: "middle",
+      },
+    });
+    doc.save(`Accident Month Wise Report (${dateToLocaleFormater(date)})`);
   };
 
   useEffect(() => {
@@ -123,16 +213,16 @@ const MonthWiseReport = () => {
               </PopoverTrigger>
               <PopoverContent className="w-60 flex flex-col gap-3">
                 <button
-                  // onClick={exportPdfHandler}
+                  onClick={exportPdfHandler}
                   className="bg-sidebar px-3 py-1 rounded-md text-sm text-white"
                 >
-                  Export to pdf
+                  Pdf Export
                 </button>
                 <button
                   onClick={exportToExcel}
                   className="bg-sidebar px-3 py-1 rounded-md text-sm text-white"
                 >
-                  Export to csv
+                  Excel Export
                 </button>
               </PopoverContent>
             </Popover>

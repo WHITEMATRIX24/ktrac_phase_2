@@ -60,7 +60,7 @@ const FormBasicReport = ({
       </div>
       <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
-          Iquiry inspector name (KSRTC) /
+          Inquiry inspector name (KSRTC) /
           <span className="text-[10px]">അന്വേഷണ ഇൻസ്പെക്ടറുടെ പേര്</span>
         </label>
         <Input
@@ -116,16 +116,16 @@ const FormBasicReport = ({
           className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
         />
       </div>
-      <div className="flex flex-col justify-between gap-2">
+      {/* <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
-          Bus no /<span className="text-[10px]">ബസ് നം</span>
+          Bonnet no /<span className="text-[10px]">ബസ് നം</span>
         </label>
         <Input
           readOnly
           value={fetchedDetails?.bonnetNumber}
           className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
         />
-      </div>
+      </div> */}
       <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
           Waybill /<span className="text-[10px]">വേബിൽ</span>
@@ -141,7 +141,7 @@ const FormBasicReport = ({
           className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
         />
       </div>
-      <div className="flex flex-col justify-between gap-2">
+      {/* <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
           Schedule Detail (Descript) /
           <span className="text-[10px]">ഷെഡ്യൂൾ വിശദാംശങ്ങൾ (വിവരണം)</span>
@@ -156,13 +156,13 @@ const FormBasicReport = ({
           }
           className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
         />
-      </div>
-      <div className="flex flex-col justify-between gap-2">
+      </div> */}
+      {/* <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
           Bus Class' /<span className="text-[10px]">ബസ് ക്ലാസ്</span>
         </label>
         <Input className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs" />
-      </div>
+      </div> */}
       <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
           Driver/DC Name' /<span className="text-[10px]">ഡ്രൈവർ/ഡിസി പേര്</span>
@@ -249,24 +249,6 @@ const FormBasicReport = ({
       </div>
       <div className="flex flex-col justify-between gap-2">
         <label className="text-[12px]  text-[#374151] mb-[6px]">
-          Primary cause of accident in insp report /
-          <span className="text-[10px]">
-            ഇൻസ്പെക്ടർ റിപ്പോർട്ടിൽ അപകടത്തിന്റെ പ്രാഥമിക കാരണം
-          </span>
-        </label>
-        <Input
-          value={accidentData?.primary_cause_of_accident_in_insp_report}
-          onChange={(e) =>
-            stateUpdateHandler((prev) => ({
-              ...prev,
-              primary_cause_of_accident_in_insp_report: e.target.value,
-            }))
-          }
-          className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
-        />
-      </div>
-      <div className="flex flex-col justify-between gap-2">
-        <label className="text-[12px]  text-[#374151] mb-[6px]">
           Responsibility of the accident in insp report /
           <span className="text-[10px]">
             ഇൻസ്പെക്ടർ റിപ്പോർട്ടിൽ അപകടത്തിന്റെ ഉത്തരവാദിത്തം
@@ -278,6 +260,25 @@ const FormBasicReport = ({
             stateUpdateHandler((prev) => ({
               ...prev,
               responsibility_of_accident_in_insp_report: e.target.value,
+            }))
+          }
+          className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+        />
+      </div>
+      <div className="flex flex-col justify-between gap-2 col-span-3">
+        <label className="text-[12px]  text-[#374151] mb-[6px]">
+          Primary cause of accident in insp report /
+          <span className="text-[10px]">
+            ഇൻസ്പെക്ടർ റിപ്പോർട്ടിൽ അപകടത്തിന്റെ പ്രാഥമിക കാരണം
+          </span>
+        </label>
+        <textarea
+          rows={5}
+          value={accidentData?.primary_cause_of_accident_in_insp_report}
+          onChange={(e) =>
+            stateUpdateHandler((prev) => ({
+              ...prev,
+              primary_cause_of_accident_in_insp_report: e.target.value,
             }))
           }
           className="w-full py-[5px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"

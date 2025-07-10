@@ -1,6 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { AccidentWorkshopReport } from "@/models/AccidentData";
+import { useEffect, useRef, useState } from "react";
 
 interface SelectedAccedentModel {
   accedent_ref_no: string;
@@ -13,13 +14,58 @@ interface Props {
   formUpdateController: React.Dispatch<
     React.SetStateAction<AccidentWorkshopReport>
   >;
+  depot: { name: string; abv: string }[];
 }
 
 // basic & workshop ui
 const BasicAndWorkShopForm = ({
   workShopFormData,
   formUpdateController,
+  depot,
 }: Props) => {
+  const [filteredDepot, setFilteredDepot] = useState(depot || []);
+  const [showDepot, setShowDepot] = useState<boolean>(false);
+  const [selectedDepot, setSelectedDepot] = useState<string>("");
+  const depoInputRef = useRef<HTMLInputElement | null>(null);
+  const depoUlRef = useRef<HTMLUListElement | null>(null);
+  // console.log(depot);
+
+  // SELECT DEPO HANDLER
+  const filterDepoHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filterValue = e.target.value.toLowerCase();
+    setSelectedDepot(filterValue);
+
+    setFilteredDepot((_prev) => {
+      const filteredDepot = depot.filter((d: any) => {
+        return (
+          d.name.toLowerCase().includes(filterValue) ||
+          d.abv.toLowerCase().includes(filterValue)
+        );
+      });
+      return filteredDepot;
+    });
+  };
+
+  // DISABLE DROP DOWN ON OUTER CLICK
+  useEffect(() => {
+    const handleDepoUlclose = (event: MouseEvent) => {
+      if (
+        depoUlRef.current &&
+        !depoUlRef.current.contains(event?.target as Node) &&
+        depoInputRef.current &&
+        !depoInputRef.current.contains(event.target as Node)
+      ) {
+        setShowDepot(false);
+      }
+    };
+
+    document.addEventListener("click", handleDepoUlclose);
+
+    return () => {
+      document.removeEventListener("click", handleDepoUlclose);
+    };
+  }, []);
+
   return (
     <div className="relative grid grid-cols-2 gap-3 overflow-auto h-full mx-3 rounded-m">
       <div className="p-3 overflow-y-auto bg-white border rounded-sm flex flex-col gap-3 w-full">
@@ -84,6 +130,43 @@ const BasicAndWorkShopForm = ({
             className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
           />
         </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-[12px]">
+            Towed /<span className="text-[10px]">വലിച്ചിഴച്ചതാണോ</span>
+          </label>
+          <div className="flex items-center gap-8">
+            <label htmlFor="#is_towed" className="text-[12px]">
+              Yes
+            </label>
+            <Input
+              type="radio"
+              checked={workShopFormData?.vehicle_towed_status === true}
+              onChange={() =>
+                formUpdateController((prev) => ({
+                  ...prev,
+                  vehicle_towed_status: true,
+                }))
+              }
+              name="is_towed"
+              className="w-[14px] h-[14px]"
+            />
+            <label htmlFor="#isFir" className="text-[12px]">
+              No
+            </label>
+            <Input
+              type="radio"
+              checked={workShopFormData?.vehicle_towed_status === false}
+              onChange={() =>
+                formUpdateController((prev) => ({
+                  ...prev,
+                  vehicle_towed_status: false,
+                }))
+              }
+              name="is_towed"
+              className="w-[14px] h-[14px]"
+            />
+          </div>
+        </div>
       </div>
       <div className="p-3 overflow-y-auto bg-white border rounded-sm flex flex-col gap-3 w-full">
         <div className="border-b-2 border-sidebar py-2">
@@ -91,21 +174,28 @@ const BasicAndWorkShopForm = ({
             Workshop /<span className="text-[10px]">ശിൽപശാല</span>
           </h6>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="relative flex flex-col gap-2">
           <label className="text-[12px]">
             Work Shop/Depot Name /
             <span className="text-[10px]">വർക്ക് ഷോപ്പ്/ഡിപ്പോ പേര്</span>
           </label>
           <Input
-            value={workShopFormData?.workshop_depot_name}
-            onChange={(e) =>
-              formUpdateController((prev) => ({
-                ...prev,
-                workshop_depot_name: e.target.value,
-              }))
-            }
-            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+            ref={depoInputRef}
+            onClick={() => setShowDepot(true)}
+            onChange={filterDepoHandler}
+            value={selectedDepot}
           />
+
+          {showDepot && (
+            <ul
+              ref={depoUlRef}
+              className="absolute border flex flex-col gap-1 top-16 bg-slate-50 rounded-sm px-3 py-2 min-w-52 h-52 overflow-auto"
+            >
+              {filteredDepot.map((depo) => (
+                <li key={depo.abv}>{depo.name}</li>
+              ))}
+            </ul>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
@@ -174,6 +264,75 @@ const BasicAndWorkShopForm = ({
             }
             className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
           />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-[12px]">
+            Spare Part Cost /
+            <span className="text-[10px]">സ്പെയർ പാർട്സ് ചെലവ്</span>
+          </label>
+          <Input
+            type="number"
+            value={workShopFormData?.spare_part_cost}
+            onChange={(e) =>
+              formUpdateController((prev) => ({
+                ...prev,
+                spare_part_cost: Number(e.target.value),
+              }))
+            }
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-[12px]">
+            Labour Cost /<span className="text-[10px]">തൊഴിൽ ചെലവ്</span>
+          </label>
+          <Input
+            type="number"
+            value={workShopFormData?.labour_cost}
+            onChange={(e) =>
+              formUpdateController((prev) => ({
+                ...prev,
+                labour_cost: Number(e.target.value),
+              }))
+            }
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-[12px]">
+            Cost Of Damage Against Third Party /
+            <span className="text-[10px]">
+              മൂന്നാം കക്ഷിക്കെതിരായ നാശനഷ്ടത്തിന്റെ ചെലവ്
+            </span>
+          </label>
+          <Input
+            type="number"
+            value={workShopFormData?.cost_of_damage}
+            onChange={(e) =>
+              formUpdateController((prev) => ({
+                ...prev,
+                cost_of_damage: Number(e.target.value),
+              }))
+            }
+            className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+          />
+          <div className="flex flex-col gap-2">
+            <label className="text-[12px]">
+              Total Bill Amount /
+              <span className="text-[10px]">മൊത്തം ബിൽ തുക</span>
+            </label>
+            <Input
+              type="number"
+              value={workShopFormData?.total_bill_amount}
+              onChange={(e) =>
+                formUpdateController((prev) => ({
+                  ...prev,
+                  total_bill_amount: Number(e.target.value),
+                }))
+              }
+              className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
+            />
+          </div>
         </div>
       </div>
     </div>

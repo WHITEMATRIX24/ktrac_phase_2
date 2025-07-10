@@ -1,14 +1,27 @@
 "use client";
 import { dateToLocaleFormater } from "@/utils/dateFormater";
 import { Divider } from "@mui/material";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 interface Props {
   caseSelectHandler: (selectedData: any) => void;
 }
 
+const dateToday = () => {
+  const date = new Date();
+  const isoString = date.toISOString();
+  const dateToday = isoString.split("T")[0];
+  return dateToday;
+};
+
 const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(dateToday());
   const [district, setDistrict] = useState("");
   const [depo, setDepo] = useState("");
   const [bonnetNo, setBonnetNo] = useState("");
@@ -17,9 +30,11 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
   const [allBusInfo, setAllbusinfo] = useState([]);
   const [filteredBusinfo, setFilteredbusInfo] = useState([]);
   const [allDepos, setAllDepos] = useState([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accidentReferenceNumber, setAccidentReferencenumber] =
     useState<string>("");
+  const bonnetNumberContainrerRef = useRef<HTMLDivElement | null>(null);
+  const bonnetnumberInputRef = useRef<HTMLInputElement | null>(null);
 
   // search handler
   const handleSearch = async () => {
@@ -30,7 +45,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
       return alert("select either filter or reference number");
 
     try {
-      setIsLoading(true);
+      !isLoading && setIsLoading(true);
 
       if (accidentReferenceNumber) {
         const response = await fetch(
@@ -68,6 +83,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
 
   // handle case select
   const handlecaseSelect = (selectedData: any) => {
+    // console.log(selectedData);
     caseSelectHandler(selectedData);
   };
 
@@ -104,8 +120,28 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
   };
 
   useEffect(() => {
+    handleSearch();
     getAllBusInfoHandler();
     getAllDepoHandler();
+  }, []);
+
+  useEffect(() => {
+    const handleBonnetNumberContainerClose = (event: MouseEvent) => {
+      if (
+        bonnetNumberContainrerRef.current &&
+        !bonnetNumberContainrerRef.current.contains(event?.target as Node) &&
+        bonnetnumberInputRef.current &&
+        !bonnetnumberInputRef.current.contains(event.target as Node)
+      ) {
+        setShowBonnetDropDown(false);
+      }
+    };
+
+    document.addEventListener("click", handleBonnetNumberContainerClose);
+
+    return () => {
+      document.removeEventListener("click", handleBonnetNumberContainerClose);
+    };
   }, []);
 
   return (
@@ -129,6 +165,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                 Bonnet No. /<span className="text-[10px]"> ബോണറ്റ് നമ്പർ</span>
               </label>
               <input
+                ref={bonnetnumberInputRef}
                 type="text"
                 placeholder="Bonnet number"
                 className="px-3 py-2 border rounded-sm"
@@ -137,7 +174,10 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                 onChange={handleSearchBonnetNumber}
               />
               {showBonnetDropDown && (
-                <div className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40">
+                <div
+                  ref={bonnetNumberContainrerRef}
+                  className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40 h-52 overflow-auto"
+                >
                   {filteredBusinfo.map((d: any) => (
                     <button
                       onClick={() => {
@@ -237,7 +277,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 py-5">
+      <div className="grid grid-cols-2 gap-3 py-5">
         {isLoading ? (
           <p>loading...</p>
         ) : !isLoading && accidentList && accidentList?.length < 1 ? (
@@ -250,18 +290,13 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
               className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer rounded-sm"
               onClick={() => handlecaseSelect(d)}
             >
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1">
                 <div className="font-semibold">
                   <label>Reference number:</label>
                   <label className="ml-1">
                     {d.accident_id.replaceAll("_", "/")}
                   </label>
                 </div>
-                <label>
-                  {dateToLocaleFormater(d.accident_details.date_of_accident)}
-                </label>
-              </div>
-              <div className="flex flex-col gap-1">
                 <p>
                   Bonnet number:{" "}
                   <span className="ml-1">{d.vehicle_info.bonet_no}</span>
@@ -273,6 +308,12 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                 <p>
                   Operated Depot:{" "}
                   <span className="ml-1">{d.location_info.operated_depot}</span>
+                </p>
+                <p>
+                  Accident Date:{" "}
+                  <span className="ml-1">
+                    {dateToLocaleFormater(d.accident_details.date_of_accident)}
+                  </span>
                 </p>
               </div>
             </div>

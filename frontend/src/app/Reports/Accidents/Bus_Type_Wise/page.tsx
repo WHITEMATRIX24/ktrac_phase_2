@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { ReportDataTable } from "@/components/reports/report_datatable";
+import { dateToLocaleFormater } from "@/utils/dateFormater";
 
 type AccidentData = {
   class: string;
@@ -105,7 +106,9 @@ const ParentAccidentReport = () => {
         columns={columns}
         data={tableData}
         searchKey="class"
-        tableLabel="Accident Report Table"
+        tableLabel={`Bus Type Wise Report (${dateToLocaleFormater(
+          startDate
+        )}) - (${dateToLocaleFormater(endDate)})`}
         startDate={startDate}
         startDateSetter={setStartDate}
         endDate={endDate}

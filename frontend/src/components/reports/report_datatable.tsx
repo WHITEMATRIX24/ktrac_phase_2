@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import React, { Dispatch, SetStateAction } from "react";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 import {
   Select,
   SelectContent,
@@ -81,21 +81,47 @@ export function ReportDataTable<TData, TValue>({
   });
 
   const exportToExcel = () => {
-    if (Object.keys(rowSelection).length > 0) {
-      const selectedRows = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original);
+    const formattedData = data.map((row: any) => {
+      const formattedRow: RowData = {};
+      columns.forEach((col: any) => {
+        const accessor = col.accessorKey || col.id;
+        formattedRow[accessor] = row[accessor];
+      });
+      return formattedRow;
+    });
 
-      const ws = XLSX.utils.json_to_sheet(selectedRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Report");
-      XLSX.writeFile(wb, "report.xlsx");
-      return;
-    }
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Report");
-    XLSX.writeFile(wb, "report.xlsx");
+    const ws_data = [
+      ["KSRTC REPORT"],
+      [tableLabel],
+      [],
+      columns.map((col) => col.header as string),
+      ...formattedData.map((item) =>
+        columns.map((col: any) => item[col.accessorKey || col.id])
+      ),
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(ws_data);
+
+    worksheet["A1"].s = {
+      font: { bold: true, sz: 16 },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "FFFF00" } },
+    };
+    worksheet["A2"].s = {
+      font: { italic: true, sz: 12 },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "FFCC99" } },
+    };
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: columns.length - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: columns.length - 1 } },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+    XLSX.writeFile(workbook, `${tableLabel}.xlsx`);
   };
 
   // export pdf
@@ -105,7 +131,7 @@ export function ReportDataTable<TData, TValue>({
       (val: any) => val.accessorKey as string
     );
     // .splice(1);
-    console.log(`header: ${header}`);
+    // console.log(`header: ${header}`);
 
     const pdfData: RowData[] = data.map((val) => val as RowData);
     const body = pdfData.map((row) => {
@@ -114,16 +140,24 @@ export function ReportDataTable<TData, TValue>({
         const value = row[smallLetterCols];
         if (value === undefined) {
           console.warn(`Missing value for column: ${col} in row:`, row);
-          return "nill";
+          return "";
         }
         return value;
       });
     });
-    console.log(`data: ${body}`);
+    // console.log(`data: ${body}`);
+
+    doc.setFontSize(20);
+    doc.text("KSRTC REPORT", 105, 10, { align: "center" });
+
+    doc.setFontSize(14);
+    doc.text(tableLabel, 13, 30, { align: "left" });
 
     autoTable(doc, {
       head: [header],
       body,
+      startY: 40,
+      margin: { horizontal: 13, vertical: 10 },
     });
     doc.save(tableLabel);
   };
@@ -183,7 +217,7 @@ export function ReportDataTable<TData, TValue>({
                 onClick={exportToExcel}
                 className="bg-green-700 px-3 py-1 rounded-sm text-sm text-white cursor-pointer"
               >
-                CSV Export
+                Excel Export
               </button>
             </PopoverContent>
           </Popover>
