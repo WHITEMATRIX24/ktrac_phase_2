@@ -10,6 +10,7 @@ import AddNewAccidentModal from "@/components/accident_management/add_new_accide
 import AddZerothReportModal from "@/components/accident_management/zerothreport_modal";
 import AccidentReportForm from "@/components/accident_management/zerothReportForm";
 import CombinedAccidentComponent from "@/components/accident_management/zerothreport_modal";
+import { react } from "plotly.js";
 
 const MapComponent = dynamic(() => import("@/components/MapComponent"), {
   ssr: false,
@@ -93,8 +94,22 @@ interface Bus {
   schedule_no: number;
   operated_depot: string;
 }
-
+interface PoliceStation {
+  id: number;
+  name: string;
+  district: string;
+  contact: string;
+}
+type PlaceSuggestion = {
+  lat: string;
+  lon: string;
+  display_name: string;
+};
 const PrimaryAccidentReport: React.FC = () => {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [suggestions, setSuggestions] = React.useState<PlaceSuggestion[]>([]);
+  const [debounceTimer, setDebounceTimer] = React.useState<NodeJS.Timeout | null>(null);
+
   const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(
     null
   );
@@ -117,6 +132,8 @@ const PrimaryAccidentReport: React.FC = () => {
   const [filteredConductors, setFilteredConductors] = React.useState<
     Conductor[]
   >([]);
+    const [showDepotDropdown, setShowDepotDropdown] = React.useState(false);
+  
   const [showConductorDropdown, setShowConductorDropdown] =
     React.useState(false);
   const zerothReportFilled = !!selectedReference;
@@ -124,6 +141,114 @@ const PrimaryAccidentReport: React.FC = () => {
     React.useState<boolean>(false);
   const [isVehicleSearchOpen, setIsVehicleModalSearch] =
     React.useState<boolean>(false);
+
+  const policeStations: PoliceStation[] = [
+    {
+      id: 1,
+      name: "Cantonment PS",
+      district: "Thiruvananthapuram",
+      contact: "0471‑2330248",
+    },
+    {
+      id: 2,
+      name: "Museum PS",
+      district: "Thiruvananthapuram",
+      contact: "0471‑2315096",
+    },
+    {
+      id: 3,
+      name: "Kollam East PS",
+      district: "Kollam",
+      contact: "0474‑2760000",
+    },
+    {
+      id: 4,
+      name: "Neendakara Coastal PS",
+      district: "Kollam",
+      contact: "0474‑2763333",
+    },
+    {
+      id: 5,
+      name: "Alappuzha North PS",
+      district: "Alappuzha",
+      contact: "0477‑2230804",
+    },
+    {
+      id: 6,
+      name: "Alappuzha Vallikunnam PS",
+      district: "Alappuzha",
+      contact: "0479‑2335240",
+    },
+    {
+      id: 7,
+      name: "Kozhikode Feroke PS",
+      district: "Kozhikode",
+      contact: "0495‑2482230",
+    },
+    {
+      id: 8,
+      name: "Malappuram PS",
+      district: "Malappuram",
+      contact: "0483‑2730000",
+    },
+    {
+      id: 9,
+      name: "Palakkad North PS",
+      district: "Palakkad",
+      contact: "0491‑2862264",
+    },
+    {
+      id: 10,
+      name: "Thrissur Town East PS",
+      district: "Thrissur",
+      contact: "0487‑2424192",
+    },
+    {
+      id: 11,
+      name: "Thrissur Town West PS",
+      district: "Thrissur",
+      contact: "0487‑2363608",
+    },
+    {
+      id: 12,
+      name: "Pathanamthitta PS",
+      district: "Pathanamthitta",
+      contact: "0468‑2222266",
+    },
+    {
+      id: 13,
+      name: "Kottayam East PS",
+      district: "Kottayam",
+      contact: "0481‑2560333",
+    },
+    { id: 14, name: "Idukki PS", district: "Idukki", contact: "04862‑232300" },
+    {
+      id: 15,
+      name: "Ernakulam North PS",
+      district: "Ernakulam",
+      contact: "0484‑2352100",
+    },
+    {
+      id: 16,
+      name: "Kannur Town PS",
+      district: "Kannur",
+      contact: "0497‑2722100",
+    },
+    {
+      id: 17,
+      name: "Wayanad Kalpetta PS",
+      district: "Wayanad",
+      contact: "04936‑282433",
+    },
+    {
+      id: 18,
+      name: "Kasargod PS",
+      district: "Kasargod",
+      contact: "04994‑235100",
+    },
+  ];
+
+
   const handleSearchModalClose = () => setIsReferenceModalSearch(false);
   const handleVehicleModalClose = () => setIsVehicleModalSearch(false);
   const initialFormState = {
@@ -207,14 +332,52 @@ const PrimaryAccidentReport: React.FC = () => {
   };
 
   const [formData, setFormData] = React.useState(initialFormState);
+  const [isSeverityManuallySet, setIsSeverityManuallySet] = React.useState(false);
+  const [depots, setDepots] = React.useState<{ name: string; abv: string }[]>([]);
+      const depotRef = React.useRef<HTMLDivElement>(null);
+          const [errors, setErrors] = React.useState<Record<string, string>>({});
+      
+  
+      const [filteredDepots, setFilteredDepots] = React.useState<{ name: string; abv: string }[]>([]);
+React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (depotRef.current && !depotRef.current.contains(event.target as Node)) {
+                setShowDepotDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+  React.useEffect(() => {
+          const fetchDepots = async () => {
+              try {
+                  const res = await fetch('/api/getAllDepo');
+                  const json = await res.json();
+                  const flatDepots = json.data?.flatMap((dist: any) =>
+                      dist.depot.map((d: any) => ({
+                          name: d["depot-name"],
+                          abv: d["depot-abv"]
+                      }))
+                  ) || [];
+                  setDepots(flatDepots);
+                  setFilteredDepots(flatDepots);
+              } catch (err) {
+                  console.error("Depot fetch error:", err);
+              }
+  
+          };
+          fetchDepots();
+      }, []);  
   const handleSearchSelect = (accidentData: any) => {
     console.log("accident", accidentData);
+    
     const mappedData: AccidentReference = {
       id: accidentData.accident_id,
       refNo: accidentData.accident_id,
       busNo: accidentData.vehicle_info.bonet_no,
       regNo: accidentData.vehicle_info.vehicle_register_no,
-      accidentPlace: accidentData.location_info.place,
+      accidentPlace: (accidentData.location_info.address).split(",")[0],
       accidentDate: accidentData.accident_details.date_of_accident,
       policeStation: accidentData.geolocation.nearest_police_station,
       timeOfAccident: accidentData.accident_details.time_of_accident,
@@ -256,7 +419,7 @@ const PrimaryAccidentReport: React.FC = () => {
       ageOfBus: mappedData.ageOfBus,
       accidentPlace: mappedData.accidentPlace,
       dateOfAccident: mappedData.accidentDate,
-      policeStation: mappedData.policeStation,
+      nearestPoliceStation: mappedData.policeStation,
       timeOfAccident: mappedData.timeOfAccident,
       homeDepot: mappedData.homeDepot,
       operatedDepot: mappedData.operatedDepot,
@@ -284,6 +447,8 @@ const PrimaryAccidentReport: React.FC = () => {
       totalMinorInjuries: 0,
     }));
   };
+  console.log(formData);
+  
 
   const handleVehicleSelect = (value: any) => {
     setSelectedVehicle(null);
@@ -303,11 +468,75 @@ const PrimaryAccidentReport: React.FC = () => {
       }));
     }
   };
+
+  const handleSearchChange = (e: any) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    const timer = setTimeout(async () => {
+      if (value.trim() === '') {
+        setSuggestions([]);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}`
+        );
+        const data = await res.json();
+        setSuggestions(data.slice(0, 5)); // show top 5
+      } catch (err) {
+        console.error('Error fetching suggestions:', err);
+      }
+    }, 500); // 500ms delay
+
+    setDebounceTimer(timer);
+  };
+  const handleSuggestionClick = (place: PlaceSuggestion) => {
+    setSearchQuery(place.display_name);
+    setSuggestions([]);
+    setFormData((prev) => ({
+      ...prev,
+      latitude: parseFloat(place.lat).toFixed(6),
+      longitude: parseFloat(place.lon).toFixed(6),
+    }));
+  };
+  const fetchPlaceName = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+      );
+      const data = await res.json();
+      return data.display_name || "Unknown location";
+    } catch (error) {
+      console.error("Error fetching place name:", error);
+      return "Unknown location";
+    }
+  };
+
+
+
+  const handleChangeSeverity = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+setIsSeverityManuallySet(true)
+  }
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
+    
     const { name, value } = e.target;
 
     const numericFields = [
@@ -336,8 +565,8 @@ const PrimaryAccidentReport: React.FC = () => {
       [name]: numericFields.includes(name)
         ? parseInt(value) || 0
         : booleanFields.includes(name)
-        ? value === "true"
-        : value,
+          ? value === "true"
+          : value,
     };
 
     const totalFatalities =
@@ -356,11 +585,20 @@ const PrimaryAccidentReport: React.FC = () => {
       Number(updatedFormData.minorInjuriesThirdParty);
     const costOfDamage = Number(updatedFormData.costOfDamage) || 0;
 
-    let severity = "not-defined";
+    if(!isSeverityManuallySet){
+      
+      let severity = "not-defined";
 
     if (totalFatalities > 0) {
       severity = "Fatal";
-    } else if (costOfDamage < 5000) {
+    }
+    else if (totalMajorInjuries || costOfDamage > 50000) {
+      severity = "Major";
+    }
+    else if (totalMinorInjuries || (costOfDamage <= 50000 && costOfDamage > 5000)) {
+      severity = "Minor";
+    }
+    else if (costOfDamage <= 5000) {
       severity = "Insignificant";
     } else if (costOfDamage <= 50000) {
       severity = "Minor";
@@ -368,13 +606,23 @@ const PrimaryAccidentReport: React.FC = () => {
       severity = "Major";
     }
 
+    console.log(severity);
+    
     setFormData({
       ...updatedFormData,
       totalFatalities,
       totalMajorInjuries,
       totalMinorInjuries,
       severity,
-    });
+    });}
+    else{
+      setFormData({
+      ...updatedFormData,
+      totalFatalities,
+      totalMajorInjuries,
+      totalMinorInjuries,
+    })
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -394,6 +642,8 @@ const PrimaryAccidentReport: React.FC = () => {
     setFormData(initialFormState);
     setAttachments([]);
     setActiveTab(0);
+    setSearchQuery("");
+    setIsSeverityManuallySet(false)
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -517,15 +767,57 @@ const PrimaryAccidentReport: React.FC = () => {
     handleCancel();
   };
   const [collisionOptions, setCollisionOptions] = React.useState<string[]>([
-    "Select Type of Collision",
-    "Head On Collision",
-    "Hit Behind By KSRTC",
-    "Hit Behind by Thrid Party",
-    "Hit Side by KSRTC",
-    "Hit Side by Thirdparty",
-    "Hit behind Serial",
-    "Hit Front by Ksrtc",
+    "Select Type of Collision (തകരാറിന്റെ തരം തിരഞ്ഞെടുക്കുക)",
+    "Head On Collision (മുൻഭാഗത്ത് മുട്ടിയ അപകടം)",
+    "Hit Behind By KSRTC (കെഎസ്ആർടിസി പിന്നിൽ ഇടിച്ച അപകടം)",
+    "Hit Behind by Third Party (മറ്റൊരാൾ പിന്നിൽ ഇടിച്ച അപകടം)",
+    "Hit Side by KSRTC (കെഎസ്ആർടിസി വശത്ത് ഇടിച്ച അപകടം)",
+    "Hit Side by Thirdparty (മറ്റൊരാൾ വശത്ത് ഇടിച്ച അപകടം)",
+    "Hit behind Serial (പിന്നിൽ അനുക്രമമായി ഇടിച്ച അപകടം)",
+    "Hit Front by KSRTC (കെഎസ്ആർടിസി മുൻഭാഗത്ത് ഇടിച്ച അപകടം)",
   ]);
+const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
+
+  const handleAccidentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({ ...prev, accidentType: e.target.value }));
+  };
+
+  const handleAddCustomAccidentType = () => {
+    if (customAccidentType.trim() && !accidentTypeList.includes(customAccidentType)) {
+      setAccidentTypeList((prev) => [...prev, customAccidentType]);
+      setFormData((prev) => ({ ...prev, accidentType: customAccidentType }));
+      setCustomAccidentType("");
+    }
+  };  
+  const [accidentTypeList, setAccidentTypeList] = React.useState<string[]>([
+      "Select Type of Accident (അപകടത്തിന്റെ തരം തിരഞ്ഞെടുക്കുക)",
+    "KSRTC-KSRTC",
+"KSRTC-KSWIFT",
+"KSRTC - TWO WHEELER",
+"KSRTC - AUTORIKSHAW",
+"KSRTC - FOUR WHEELER",
+"KSRTC - PICK UP",
+"KSRTC - PRIVATE BUS",
+"KSRTC - SCHOOLBUS",
+"KSRTC - LORRY",
+"KSRTC - TRUCK",
+"KSRTC - PEDESTRIAN",
+"KSRTC - OBJECT",
+"KSRTC - PASSANGER",
+"KSRTC - ANIMAL",
+"KSRTC - BICYCLE",
+"KSRTC - OTHER VEHICLE",
+"KSRTC - AMBULANCE",
+"CAUGHT FIRE",
+"FELL INTO DEPTH",
+"JUMP OVER HUMP",
+"SUDDEN BREAK",
+"MECHANICAL FAILURE",
+"PUBLIC THROW STONE",
+"FRONT GLASS BROKE WITHOUT ANY SPECIFIC REASON",
+
+  ]);
+
   const [customCollision, setCustomCollision] = React.useState<string>("");
 
   const handleCollisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -603,19 +895,19 @@ const PrimaryAccidentReport: React.FC = () => {
   // Define tabs conditionally based on zeroth report status
   const tabLabels = zerothReportFilled
     ? [
-        { label: "Details" },
-        { label: "Primary Details" },
-        { label: "Accident Overview" },
-        { label: "Damage & Inspection" },
-        { label: "Recovery" },
-      ]
+      { label: "Details" },
+      { label: "Primary Details" },
+      { label: "Accident Overview" },
+      { label: "Damage & Inspection" },
+      { label: "Recovery" },
+    ]
     : [
-        { label: "Zeroth Report" },
-        { label: "Primary Details" },
-        { label: "Accident Overview" },
-        { label: "Damage & Inspection" },
-        { label: "Recovery" },
-      ];
+      { label: "Zeroth Report" },
+      { label: "Primary Details" },
+      { label: "Accident Overview" },
+      { label: "Damage & Inspection" },
+      { label: "Recovery" },
+    ];
 
   return (
     <div className="my-0 text-xs">
@@ -671,7 +963,7 @@ const PrimaryAccidentReport: React.FC = () => {
                   <div>
                     <div className="flex flex-col">
                       {/* Tab Navigation */}
-                      <h2 className="text-[18px] font-[600] text-[var(--themeRed)] px-4 mb-2 text-center">
+                      <h2 className="text-[18px] font-[600] text-[var(--themeRed)] px-5 mb-2 text-right">
                         {" "}
                         {formData.accidentRefNo?.replaceAll("_", "/")}
                       </h2>
@@ -682,12 +974,11 @@ const PrimaryAccidentReport: React.FC = () => {
                               key={index}
                               type="button"
                               className={`flex items-center px-4 py-2.5 text-[14px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
-                                                                ${
-                                                                  activeTab ===
-                                                                  index
-                                                                    ? "text-[var(--sidebar-bg)] border-white bg-gray-500"
-                                                                    : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
-                                                                }`}
+                                                                ${activeTab ===
+                                  index
+                                  ? "text-[var(--sidebar-bg)] border-white bg-gray-500"
+                                  : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
+                                }`}
                               onClick={() => {
                                 setActiveTab(index);
                               }}
@@ -703,9 +994,8 @@ const PrimaryAccidentReport: React.FC = () => {
                         <div
                           className="h-full bg-[var(--sidebar-bg)] transition-all duration-300 ease-in-out"
                           style={{
-                            width: `${
-                              ((activeTab + 1) / tabLabels.length) * 100
-                            }%`,
+                            width: `${((activeTab + 1) / tabLabels.length) * 100
+                              }%`,
                           }}
                         />
                       </div>
@@ -1328,7 +1618,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Basic Details{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (അടിസ്ഥാന വിവരങ്ങൾ)
                               </span>
                             </h3>
@@ -1409,17 +1699,44 @@ const PrimaryAccidentReport: React.FC = () => {
                                     className="w-1/2 py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                   />
                                 </div>
+                                {/* Search Input for Location */}
+                                <div className="mt-2 relative z-50">
+                                  <input
+                                    type="text"
+                                    placeholder="Search a place (സ്ഥലം തിരയൂ)"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    className="w-full py-[8px] px-[12px] border border-gray-300 rounded text-xs"
+                                  />
+
+                                  {suggestions.length > 0 && (
+                                    <ul className="absolute z-100 bg-white border border-gray-300 rounded w-full max-h-40 overflow-y-auto text-xs shadow" style={{ zIndex: 10 }} >
+                                      {suggestions.map((place, idx) => (
+                                        <li
+                                          key={idx}
+                                          className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                                          onClick={() => handleSuggestionClick(place)}
+                                        >
+                                          {place.display_name}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+
 
                                 {/* Map using Leaflet */}
-                                <div className="mt-2 h-48 border rounded overflow-hidden">
+                                <div className="mt-2 h-48 border rounded overflow-visible relative z-10">
                                   {formData.latitude &&
-                                  formData.longitude &&
-                                  !isNaN(parseFloat(formData.latitude)) &&
-                                  !isNaN(parseFloat(formData.longitude)) ? (
+                                    formData.longitude &&
+                                    !isNaN(parseFloat(formData.latitude)) &&
+                                    !isNaN(parseFloat(formData.longitude)) ? (
                                     <MapComponent
                                       latitude={parseFloat(formData.latitude)}
                                       longitude={parseFloat(formData.longitude)}
-                                      onLocationChange={(lat, lng) => {
+                                      onLocationChange={async (lat, lng) => {
+                                        const placeName = await fetchPlaceName(lat, lng);
+                                        setSearchQuery(placeName)
                                         setFormData((prev) => ({
                                           ...prev,
                                           latitude: lat.toFixed(6),
@@ -1444,7 +1761,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Other Vehicle Involved{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (മറ്റ് വാഹനം ഉൾപ്പെട്ടത്)
                               </span>
                             </h3>
@@ -1491,7 +1808,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Accident Details{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (അപകട വിവരങ്ങൾ)
                               </span>
                             </h3>
@@ -1503,13 +1820,41 @@ const PrimaryAccidentReport: React.FC = () => {
                                     (അപകടത്തിന്റെ തരം)
                                   </span>
                                 </label>
-                                <input
+
+                                {/* <input
                                   type="text"
                                   name="accidentType"
                                   value={formData.accidentType}
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
-                                />
+                                /> */}
+                                <select
+                                  name="accidentType"
+                                  value={formData.accidentType}
+                                  onChange={handleAccidentTypeChange}
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
+                                >
+                                  
+                                  {accidentTypeList.map((opt) => (
+                                    <option key={opt} value={opt}>
+                                      {opt}
+                                    </option>
+                                  ))} 
+                                  <option value="custom">
+                                    ADD CUSTOM... (ഇഷ്ടാനുസൃതം ചേർക്കുക){" "}
+                                  </option> 
+                                </select>
+                                 {formData.accidentType === "custom" && (
+                                  <input
+                                    type="text"
+                                    value={customAccidentType}
+                                    onChange={(e) =>
+                                      setCustomAccidentType(e.target.value)
+                                    }
+                                    onBlur={handleAddCustomAccidentType}
+                                    className="w-full py-[8px] px-[12px] mt-[6px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  />
+                                )} 
                               </div>
 
                               <div>
@@ -1521,10 +1866,10 @@ const PrimaryAccidentReport: React.FC = () => {
                                 </label>
                                 <select
                                   name="accidentOccurred"
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px]  bg-white"
                                 >
-                                  <option value="">
-                                    Select Status (സ്ഥിതി തിരഞ്ഞെടുക്കുക)
+                                  <option value="" >
+                                    Select Status  (സ്ഥിതി തിരഞ്ഞെടുക്കുക)
                                   </option>
                                   <option value="Middle of Service">
                                     Middle of Service (സേവനത്തിന്റെ മധ്യത്തിൽ)
@@ -1545,23 +1890,44 @@ const PrimaryAccidentReport: React.FC = () => {
                                     (ഘർഷണത്തിന്റെ തരം)
                                   </span>
                                 </label>
+
                                 <select
                                   name="typeOfCollision"
                                   value={formData.typeOfCollision}
                                   onChange={handleCollisionChange}
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
                                 >
-                                  {collisionOptions.map((opt) => (
+                                  <option value="">
+                                    Select Type of Collision  (തകരാറിന്റെ തരം തിരഞ്ഞെടുക്കുക)
+                                  </option>
+                                  <option value="Head On Collision">
+                                    Head On Collision(മുൻഭാഗത്ത് മുട്ടിയ അപകടം)
+                                  </option>
+                                  <option value="Hit Behind By KSRTC">
+                                    Hit Behind By KSRTC (കെഎസ്ആർടിസി പിന്നിൽ ഇടിച്ച അപകടം)
+                                  </option>
+                                  <option value="Hit Behind by Third Party">
+                                    Hit Behind by Third Party(മറ്റൊരാൾ പിന്നിൽ ഇടിച്ച അപകടം)
+                                  </option><option value="Hit Side by KSRTC ">
+                                    Hit Side by KSRTC (കെഎസ്ആർടിസി വശത്ത് ഇടിച്ച അപകടം)
+                                  </option><option value="Hit Side by Thirdparty">
+                                    Hit Side by Thirdparty(മറ്റൊരാൾ വശത്ത് ഇടിച്ച അപകടം)
+                                  </option><option value="Hit behind Serial">
+                                    Hit behind Serial(പിന്നിൽ അനുക്രമമായി ഇടിച്ച അപകടം)
+                                  </option><option value="Hit Front by KSRTC">
+                                    Hit Front by KSRTC(കെഎസ്ആർടിസി മുൻഭാഗത്ത് ഇടിച്ച അപകടം)
+                                  </option>
+                                  {/* {collisionOptions.map((opt) => (
                                     <option key={opt} value={opt}>
                                       {opt}
                                     </option>
-                                  ))}
-                                  <option value="custom">
+                                  ))} */}
+                                  {/* <option value="custom">
                                     Add custom... (ഇഷ്ടാനുസൃതം ചേർക്കുക){" "}
-                                  </option>
+                                  </option> */}
                                 </select>
 
-                                {formData.typeOfCollision === "custom" && (
+                                {/* {formData.typeOfCollision === "custom" && (
                                   <input
                                     type="text"
                                     value={customCollision}
@@ -1571,7 +1937,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                     onBlur={handleAddCustomCollision}
                                     className="w-full py-[8px] px-[12px] mt-[6px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                   />
-                                )}
+                                )} */}
                               </div>
 
                               <div>
@@ -1581,12 +1947,12 @@ const PrimaryAccidentReport: React.FC = () => {
                                     (അപകടത്തിന്റെ പ്രാഥമിക കാരണം)
                                   </span>
                                 </label>
-                                <input
-                                  type="text"
+                                <textarea
                                   name="primaryCause"
                                   value={formData.primaryCause}
                                   onChange={handleChange}
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
+                                  rows={8} // adjust the number of rows as needed
                                 />
                               </div>
 
@@ -1611,9 +1977,9 @@ const PrimaryAccidentReport: React.FC = () => {
                           {/* RIGHT: Service Information */}
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
-                              Service Information{" "}
-                              <span className="text-[12px]">
-                                (സേവന വിവരങ്ങൾ)
+                              Accident Scene Conditions{" "}
+                              <span className="text-[14px]">
+                                (അപകടസ്ഥലത്തെ അവസ്ഥകൾ)
                               </span>
                             </h3>
                             <div className="space-y-4 p-[16px]">
@@ -1656,14 +2022,14 @@ const PrimaryAccidentReport: React.FC = () => {
                                 <label className="text-[12px] text-[#374151] mb-[6px]">
                                   Road Condition{" "}
                                   <span className="text-[10px]">
-                                    (റോഡിന്റെ അവസ്ഥ)
+                                    (റോഡിന്റെ അവസ്ഥ )
                                   </span>
                                 </label>
                                 <select
                                   name="roadCondition"
                                   value={formData.roadCondition}
                                   onChange={handleChange}
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
                                 >
                                   <option value="">
                                     Select Condition (അവസ്ഥ തിരഞ്ഞെടുക്കുക)
@@ -1690,7 +2056,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                   name="weatherCondition"
                                   value={formData.weatherCondition}
                                   onChange={handleChange}
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
                                 >
                                   <option value="">
                                     Select Condition (അവസ്ഥ തിരഞ്ഞെടുക്കുക)
@@ -1719,7 +2085,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                   name="trafficDensity"
                                   value={formData.trafficDensity}
                                   onChange={handleChange}
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
                                 >
                                   <option value="">
                                     Select Density (സാന്ദ്രത തിരഞ്ഞെടുക്കുക)
@@ -1757,7 +2123,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Damage & Inspection{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (നാശനഷ്ടവും പരിശോധനയും)
                               </span>
                             </h3>
@@ -1798,7 +2164,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                               <div>
                                 <label className="text-[12px] text-[#374151] mb-2 block">
-                                  Inquiry Inspector Name (Ksrtc){" "}
+                                  Inquiry Inspector Name (KSRTC){" "}
                                   <span className="text-[10px]">
                                     (വിചാരണ പരിശോധകരുടെ പേര് (കെ.എസ്.ആർ.ടി.സി))
                                   </span>
@@ -1814,7 +2180,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                               <div>
                                 <label className="text-[12px] text-[#374151] mb-2 block">
-                                  Inspector Phone No.{" "}
+                                  Inspector Phone Number{" "}
                                   <span className="text-[10px]">
                                     (പരിശോധകരുടെ ഫോൺ നമ്പർ)
                                   </span>
@@ -1828,19 +2194,55 @@ const PrimaryAccidentReport: React.FC = () => {
                                 />
                               </div>
 
-                              <div>
+                              <div ref={depotRef}>
                                 <label className="text-[12px] text-[#374151] mb-2 block">
                                   Jurisdiction (Depot){" "}
                                   <span className="text-[10px]">
                                     (അധികാരപരിധി (ഡിപ്പോ))
                                   </span>
                                 </label>
-                                <input
+                                {/* <input
                                   name="jurisdictionDepot"
                                   value={formData.jurisdictionDepot}
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                /> */}
+                                <input
+                                    name="jurisdictionDepot"
+                                    value={formData.jurisdictionDepot}
+                                    onChange={handleChange}
+                                    onFocus={() => setShowDepotDropdown(true)}
+                                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.operatedDepot ? 'border-red-500' : 'border-gray-300'}`}
+                                    placeholder="Search depot by name or abbreviation"
+                                    autoComplete="off"
                                 />
+                                {errors.operatedDepot && (
+                                    <p className="text-xs text-red-600 mt-1">{errors.operatedDepot}</p>
+                                )}
+                                {showDepotDropdown && (
+                                    <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
+                                        {filteredDepots.length === 0 ? (
+                                            <div className="p-3 text-center text-gray-500">
+                                                No matching depots  <span> അനുയോജ്യമായ ഡിപ്പോകൾ കണ്ടെത്തിയില്ല</span>
+                                            </div>
+                                        ) : (
+                                            <ul>
+                                                {filteredDepots.map((d, index) => (
+                                                    <li
+                                                        key={`depot-${d.abv}-${index}`}
+                                                        className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
+                                                        onClick={() => {
+                                                            setFormData(prev => ({ ...prev, operatedDepot: d.name }));
+                                                            setShowDepotDropdown(false);
+                                                        }}
+                                                    >
+                                                        {d.abv.toUpperCase()} - {d.name}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
                               </div>
                               <div>
                                 <label className="text-xs text-gray-700 mb-0 block">
@@ -1862,7 +2264,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Injury & Fatality Details{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (പരിക്കുകളും മരണങ്ങളും)
                               </span>
                             </h3>
@@ -2085,7 +2487,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Recovery Details{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (പുനരുപയോഗ വിവരങ്ങൾ)
                               </span>
                             </h3>
@@ -2279,7 +2681,7 @@ const PrimaryAccidentReport: React.FC = () => {
                           <div className="bg-white border-2 border-gray-400 rounded-[8px] overflow-auto">
                             <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
                               Cost & Settlement{" "}
-                              <span className="text-[12px]">
+                              <span className="text-[14px]">
                                 (ചെലവും തീർപ്പും)
                               </span>
                             </h3>
@@ -2323,14 +2725,32 @@ const PrimaryAccidentReport: React.FC = () => {
                                     (നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം)
                                   </span>
                                 </label>
-                                <input
+                                {/* <input
                                   type="text"
                                   name="severity"
                                   value={formData.severity}
                                   readOnly
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] bg-gray-100 rounded text-xs bg-white"
-                                />
+                                /> */}
+                                <select
+                                  name="severity"
+                                  value={formData.severity}
+                                  onChange={handleChangeSeverity}
+                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
+                                >
+                                  <option value="">
+                                    Select severity (നാശനഷ്ടത്തിനുള്ള സാന്ദ്രത തിരഞ്ഞെടുക്കുക)
+                                  </option>
+                                  <option value="Fatal">Fatal</option>
+                                  <option value="Major">
+                                    Major
+                                  </option>
+                                  <option value="Minor">Minor</option>
+                                  <option value="Insignificant">Insignificant</option>
+
+                                </select>
                               </div>
+
                               <div>
                                 <label className="text-[12px] text-[#374151] mb-[6px]">
                                   COD Settled with Other Vehicle (₹){" "}
@@ -2457,7 +2877,7 @@ const PrimaryAccidentReport: React.FC = () => {
 
                         {activeTab < tabLabels.length - 1 &&
                           (formData.severity === "Insignificantui" &&
-                          activeTab === 2 ? null : (
+                            activeTab === 2 ? null : (
                             <button
                               type="button"
                               onClick={() => setActiveTab(activeTab + 1)}

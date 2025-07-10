@@ -234,37 +234,47 @@ const ZerothReport = () => {
         latitude: '',
         longitude: '',
         policeStation: '',
+        policeStationName:"",
         policeStationContact: '',
     });
 
 
     const [formData, setFormData] = useState({
-        bonnetNumber: '',
-        timeOfAccident: '',
+        bonnetNumber: "",
+        timeOfAccident: "",
         dateOfAccident: new Date().toISOString().split("T")[0],
-        homeDepot: '',
-        operatedDepot: '',
-        scheduleNumber: '',
-        scheduleName: '',
-        description: '',
-        driverPenNo: '',
-        driverName: '',
-        driverPhone: '',
-        conductorPenNo: '',
-        conductorName: '',
-        conductorPhone: '',
-        nearestDepoName: '',
-        depotContact: '',
-        timeZone: '',
-    });
+        homeDepot: "",
+        operatedDepot: "",
+        scheduleNumber: "",
+        scheduleName: "",
+        description: "",
+        driverPenNo: "",
+        driverName: "",
+        driverPhone: "",
+        conductorPenNo: "",
+        conductorName: "",
+        conductorPhone: "",
+        nearestDepoId:"",
+        nearestDepoName: "",
+        depotContact: "",
+        timeZone: "",
+      });
 
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-
+    const [policeControlRoom, setPoliceControlRoom] = useState("")
+    const [nearestDepoNum, setNearestDepoNum] = useState("")
     const tabLabels = [
         { label: "Location Details" },
         { label: "Accident & Crew" },
         { label: "Documentation" }
     ];
+
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
     useEffect(() => {
         const data = sessionStorage.getItem('accidentData');
@@ -455,6 +465,7 @@ const ZerothReport = () => {
             latitude: lat,
             longitude: lon,
             policeStation: '',
+            policeStationName:"",
             policeStationContact: '',
         });
 
@@ -464,10 +475,10 @@ const ZerothReport = () => {
         setLocationQuery(display_name);
     };
 
-    const handleLocationChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setLocationData(prev => ({ ...prev, [name]: value }));
-    };
+   const handleLocationChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+     const { name, value } = e.target;
+     setLocationData((prev) => ({ ...prev, [name]: value }));
+   };
     const calculateTimeSlot = (time: string) => {
         if (!time) return '';
         const [hoursStr, minutesStr] = time.split(':');
@@ -518,6 +529,8 @@ const ZerothReport = () => {
                 policeStationName: station.name,
                 policeStationContact: station.contact
             }));
+                  setPoliceControlRoom(station.contact)
+
         } else {
             setLocationData(prev => ({
                 ...prev,
@@ -535,9 +548,12 @@ const ZerothReport = () => {
         if (depot) {
             setFormData(prev => ({
                 ...prev,
+                nearestDepoId:depot.id.toString(),
                 nearestDepoName: depot.name,
                 depotContact: depot.contact
             }));
+                  setNearestDepoNum(depot.contact)
+
         }
     };
 
@@ -623,7 +639,7 @@ const ZerothReport = () => {
                 geolocation: {
                     latitude: parseFloat(locationData.latitude),
                     longitude: parseFloat(locationData.longitude),
-                    nearest_police_station: locationData.policeStation,
+          nearest_police_station: locationData.policeStationName,
                     nearest_police_station_contact_number: locationData.policeStationContact,
                     timezone_info: {
                         timezone: "Asia/Kolkata",
@@ -710,9 +726,16 @@ const ZerothReport = () => {
     }
     return (
         <div className="min-h-screen bg-gray-50 text-xs flex flex-col">
-            <h2 className="text-[16px] px-4 font-semibold py-1 text-[var(--themeRed)] text-center">
-                {accidentRefernceId?.replaceAll('_', '/')}
-            </h2>
+            <div className='flex justify-center mt-3'>
+          <h2 className="ms-auto text-[16px] text-center font-semibold py-1 text-[var(--sidebar)]">
+            {accidentRefernceId?.replaceAll("_", "/")}
+          </h2>
+          <div className='flex ms-auto'>
+           {policeControlRoom &&( <h6 className='text-[14px] text-blue-600 text-center'>ControlRoom Number {"  "}{policeControlRoom}</h6>)}
+                      {nearestDepoNum &&( <h6 className='text-[14px] text-blue-600 text-center ms-3'>Depo Number{" "}{nearestDepoNum}</h6>)}
+
+          </div>
+        </div>
             {/* Main Form Content */}
             <div className="flex flex-col flex-1 mt-2">
                 <div className="flex flex-col flex-1">
@@ -791,17 +814,35 @@ const ZerothReport = () => {
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 px-[16px]"> {/* Increased gap and mb */}
-                                        <div className="flex flex-col h-full"> {/* Flex container */}
-                                            <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
-                                                Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
-                                            </label>
-                                            <input
-                                                name="district"
-                                                value={locationData.district}
-                                                onChange={handleLocationChange}
-                                                className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
-                                            />
-                                        </div>
+                                         <div className="flex flex-col h-full">
+  {/* Flex container */}
+  <label className="text-[12px] text-gray-700 mb-2">
+    Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
+  </label>
+  <select
+    name="district"
+     value={locationData.district}
+    onChange={handleLocationChange}
+    className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
+  >
+    <option value="">Select District</option>
+    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+    <option value="Kollam">Kollam</option>
+    <option value="Pathanamthitta">Pathanamthitta</option>
+    <option value="Alappuzha">Alappuzha</option>
+    <option value="Kottayam">Kottayam</option>
+    <option value="Idukki">Idukki</option>
+    <option value="Ernakulam">Ernakulam</option>
+    <option value="Thrissur">Thrissur</option>
+    <option value="Palakkad">Palakkad</option>
+    <option value="Malappuram">Malappuram</option>
+    <option value="Kozhikode">Kozhikode</option>
+    <option value="Wayanad">Wayanad</option>
+    <option value="Kannur">Kannur</option>
+    <option value="Kasaragod">Kasaragod</option>
+  </select>
+</div>
+
                                         <div className="flex flex-col h-full"> {/* Flex container */}
                                             <label className="text-[12px] text-gray-700 mb-2 "> {/* min-height */}
                                                 Accident State (<MalayalamText text="അപകടം നടന്ന സംസ്ഥാനം" />)
@@ -882,7 +923,7 @@ const ZerothReport = () => {
                                                 Nearest Depot (<MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />)
                                             </label>
                                             <select
-                                                value={formData.nearestDepoName}
+                                                value={formData.nearestDepoId}
                                                 onChange={handleDepotSelect}
                                                 className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                                             >

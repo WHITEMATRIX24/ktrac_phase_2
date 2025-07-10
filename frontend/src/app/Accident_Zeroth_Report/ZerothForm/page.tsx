@@ -1,5 +1,5 @@
 "use client";
-
+import dynamic from 'next/dynamic';
 import React, {
   useState,
   useEffect,
@@ -10,7 +10,17 @@ import React, {
 } from "react";
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+import 'leaflet/dist/leaflet.css'; // ✅ required
+// import CurrentLocationMap from '@/components/CurrentLocationMap';
+// const LiveMap = dynamic(() => import('@/components/LiveMap'), {
+//   ssr: false,
+// });
+/* const LiveGoogleMap = dynamic(() => import('@/components/LiveGoogleMap'), {
+  ssr: false,
+});
+const CurrentLocationMap  = dynamic(() => import('@/components/LiveGoogleMap'), {
+  ssr: false,
+}); */
 type MediaFile = {
   id: string;
   url: string;
@@ -690,6 +700,7 @@ const ZerothReport = () => {
     latitude: "",
     longitude: "",
     policeStation: "",
+    policeStationName:"",
     policeStationContact: "",
   });
 
@@ -708,6 +719,7 @@ const ZerothReport = () => {
     conductorPenNo: "",
     conductorName: "",
     conductorPhone: "",
+    nearestDepoId:"",
     nearestDepoName: "",
     depotContact: "",
     timeZone: "",
@@ -715,11 +727,21 @@ const ZerothReport = () => {
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
+  const [policeControlRoom, setPoliceControlRoom] = useState("")
+  const [nearestDepoNum, setNearestDepoNum] = useState("")
   const tabLabels = [
     { label: "Location Details" },
     { label: "Accident & Crew" },
     { label: "Documentation" },
   ];
+
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
 
   useEffect(() => {
     const data = sessionStorage.getItem("accidentData");
@@ -936,6 +958,7 @@ const ZerothReport = () => {
               latitude: lat,
               longitude: lon,
               policeStation: "",
+              policeStationName:"",
               policeStationContact: "",
             });
 
@@ -978,10 +1001,10 @@ const ZerothReport = () => {
     }
   };
 
-  const handleLocationChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLocationData((prev) => ({ ...prev, [name]: value }));
-  };
+ const handleLocationChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setLocationData((prev) => ({ ...prev, [name]: value }));
+};
 
   const handlePoliceStationSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     const stationId = parseInt(e.target.value);
@@ -993,7 +1016,8 @@ const ZerothReport = () => {
         policeStation: station.id.toString(),
         policeStationName: station.name,
         policeStationContact: station.contact,
-      }));
+      }));      
+      setPoliceControlRoom(station.contact)
     } else {
       setLocationData((prev) => ({
         ...prev,
@@ -1011,9 +1035,12 @@ const ZerothReport = () => {
     if (depot) {
       setFormData((prev) => ({
         ...prev,
+        nearestDepoId:depot.id.toString(),
         nearestDepoName: depot.name,
         depotContact: depot.contact,
       }));
+      setNearestDepoNum(depot.contact)
+      
     }
   };
 
@@ -1101,7 +1128,7 @@ const ZerothReport = () => {
         geolocation: {
           latitude: parseFloat(locationData.latitude),
           longitude: parseFloat(locationData.longitude),
-          nearest_police_station: locationData.policeStation,
+          nearest_police_station: locationData.policeStationName,
           nearest_police_station_contact_number:
             locationData.policeStationContact,
           timezone_info: {
@@ -1209,9 +1236,16 @@ const ZerothReport = () => {
           </button>
         </div>
 
-        <h2 className="text-[16px] text-center font-semibold py-1 text-[var(--sidebar)]">
-          {accidentRefernceId?.replaceAll("_", "/")}
-        </h2>
+        <div className='flex justify-center mt-3'>
+          <h2 className="ms-auto text-[16px] text-center font-semibold py-1 text-[var(--sidebar)]">
+            {accidentRefernceId?.replaceAll("_", "/")}
+          </h2>
+          <div className='flex ms-auto'>
+           {policeControlRoom &&( <h6 className='text-[14px] text-blue-600 text-center'>ControlRoom Number {"  "}{policeControlRoom}</h6>)}
+                      {nearestDepoNum &&( <h6 className='text-[14px] text-blue-600 text-center ms-3'>Depo Number{" "}{nearestDepoNum}</h6>)}
+
+          </div>
+        </div>
       </div>
 
       {/* Main Form Content */}
@@ -1298,22 +1332,35 @@ const ZerothReport = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       {" "}
                       {/* Increased gap and mb */}
-                      <div className="flex flex-col h-full">
-                        {" "}
-                        {/* Flex container */}
-                        <label className="text-[12px] text-gray-700 mb-2 ">
-                          {" "}
-                          {/* min-height */}
-                          Accident District (
-                          <MalayalamText text="അപകടം നടന്ന ജില്ല" />)
-                        </label>
-                        <input
-                          name="district"
-                          value={locationData.district}
-                          onChange={handleLocationChange}
-                          className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
-                        />
-                      </div>
+                   <div className="flex flex-col h-full">
+  {/* Flex container */}
+  <label className="text-[12px] text-gray-700 mb-2">
+    Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
+  </label>
+  <select
+    name="district"
+     value={locationData.district}
+    onChange={handleLocationChange}
+    className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
+  >
+    <option value="">Select District</option>
+    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+    <option value="Kollam">Kollam</option>
+    <option value="Pathanamthitta">Pathanamthitta</option>
+    <option value="Alappuzha">Alappuzha</option>
+    <option value="Kottayam">Kottayam</option>
+    <option value="Idukki">Idukki</option>
+    <option value="Ernakulam">Ernakulam</option>
+    <option value="Thrissur">Thrissur</option>
+    <option value="Palakkad">Palakkad</option>
+    <option value="Malappuram">Malappuram</option>
+    <option value="Kozhikode">Kozhikode</option>
+    <option value="Wayanad">Wayanad</option>
+    <option value="Kannur">Kannur</option>
+    <option value="Kasaragod">Kasaragod</option>
+  </select>
+</div>
+
                       <div className="flex flex-col h-full">
                         {" "}
                         {/* Flex container */}
@@ -1364,7 +1411,10 @@ const ZerothReport = () => {
                         />
                       </div>
                     </div>
-                  </div>
+                     {/* <div>  <LiveMap/></div> */}
+                      {/* <div>  <LiveGoogleMap/></div> */}
+{/*                          <div>  <CurrentLocationMap/></div>
+ */}                  </div>
                 </div>
                 {/* Second Column - Nearby Assistance */}
                 <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
@@ -1433,7 +1483,7 @@ const ZerothReport = () => {
                           )
                         </label>
                         <select
-                          value={formData.nearestDepoName}
+                          value={formData.nearestDepoId}
                           onChange={handleDepotSelect}
                           className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white" /* mt-auto */
                         >
