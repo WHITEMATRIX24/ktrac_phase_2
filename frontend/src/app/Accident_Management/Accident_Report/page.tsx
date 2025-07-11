@@ -132,8 +132,9 @@ const PrimaryAccidentReport: React.FC = () => {
   const [filteredConductors, setFilteredConductors] = React.useState<
     Conductor[]
   >([]);
-    const [showDepotDropdown, setShowDepotDropdown] = React.useState(false);
-  
+  const [showDepotDropdown, setShowDepotDropdown] = React.useState(false);
+
+
   const [showConductorDropdown, setShowConductorDropdown] =
     React.useState(false);
   const zerothReportFilled = !!selectedReference;
@@ -334,44 +335,44 @@ const PrimaryAccidentReport: React.FC = () => {
   const [formData, setFormData] = React.useState(initialFormState);
   const [isSeverityManuallySet, setIsSeverityManuallySet] = React.useState(false);
   const [depots, setDepots] = React.useState<{ name: string; abv: string }[]>([]);
-      const depotRef = React.useRef<HTMLDivElement>(null);
-          const [errors, setErrors] = React.useState<Record<string, string>>({});
-      
-  
-      const [filteredDepots, setFilteredDepots] = React.useState<{ name: string; abv: string }[]>([]);
-React.useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (depotRef.current && !depotRef.current.contains(event.target as Node)) {
-                setShowDepotDropdown(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+  const depotRef = React.useRef<HTMLDivElement>(null);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+
+
+  const [filteredDepots, setFilteredDepots] = React.useState<{ name: string; abv: string }[]>([]);
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (depotRef.current && !depotRef.current.contains(event.target as Node)) {
+        setShowDepotDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   React.useEffect(() => {
-          const fetchDepots = async () => {
-              try {
-                  const res = await fetch('/api/getAllDepo');
-                  const json = await res.json();
-                  const flatDepots = json.data?.flatMap((dist: any) =>
-                      dist.depot.map((d: any) => ({
-                          name: d["depot-name"],
-                          abv: d["depot-abv"]
-                      }))
-                  ) || [];
-                  setDepots(flatDepots);
-                  setFilteredDepots(flatDepots);
-              } catch (err) {
-                  console.error("Depot fetch error:", err);
-              }
-  
-          };
-          fetchDepots();
-      }, []);  
+    const fetchDepots = async () => {
+      try {
+        const res = await fetch('/api/getAllDepo');
+        const json = await res.json();
+        const flatDepots = json.data?.flatMap((dist: any) =>
+          dist.depot.map((d: any) => ({
+            name: d["depot-name"],
+            abv: d["depot-abv"]
+          }))
+        ) || [];
+        setDepots(flatDepots);
+        setFilteredDepots(flatDepots);
+      } catch (err) {
+        console.error("Depot fetch error:", err);
+      }
+
+    };
+    fetchDepots();
+  }, []);
   const handleSearchSelect = (accidentData: any) => {
     console.log("accident", accidentData);
-    
+
     const mappedData: AccidentReference = {
       id: accidentData.accident_id,
       refNo: accidentData.accident_id,
@@ -447,8 +448,7 @@ React.useEffect(() => {
       totalMinorInjuries: 0,
     }));
   };
-  console.log(formData);
-  
+
 
   const handleVehicleSelect = (value: any) => {
     setSelectedVehicle(null);
@@ -523,20 +523,20 @@ React.useEffect(() => {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    
+
     const { name, value } = e.target;
     setFormData((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-setIsSeverityManuallySet(true)
+      ...prev,
+      [name]: value,
+    }));
+    setIsSeverityManuallySet(true)
   }
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    
+
     const { name, value } = e.target;
 
     const numericFields = [
@@ -585,46 +585,73 @@ setIsSeverityManuallySet(true)
       Number(updatedFormData.minorInjuriesThirdParty);
     const costOfDamage = Number(updatedFormData.costOfDamage) || 0;
 
-    if(!isSeverityManuallySet){
-      
+    if (!isSeverityManuallySet) {
+
       let severity = "not-defined";
 
-    if (totalFatalities > 0) {
-      severity = "Fatal";
-    }
-    else if (totalMajorInjuries || costOfDamage > 50000) {
-      severity = "Major";
-    }
-    else if (totalMinorInjuries || (costOfDamage <= 50000 && costOfDamage > 5000)) {
-      severity = "Minor";
-    }
-    else if (costOfDamage <= 5000) {
-      severity = "Insignificant";
-    } else if (costOfDamage <= 50000) {
-      severity = "Minor";
-    } else {
-      severity = "Major";
-    }
+      if (totalFatalities > 0) {
+        severity = "Fatal";
+      }
+      else if (totalMajorInjuries || costOfDamage > 50000) {
+        severity = "Major";
+      }
+      else if (totalMinorInjuries || (costOfDamage <= 50000 && costOfDamage > 5000)) {
+        severity = "Minor";
+      }
+      else if (costOfDamage <= 5000) {
+        severity = "Insignificant";
+      } else if (costOfDamage <= 50000) {
+        severity = "Minor";
+      } else {
+        severity = "Major";
+      }
 
-    console.log(severity);
-    
-    setFormData({
-      ...updatedFormData,
-      totalFatalities,
-      totalMajorInjuries,
-      totalMinorInjuries,
-      severity,
-    });}
-    else{
+      console.log(severity);
+
       setFormData({
-      ...updatedFormData,
-      totalFatalities,
-      totalMajorInjuries,
-      totalMinorInjuries,
-    })
+        ...updatedFormData,
+        totalFatalities,
+        totalMajorInjuries,
+        totalMinorInjuries,
+        severity,
+      });
+    }
+    else {
+      setFormData({
+        ...updatedFormData,
+        totalFatalities,
+        totalMajorInjuries,
+        totalMinorInjuries,
+      })
     }
   };
 
+  const handleChangeDepoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+
+      const term = value.toLowerCase();
+
+    if (name === 'jurisdictionDepot') {
+      setFormData(prev => ({ ...prev, [name]: value }));
+      setFilteredDepots(
+        depots.filter(d =>
+          d.name.toLowerCase().includes(term) || d.abv.toLowerCase().includes(term)
+        )
+      );
+      setShowDepotDropdown(true);
+    }
+    else if (name == 'homeDepot')
+      setFormData(prev => ({ ...prev, [name]: value }));
+      setFilteredDepots(
+        depots.filter(d =>
+          d.name.toLowerCase().includes(term) || d.abv.toLowerCase().includes(term)
+        )
+      );
+      setShowDepotDropdown(true);
+
+  };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
@@ -776,7 +803,7 @@ setIsSeverityManuallySet(true)
     "Hit behind Serial (പിന്നിൽ അനുക്രമമായി ഇടിച്ച അപകടം)",
     "Hit Front by KSRTC (കെഎസ്ആർടിസി മുൻഭാഗത്ത് ഇടിച്ച അപകടം)",
   ]);
-const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
+  const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
 
   const handleAccidentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, accidentType: e.target.value }));
@@ -788,37 +815,44 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
       setFormData((prev) => ({ ...prev, accidentType: customAccidentType }));
       setCustomAccidentType("");
     }
-  };  
+  };
   const [accidentTypeList, setAccidentTypeList] = React.useState<string[]>([
-      "Select Type of Accident (അപകടത്തിന്റെ തരം തിരഞ്ഞെടുക്കുക)",
+    "Select Type of Accident (അപകടത്തിന്റെ തരം തിരഞ്ഞെടുക്കുക)",
     "KSRTC-KSRTC",
-"KSRTC-KSWIFT",
-"KSRTC - TWO WHEELER",
-"KSRTC - AUTORIKSHAW",
-"KSRTC - FOUR WHEELER",
-"KSRTC - PICK UP",
-"KSRTC - PRIVATE BUS",
-"KSRTC - SCHOOLBUS",
-"KSRTC - LORRY",
-"KSRTC - TRUCK",
-"KSRTC - PEDESTRIAN",
-"KSRTC - OBJECT",
-"KSRTC - PASSANGER",
-"KSRTC - ANIMAL",
-"KSRTC - BICYCLE",
-"KSRTC - OTHER VEHICLE",
-"KSRTC - AMBULANCE",
-"CAUGHT FIRE",
-"FELL INTO DEPTH",
-"JUMP OVER HUMP",
-"SUDDEN BREAK",
-"MECHANICAL FAILURE",
-"PUBLIC THROW STONE",
-"FRONT GLASS BROKE WITHOUT ANY SPECIFIC REASON",
+    "KSRTC-KSWIFT",
+    "KSRTC - TWO WHEELER",
+    "KSRTC - AUTORIKSHAW",
+    "KSRTC - FOUR WHEELER",
+    "KSRTC - PICK UP",
+    "KSRTC - PRIVATE BUS",
+    "KSRTC - SCHOOLBUS",
+    "KSRTC - LORRY",
+    "KSRTC - TRUCK",
+    "KSRTC - PEDESTRIAN",
+    "KSRTC - OBJECT",
+    "KSRTC - PASSANGER",
+    "KSRTC - ANIMAL",
+    "KSRTC - BICYCLE",
+    "KSRTC - OTHER VEHICLE",
+    "KSRTC - AMBULANCE",
+    "CAUGHT FIRE",
+    "FELL INTO DEPTH",
+    "JUMP OVER HUMP",
+    "SUDDEN BREAK",
+    "MECHANICAL FAILURE",
+    "PUBLIC THROW STONE",
+    "FRONT GLASS BROKE WITHOUT ANY SPECIFIC REASON",
 
   ]);
 
   const [customCollision, setCustomCollision] = React.useState<string>("");
+  const [customPrimaryResponsibility, setcustomPrimaryResponsibility] = React.useState<string>("");
+  const handleAddCustomPrimaryResponsibility = () => {
+    if (customPrimaryResponsibility.trim()) {
+      setFormData((prev) => ({ ...prev, primaryResponsibility: customPrimaryResponsibility }));
+      setcustomPrimaryResponsibility("");
+    }
+  };
 
   const handleCollisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, typeOfCollision: e.target.value }));
@@ -883,7 +917,7 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
     }
   };
   /*   console.log(formData);
- */  
+ */
   const handleConductorSelect = (conductor: Conductor) => {
     setFormData((prev) => ({
       ...prev,
@@ -893,19 +927,23 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
     setConductorSearchTearm(conductor.gNumber);
     setShowConductorDropdown(false);
   };
-   
+
   const handleJurisdictionDepo = (depo: string) => {
-    console.log('inside');
-    
-    console.log(depo);
-    
+
     setFormData((prev) => ({
       ...prev,
       jurisdictionDepot: depo,
     }));
     setShowDepotDropdown(false);
   };
+const handleHomeDepo = (depo: string) => {
 
+    setFormData((prev) => ({
+      ...prev,
+      homeDepot: depo,
+    }));
+    setShowDepotDropdown(false);
+  };
   // Define tabs conditionally based on zeroth report status
   const tabLabels = zerothReportFilled
     ? [
@@ -1062,7 +1100,8 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-gray-100"
                                   readOnly
-                                />
+                                /> 
+                               
                               </div>
 
                               <div>
@@ -1678,13 +1717,50 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                     (ഹോം ഡിപ്പോ)
                                   </span>
                                 </label>
-                                <input
+                                {/* <input
                                   type="text"
                                   name="homeDepot"
                                   value={formData.homeDepot}
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
+                                /> */}
+                                 <input
+                                  name="homeDepot"
+                                  value={formData.homeDepot}
+                                  onChange={handleChangeDepoSelect}
+                                  onFocus={() => setShowDepotDropdown(true)}
+                                  className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.jurisdictionDepot ? 'border-red-500' : 'border-gray-300'}`}
+                                  placeholder="Search depot by name or abbreviation"
+                                  autoComplete="off"
                                 />
+                                {errors.homeDepot && (
+                                  <p className="text-xs text-red-600 mt-1">{errors.homeDepot}</p>
+                                )}
+                                {showDepotDropdown && (
+                                  <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
+                                    {filteredDepots.length === 0 ? (
+                                      <div className="p-3 text-center text-gray-500">
+                                        No matching depots  <span> അനുയോജ്യമായ ഡിപ്പോകൾ കണ്ടെത്തിയില്ല</span>
+                                      </div>
+                                    ) : (
+                                      <ul>
+                                        {filteredDepots.map((d, index) => (
+                                          <li
+                                            key={`depot-${d.abv}-${index}`}
+                                            className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
+                                            onClick={() =>
+                                              handleHomeDepo(d.name)
+
+
+                                            }
+                                          >
+                                            {d.abv.toUpperCase()} - {d.name}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+                                )}
                               </div>
 
                               {/* Location Input + Map */}
@@ -1848,17 +1924,17 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                   onChange={handleAccidentTypeChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px] bg-white"
                                 >
-                                  
+
                                   {accidentTypeList.map((opt) => (
                                     <option key={opt} value={opt}>
                                       {opt}
                                     </option>
-                                  ))} 
+                                  ))}
                                   <option value="custom">
                                     ADD CUSTOM... (ഇഷ്ടാനുസൃതം ചേർക്കുക){" "}
-                                  </option> 
+                                  </option>
                                 </select>
-                                 {formData.accidentType === "custom" && (
+                                {formData.accidentType === "custom" && (
                                   <input
                                     type="text"
                                     value={customAccidentType}
@@ -1868,7 +1944,7 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                     onBlur={handleAddCustomAccidentType}
                                     className="w-full py-[8px] px-[12px] mt-[6px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                   />
-                                )} 
+                                )}
                               </div>
 
                               <div>
@@ -1971,20 +2047,54 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                               </div>
 
                               <div>
-                                <label className="text-[12px] text-[#374151] mb-[6px]">
+                                <label className="text-[12px] text-[#374151] mb-[6px] block">
                                   Primary Responsibility for the Accident{" "}
                                   <span className="text-[10px]">
                                     (അപകടത്തിനുള്ള പ്രാഥമിക ഉത്തരവാദിത്തം)
                                   </span>
                                 </label>
-                                <input
-                                  type="text"
+
+                                <select
                                   name="primaryResponsibility"
                                   value={formData.primaryResponsibility}
                                   onChange={handleChange}
-                                  className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
-                                />
+                                  className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
+                                >
+                                  <option value="">Select Responsibility</option>
+                                  <option value="KSRTC Driver">KSRTC Driver</option>
+                                  <option value="KSWIFT Driver">KSWIFT Driver</option>
+                                  <option value="Two Wheeler Driver">Two Wheeler Driver</option>
+                                  <option value="For Wheeler Driver">For Wheeler Driver</option>
+                                  <option value="Pedestrian">Pedestrian</option>
+                                  <option value="Passenger">Passenger</option>
+                                  <option value="Cyclist">Cyclist</option>
+                                  <option value="Both Drivers">Both Drivers</option>
+                                  <option value="Mechanical Defect">Mechanical Defect</option>
+                                  <option value="Autorickshaw Driver">Autorickshaw Driver</option>
+                                  <option value="Private Bus Driver">Private Bus Driver</option>
+                                  <option value="Lorry Driver">Lorry Driver</option>
+                                  <option value="Truck Driver">Truck Driver</option>
+                                  <option value="Ambulance Driver">Ambulance Driver</option>
+                                  <option value="Other">Other</option>
+                                </select>
+
+                                {/* Show text input if 'Other' is selected */}
+                                {formData.primaryResponsibility === "Other" && (
+                                  <input
+                                    type="text"
+                                    name="customPrimaryResponsibility"
+                                    value={customPrimaryResponsibility || ""}
+                                    onChange={(e) =>
+                                      setcustomPrimaryResponsibility(e.target.value)
+                                    }
+                                    onBlur={handleAddCustomPrimaryResponsibility}
+                                    placeholder="Enter custom responsibility"
+                                    className="mt-2 w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
+                                  />
+                                )}
                               </div>
+
+
                             </div>
                           </div>
 
@@ -2222,41 +2332,41 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                 /> */}
                                 <input
-                                    name="jurisdictionDepot"
-                                    value={formData.jurisdictionDepot}
-                                    onChange={handleChange}
-                                    onFocus={() => setShowDepotDropdown(true)}
-                                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.jurisdictionDepot ? 'border-red-500' : 'border-gray-300'}`}
-                                    placeholder="Search depot by name or abbreviation"
-                                    autoComplete="off"
+                                  name="jurisdictionDepot"
+                                  value={formData.jurisdictionDepot}
+                                  onChange={handleChangeDepoSelect}
+                                  onFocus={() => setShowDepotDropdown(true)}
+                                  className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.jurisdictionDepot ? 'border-red-500' : 'border-gray-300'}`}
+                                  placeholder="Search depot by name or abbreviation"
+                                  autoComplete="off"
                                 />
                                 {errors.jurisdictionDepot && (
-                                    <p className="text-xs text-red-600 mt-1">{errors.jurisdictionDepot}</p>
+                                  <p className="text-xs text-red-600 mt-1">{errors.jurisdictionDepot}</p>
                                 )}
                                 {showDepotDropdown && (
-                                    <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
-                                        {filteredDepots.length === 0 ? (
-                                            <div className="p-3 text-center text-gray-500">
-                                                No matching depots  <span> അനുയോജ്യമായ ഡിപ്പോകൾ കണ്ടെത്തിയില്ല</span>
-                                            </div>
-                                        ) : (
-                                            <ul>
-                                                {filteredDepots.map((d, index) => (
-                                                    <li
-                                                        key={`depot-${d.abv}-${index}`}
-                                                        className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
-                                                        onClick={() => 
-                                                          handleJurisdictionDepo(d.name)
-                                                          
-              
-                                                        }
-                                                    >
-                                                        {d.abv.toUpperCase()} - {d.name}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
+                                  <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
+                                    {filteredDepots.length === 0 ? (
+                                      <div className="p-3 text-center text-gray-500">
+                                        No matching depots  <span> അനുയോജ്യമായ ഡിപ്പോകൾ കണ്ടെത്തിയില്ല</span>
+                                      </div>
+                                    ) : (
+                                      <ul>
+                                        {filteredDepots.map((d, index) => (
+                                          <li
+                                            key={`depot-${d.abv}-${index}`}
+                                            className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
+                                            onClick={() =>
+                                              handleJurisdictionDepo(d.name)
+
+
+                                            }
+                                          >
+                                            {d.abv.toUpperCase()} - {d.name}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                               <div>

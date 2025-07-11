@@ -11,16 +11,25 @@ import React, {
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import 'leaflet/dist/leaflet.css'; // ✅ required
-// import CurrentLocationMap from '@/components/CurrentLocationMap';
+import VideoUploader from '@/components/accident_management/videoUploader';
+import MapComponent from '@/components/MapComponent';
+// import MapmyIndiaLiveLocation from '@/components/MapmyIndiaLiveLocation';
+// const MapmyIndiaLiveLocation = dynamic(() => import('@/components/MapmyIndiaLiveLocation'), {
+//   ssr: false,
+// });
+// import TomTomLiveMap from '@/components/TomTomLiveMap';
+// Dynamically import with SSR off to prevent hydration mismatch
+const TomTomLiveMap = dynamic(() => import('@/components/TomTomLiveMap'), {
+  ssr: false,
+});
+
 // const LiveMap = dynamic(() => import('@/components/LiveMap'), {
 //   ssr: false,
 // });
-/* const LiveGoogleMap = dynamic(() => import('@/components/LiveGoogleMap'), {
-  ssr: false,
-});
-const CurrentLocationMap  = dynamic(() => import('@/components/LiveGoogleMap'), {
-  ssr: false,
-}); */
+
+// const CurrentLocationMap  = dynamic(() => import('@/components/CurrentLocationMap'), {
+//   ssr: false,
+// });
 type MediaFile = {
   id: string;
   url: string;
@@ -700,7 +709,7 @@ const ZerothReport = () => {
     latitude: "",
     longitude: "",
     policeStation: "",
-    policeStationName:"",
+    policeStationName: "",
     policeStationContact: "",
   });
 
@@ -719,7 +728,7 @@ const ZerothReport = () => {
     conductorPenNo: "",
     conductorName: "",
     conductorPhone: "",
-    nearestDepoId:"",
+    nearestDepoId: "",
     nearestDepoName: "",
     depotContact: "",
     timeZone: "",
@@ -930,6 +939,84 @@ const ZerothReport = () => {
     return "";
   };
 
+  const [uploading, setUploading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
+
+  const fileInputRefVideo = useRef<HTMLInputElement>(null);
+
+  const handleDragOverVideo = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeaveVideo = () => setIsDragging(false);
+
+  const handleDropVideo = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    handleFiles(Array.from(e.dataTransfer.files));
+  };
+
+  const handleFileChangeVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    handleFiles(Array.from(e.target.files));
+  };
+
+  const handleFiles = async (files: File[]) => {
+    const videoFiles = files.filter((file) => file.type.startsWith("video/"));
+    if (videoFiles.length === 0) {
+      alert("Please upload a valid video file.");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+
+      // Append each file with the key 'files'
+      for (const file of videoFiles) {
+        formData.append("files", file);
+      }
+
+      // Optional: add reference number
+      const referenceNumber = "KTRAC123";
+      for (let pair of formData.entries()) {
+        console.log("form field:", pair[0], pair[1]);
+      }
+
+
+      const res = await fetch(`/api/storage/uploadVideo?reference_numner=${referenceNumber}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        return alert("error in uploading files");
+      }
+      const result = await res.json();
+      const fileUploadData: {
+        name: string;
+        key: string;
+      }[] = result.data;
+/*       console.log(fileUploadData[0].key);
+ */      setVideoUrl(fileUploadData[0].key)
+
+/*       console.log(videoUrl);
+ */      // After successful upload
+      const fileUrl = `https://accidentphotos.s3.ap-south-1.amazonaws.com/${videoUrl}`;
+      setUploadedVideoUrl(fileUrl);
+
+
+/*       console.log("Uploaded files:", result);
+ */      alert("Upload successful!");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Upload failed");
+    }
+    setUploading(false);
+  };
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -958,7 +1045,7 @@ const ZerothReport = () => {
               latitude: lat,
               longitude: lon,
               policeStation: "",
-              policeStationName:"",
+              policeStationName: "",
               policeStationContact: "",
             });
 
@@ -1001,10 +1088,22 @@ const ZerothReport = () => {
     }
   };
 
- const handleLocationChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value } = e.target;
-  setLocationData((prev) => ({ ...prev, [name]: value }));
-};
+  const handleLocationChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setLocationData((prev) => ({ ...prev, [name]: value }));
+  };
+   const fetchPlaceName = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+      );
+      const data = await res.json();
+      return data.display_name || "Unknown location";
+    } catch (error) {
+      console.error("Error fetching place name:", error);
+      return "Unknown location";
+    }
+  };
 
   const handlePoliceStationSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     const stationId = parseInt(e.target.value);
@@ -1016,7 +1115,7 @@ const ZerothReport = () => {
         policeStation: station.id.toString(),
         policeStationName: station.name,
         policeStationContact: station.contact,
-      }));      
+      }));
       setPoliceControlRoom(station.contact)
     } else {
       setLocationData((prev) => ({
@@ -1035,25 +1134,35 @@ const ZerothReport = () => {
     if (depot) {
       setFormData((prev) => ({
         ...prev,
-        nearestDepoId:depot.id.toString(),
+        nearestDepoId: depot.id.toString(),
         nearestDepoName: depot.name,
         depotContact: depot.contact,
       }));
       setNearestDepoNum(depot.contact)
-      
+
     }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const newFiles: MediaFile[] = Array.from(e.target.files).map((file) => ({
+    const filesArray = Array.from(e.target.files);
+    const newFiles: MediaFile[] = filesArray.map((file) => ({
       id: `${file.name}-${Date.now()}`,
       file,
       type: file.type.startsWith("video") ? "video" : "image",
       url: URL.createObjectURL(file),
     }));
+    
     setMediaFiles((prev) => [...prev, ...newFiles]);
-  };
+    
+const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
+
+  // Step 4: If any video file is present, upload
+  if (videoFiles.length > 0) {
+    handleFiles(videoFiles); // Call your upload logic
+  }
+};
+  
 
   const handleRemoveFile = (id: string) => {
     setMediaFiles((prev) => prev.filter((file) => file.id !== id));
@@ -1093,8 +1202,9 @@ const ZerothReport = () => {
       if (mediaFiles.length === 0) {
         throw new Error("Please upload at least one photo of the accident");
       }
+      const imageFiles = mediaFiles.filter((file)=>file.type==='image')
 
-      const photoPromises = mediaFiles.map((file) => {
+      const photoPromises = imageFiles.map((file) => {
         return new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => {
@@ -1115,7 +1225,7 @@ const ZerothReport = () => {
         content_type: "image/jpeg",
       }));
 
-      const payload = {
+       const payload = {
         accident_id: accidentRefernceId,
         location_info: {
           address: locationData.address,
@@ -1159,8 +1269,59 @@ const ZerothReport = () => {
           vehicle_make: "",
         },
         photos: photosPayload,
-      };
-console.log(payload);
+        videos: videoUrl,
+      }; 
+      /* const payload = {
+        accident_id: accidentRefernceId,
+        location_info: {
+          address: locationData.address,
+          place: locationData.place,
+          district: locationData.district,
+          state: locationData.state,
+         latitude: parseFloat(locationData.latitude),
+          longitude: parseFloat(locationData.longitude),
+        },
+          
+        nearby_assistance_details: {
+          nearest_police_station: locationData.policeStationName,
+          nearest_police_station_contact_number:
+            locationData.policeStationContact,
+            nearest_depo: formData.nearestDepoName,
+          nearest_depo_contact_number: formData.depotContact,
+          timezone_info: {
+            timezone: "Asia/Kolkata",
+            offset: "+05:30",
+          },
+        },
+        accident_details: {
+          date_of_accident: formData.dateOfAccident,
+          time_of_accident: formData.timeOfAccident,
+          time_zone_of_accident: formData.timeZone,
+          operated_depot: formData.operatedDepot,
+          schedule_number: formData.scheduleNumber,
+          description: formData.description,
+        },
+        crew_information: {
+          driver_type_code: driverCategory,
+          driver_name: formData.driverName,
+          driver_phn_no: formData.driverPhone,
+          driver_pen_no: formData.driverPenNo,
+          conductor_name: formData.conductorName,
+          conductor_phn_no: formData.conductorPhone,
+          conductor_pen_no: formData.conductorPenNo,
+        },
+        vehicle_info: {
+          bonet_no: formData.bonnetNumber,
+          vehicle_register_no: "",
+          vehicle_make: "",
+        },
+        accident_documentation:{
+        photos: photosPayload,
+        videos: videoUrl,
+        }
+        
+      }; */
+      console.log(payload);
 
       const response = await fetch("/api/submitZeroReportDetails", {
         method: "POST",
@@ -1169,8 +1330,8 @@ console.log(payload);
         },
         body: JSON.stringify(payload),
       });
-console.log(response);
-
+/*       console.log(response);
+ */
       if (!response.ok) {
         throw new Error("Failed to submit accident report");
       }
@@ -1243,8 +1404,8 @@ console.log(response);
             {accidentRefernceId?.replaceAll("_", "/")}
           </h2>
           <div className='flex ms-auto'>
-           {policeControlRoom &&( <h6 className='text-[14px] text-blue-600 text-center'>ControlRoom Number {"  "}{policeControlRoom}</h6>)}
-                      {nearestDepoNum &&( <h6 className='text-[14px] text-blue-600 text-center ms-3'>Depo Number{" "}{nearestDepoNum}</h6>)}
+            {policeControlRoom && (<h6 className='text-[14px] text-blue-600 text-center'>ControlRoom Number {"  "}{policeControlRoom}</h6>)}
+            {nearestDepoNum && (<h6 className='text-[14px] text-blue-600 text-center ms-3'>Depo Number{" "}{nearestDepoNum}</h6>)}
 
           </div>
         </div>
@@ -1262,11 +1423,10 @@ console.log(response);
                     key={index}
                     type="button"
                     className={`flex items-center px-4 py-2.5 text-[12px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
-                                            ${
-                                              activeTab === index
-                                                ? "text-[var(--sidebar-bg)] border-white bg-gray-500"
-                                                : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
-                                            }`}
+                                            ${activeTab === index
+                        ? "text-[var(--sidebar-bg)] border-white bg-gray-500"
+                        : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
+                      }`}
                     onClick={() => setActiveTab(index)}
                   >
                     {tab.label}
@@ -1334,34 +1494,34 @@ console.log(response);
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       {" "}
                       {/* Increased gap and mb */}
-                   <div className="flex flex-col h-full">
-  {/* Flex container */}
-  <label className="text-[12px] text-gray-700 mb-2">
-    Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
-  </label>
-  <select
-    name="district"
-     value={locationData.district}
-    onChange={handleLocationChange}
-    className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
-  >
-    <option value="">Select District</option>
-    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-    <option value="Kollam">Kollam</option>
-    <option value="Pathanamthitta">Pathanamthitta</option>
-    <option value="Alappuzha">Alappuzha</option>
-    <option value="Kottayam">Kottayam</option>
-    <option value="Idukki">Idukki</option>
-    <option value="Ernakulam">Ernakulam</option>
-    <option value="Thrissur">Thrissur</option>
-    <option value="Palakkad">Palakkad</option>
-    <option value="Malappuram">Malappuram</option>
-    <option value="Kozhikode">Kozhikode</option>
-    <option value="Wayanad">Wayanad</option>
-    <option value="Kannur">Kannur</option>
-    <option value="Kasaragod">Kasaragod</option>
-  </select>
-</div>
+                      <div className="flex flex-col h-full">
+                        {/* Flex container */}
+                        <label className="text-[12px] text-gray-700 mb-2">
+                          Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
+                        </label>
+                        <select
+                          name="district"
+                          value={locationData.district}
+                          onChange={handleLocationChange}
+                          className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
+                        >
+                          <option value="">Select District</option>
+                          <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                          <option value="Kollam">Kollam</option>
+                          <option value="Pathanamthitta">Pathanamthitta</option>
+                          <option value="Alappuzha">Alappuzha</option>
+                          <option value="Kottayam">Kottayam</option>
+                          <option value="Idukki">Idukki</option>
+                          <option value="Ernakulam">Ernakulam</option>
+                          <option value="Thrissur">Thrissur</option>
+                          <option value="Palakkad">Palakkad</option>
+                          <option value="Malappuram">Malappuram</option>
+                          <option value="Kozhikode">Kozhikode</option>
+                          <option value="Wayanad">Wayanad</option>
+                          <option value="Kannur">Kannur</option>
+                          <option value="Kasaragod">Kasaragod</option>
+                        </select>
+                      </div>
 
                       <div className="flex flex-col h-full">
                         {" "}
@@ -1413,10 +1573,40 @@ console.log(response);
                         />
                       </div>
                     </div>
-                     {/* <div>  <LiveMap/></div> */}
-                      {/* <div>  <LiveGoogleMap/></div> */}
-{/*                          <div>  <CurrentLocationMap/></div>
- */}                  </div>
+                    <div className="mt-2 h-48 border rounded overflow-visible relative z-10">
+                                  {locationData.latitude &&
+                                    locationData.longitude &&
+                                    !isNaN(parseFloat(locationData.latitude)) &&
+                                    !isNaN(parseFloat(locationData.longitude)) ? (
+                                    <MapComponent
+                                      latitude={parseFloat(locationData.latitude)}
+                                      longitude={parseFloat(locationData.longitude)}
+                                      onLocationChange={async (lat, lng) => {
+                                        const placeName = await fetchPlaceName(lat, lng);
+                                        setLocationQuery(placeName) 
+                                        setLocationData((prev)=>({
+                                          ...prev,
+                                          latitude: lat.toFixed(6),
+                                          longitude: lng.toFixed(6),
+                                        }))
+                                        
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                                      Location not selected{" "}
+                                      <span className="text-[10px]">
+                                        (സ്ഥലം തിരഞ്ഞെടുത്തിട്ടില്ല)
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+{/*                      <div>  <LiveMap/></div> 
+ */}                    {/* <div>  <LiveGoogleMap/></div> */}
+{/*                     <div>  <CurrentLocationMa/></div> 
+ */}                    {/* <div>  <MapmyIndiaLiveLocation/></div> */}
+                    {/* <TomTomLiveMap /> */}
+                  </div>
                 </div>
                 {/* Second Column - Nearby Assistance */}
                 <div className="border-2 border-gray-400 rounded-[8px] overflow-auto">
@@ -1796,11 +1986,10 @@ console.log(response);
                   </h3>
 
                   <div
-                    className={`flex-1 border-2 m-[16px] ${
-                      isDragging
+                    className={`flex-1 border-2 m-[16px] ${isDragging
                         ? "border-blue-500 bg-blue-50"
                         : "border-dashed border-gray-300"
-                    } 
+                      } 
                 rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -1829,7 +2018,35 @@ console.log(response);
                       </p>
                     </div>
                   </div>
-
+                  {/* <div
+                    className={`flex-1 border-2 m-[16px] ${isDragging ? "border-blue-500 bg-blue-50" : "border-dashed border-gray-300"} rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer`}
+                    onDragOver={handleDragOverVideo}
+                    onDragLeave={handleDragLeaveVideo}
+                    onDrop={handleDropVideo}
+                    onClick={() => fileInputRefVideo.current?.click()}
+                  >
+                    <input
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      onChange={handleFileChangeVideo}
+                      className="hidden"
+                      ref={fileInputRefVideo}
+                    />
+                    <div className="text-center">
+                      <div className="bg-gray-100 p-3 rounded-full inline-block mb-3">
+                        <Camera className="w-6 h-6 text-gray-500" />
+                      </div>
+                      <p className="text-sm font-medium text-gray-700">
+                        {isDragging ? "Drop video here" : "Click or drag video to upload"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Upload accident scene videos <br />
+                        <span className="text-[10px]">അപകട സ്ഥലത്തിന്റെ വീഡിയോ അപ്‌ലോഡ് ചെയ്യുക</span>
+                      </p>
+                      {uploading && <p className="text-blue-500 mt-2">Uploading...</p>}
+                    </div>
+                  </div> */}
                   <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200 m-[16px]">
                     <h4 className="text-xs font-semibold mb-2">
                       {" "}
@@ -1864,7 +2081,7 @@ console.log(response);
                     <MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ" />)
                   </h3>
 
-                  {mediaFiles.length > 0 ? (
+                  {mediaFiles.length > 0 || uploadedVideoUrl ? (
                     <div className="m-[16px]">
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                         {mediaFiles.map((media) => (
@@ -1896,6 +2113,16 @@ console.log(response);
                             </button>
                           </div>
                         ))}
+                        {/* {uploadedVideoUrl && (
+                          <div className="mt-4 w-full lg:w-1/2">
+                            <video controls className="w-full rounded shadow-lg">
+                              <source src={uploadedVideoUrl} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                            <p className="text-xs mt-2 break-all text-gray-500">{uploadedVideoUrl}</p>
+                          </div>
+                        )} */}
+
                       </div>
                     </div>
                   ) : (
@@ -1952,11 +2179,10 @@ console.log(response);
                   type="button"
                   onClick={handleSubmitAccidentDetails}
                   disabled={isSubmittingDocumentation}
-                  className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${
-                    isSubmittingDocumentation
+                  className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${isSubmittingDocumentation
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[var(--sidebar)] hover:bg-[#001670]"
-                  }`}
+                    }`}
                 >
                   {isSubmittingDocumentation ? (
                     <span className="flex items-center">
