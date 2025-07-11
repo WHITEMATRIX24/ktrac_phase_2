@@ -2,7 +2,7 @@ import s3 from "@/lib/s3_config";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const referenceNumber = searchParams.get("reference_numner");

@@ -28,7 +28,7 @@ const BasicAndWorkShopForm = ({
   const [selectedDepot, setSelectedDepot] = useState<string>("");
   const depoInputRef = useRef<HTMLInputElement | null>(null);
   const depoUlRef = useRef<HTMLUListElement | null>(null);
-  console.log(depot);
+  // console.log(depot);
 
   //  DEPO SELECT HANDLER
   const handleSelectDepo = (depo: { name: string; abv: string }) => {
