@@ -28,7 +28,17 @@ const BasicAndWorkShopForm = ({
   const [selectedDepot, setSelectedDepot] = useState<string>("");
   const depoInputRef = useRef<HTMLInputElement | null>(null);
   const depoUlRef = useRef<HTMLUListElement | null>(null);
-  // console.log(depot);
+  console.log(depot);
+
+  //  DEPO SELECT HANDLER
+  const handleSelectDepo = (depo: { name: string; abv: string }) => {
+    setSelectedDepot(depo.name);
+    formUpdateController((prev) => ({
+      ...prev,
+      workshop_depot_name: depo.name,
+    }));
+    setShowDepot(false);
+  };
 
   // SELECT DEPO HANDLER
   const filterDepoHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,10 +199,16 @@ const BasicAndWorkShopForm = ({
           {showDepot && (
             <ul
               ref={depoUlRef}
-              className="absolute border flex flex-col gap-1 top-16 bg-slate-50 rounded-sm px-3 py-2 min-w-52 h-52 overflow-auto"
+              className="absolute border flex flex-col gap-1 top-16 bg-gray-200 rounded-sm px-1 py-2 min-w-52 h-52 overflow-auto"
             >
               {filteredDepot.map((depo) => (
-                <li key={depo.abv}>{depo.name}</li>
+                <li
+                  onClick={(e) => handleSelectDepo(depo)}
+                  key={depo.abv}
+                  className="bg-white px-2 py-1 rounded-sm cursor-pointer"
+                >
+                  {depo.name}
+                </li>
               ))}
             </ul>
           )}

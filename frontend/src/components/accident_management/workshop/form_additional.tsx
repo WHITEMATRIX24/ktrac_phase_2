@@ -71,6 +71,20 @@ const AdditionalInfoForm = ({
             className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs"
           />
         </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-2">
+            <label className="text-[12px] text-[#374151] mb-[6px]">
+              Bill / <span className="text-[10px]">ബിൽ</span>
+            </label>
+            <Input type="file" id="accidentWorkshopBillFileInput" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-[12px] text-[#374151] mb-[6px]">
+              Total Bill / <span className="text-[10px]">ബിൽ</span>
+            </label>
+            <Input type="file" id="accidentWorkshopTotalBillFileInput" />
+          </div>
+        </div>
       </div>
     </div>
   );

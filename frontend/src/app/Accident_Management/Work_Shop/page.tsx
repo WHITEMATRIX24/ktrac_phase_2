@@ -146,6 +146,58 @@ const AccedentWorkshop = () => {
     };
 
     try {
+      //  BILL FILE UPLOAD
+      const billInput = document.getElementById(
+        "accidentWorkshopBillFileInput"
+      ) as HTMLInputElement;
+      const billTotalInput = document.getElementById(
+        "accidentWorkshopTotalBillFileInput"
+      ) as HTMLInputElement;
+
+      let billFile = billInput.files ? billInput.files[0] : null;
+      let totalBillFile = billTotalInput.files ? billTotalInput.files[0] : null;
+
+      const accidentWorkshopBillFormData = new FormData();
+      if (billFile) {
+        accidentWorkshopBillFormData.append("files", billFile, "bill");
+      }
+      if (totalBillFile) {
+        accidentWorkshopBillFormData.append(
+          "files",
+          totalBillFile,
+          "total_bill"
+        );
+      }
+
+      if (billFile || totalBillFile) {
+        const response = await fetch(
+          `/api/storage/upload_workshop_bill?reference_numner=${selectedAccedentData?.accident_id}`,
+          {
+            method: "POST",
+            body: accidentWorkshopBillFormData,
+          }
+        );
+
+        if (!response.ok) {
+          return alert("error in uploading files");
+        }
+        const fileUploadResponseData = await response.json();
+        const fileUploadData: {
+          name: string;
+          key: string;
+        }[] = fileUploadResponseData.data;
+        // console.log(fileUploadData);
+        const billFile = fileUploadData.find((v) => v.name === "bill");
+        const totalBillFile = fileUploadData.find(
+          (v) => v.name === "total_bill"
+        );
+
+        body.individual_bill_document_s3_path = billFile?.key;
+        body.total_bill_document_s3_path = totalBillFile?.key;
+      }
+      console.log(body);
+
+      // // FORM UPLOAD
       const response = await fetch("/api/submitAccidentWorkshopForm", {
         method: "POST",
         body: JSON.stringify(body),
@@ -158,6 +210,8 @@ const AccedentWorkshop = () => {
         setSelectedAccedentData(null);
       } else {
         const errorData = await response.json();
+        console.log(errorData);
+
         alert(errorData.error.error || "something went wrong");
       }
     } catch (error) {

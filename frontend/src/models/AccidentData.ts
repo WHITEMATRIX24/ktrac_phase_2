@@ -90,4 +90,6 @@ export interface AccidentWorkshopReport {
   invoice_number?: string;
   final_inspection_report?: string;
   remarks?: string;
+  individual_bill_document_s3_path?: string;
+  total_bill_document_s3_path?: string;
 }
