@@ -882,6 +882,8 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
       setShowConductorDropdown(false);
     }
   };
+  /*   console.log(formData);
+ */  
   const handleConductorSelect = (conductor: Conductor) => {
     setFormData((prev) => ({
       ...prev,
@@ -890,6 +892,18 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
     }));
     setConductorSearchTearm(conductor.gNumber);
     setShowConductorDropdown(false);
+  };
+   
+  const handleJurisdictionDepo = (depo: string) => {
+    console.log('inside');
+    
+    console.log(depo);
+    
+    setFormData((prev) => ({
+      ...prev,
+      jurisdictionDepot: depo,
+    }));
+    setShowDepotDropdown(false);
   };
 
   // Define tabs conditionally based on zeroth report status
@@ -2212,12 +2226,12 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                     value={formData.jurisdictionDepot}
                                     onChange={handleChange}
                                     onFocus={() => setShowDepotDropdown(true)}
-                                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.operatedDepot ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 ${errors.jurisdictionDepot ? 'border-red-500' : 'border-gray-300'}`}
                                     placeholder="Search depot by name or abbreviation"
                                     autoComplete="off"
                                 />
-                                {errors.operatedDepot && (
-                                    <p className="text-xs text-red-600 mt-1">{errors.operatedDepot}</p>
+                                {errors.jurisdictionDepot && (
+                                    <p className="text-xs text-red-600 mt-1">{errors.jurisdictionDepot}</p>
                                 )}
                                 {showDepotDropdown && (
                                     <div className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
@@ -2231,10 +2245,11 @@ const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
                                                     <li
                                                         key={`depot-${d.abv}-${index}`}
                                                         className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer border-b last:border-0"
-                                                        onClick={() => {
-                                                            setFormData(prev => ({ ...prev, operatedDepot: d.name }));
-                                                            setShowDepotDropdown(false);
-                                                        }}
+                                                        onClick={() => 
+                                                          handleJurisdictionDepo(d.name)
+                                                          
+              
+                                                        }
                                                     >
                                                         {d.abv.toUpperCase()} - {d.name}
                                                     </li>

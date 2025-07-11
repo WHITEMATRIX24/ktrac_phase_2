@@ -737,11 +737,11 @@ const ZerothReport = () => {
 
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch
+  /* // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
-
+ */
 
   useEffect(() => {
     const data = sessionStorage.getItem("accidentData");
@@ -1160,6 +1160,7 @@ const ZerothReport = () => {
         },
         photos: photosPayload,
       };
+console.log(payload);
 
       const response = await fetch("/api/submitZeroReportDetails", {
         method: "POST",
@@ -1168,6 +1169,7 @@ const ZerothReport = () => {
         },
         body: JSON.stringify(payload),
       });
+console.log(response);
 
       if (!response.ok) {
         throw new Error("Failed to submit accident report");
