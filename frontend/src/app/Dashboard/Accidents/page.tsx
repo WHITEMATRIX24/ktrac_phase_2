@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AccidentDashboardCards } from "@/components/dashboard/accidents/cards";
-import { AccidentDashboardPieChart } from "@/components/dashboard/accidents/accident_dashboard_piechart";
+import { AccidentSevertyBarChart } from "@/components/dashboard/accidents/accident_severity";
 
 type CardModel = {
   name: string;
@@ -223,9 +223,22 @@ const AccidentsDashboard = () => {
                 <SelectValue placeholder="Select District" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="depo1">Thiruvanathapuram</SelectItem>
-                <SelectItem value="depo2">Kottayam</SelectItem>
-                <SelectItem value="depo3">Pathanamthitta</SelectItem>
+                <SelectItem value="Thiruvananthapuram">
+                  Thiruvananthapuram
+                </SelectItem>
+                <SelectItem value="Kollam">Kollam</SelectItem>
+                <SelectItem value="Pathanamthitta">Pathanamthitta</SelectItem>
+                <SelectItem value="Alappuzha">Alappuzha</SelectItem>
+                <SelectItem value="Kottayam">Kottayam</SelectItem>
+                <SelectItem value="Idukki">Idukki</SelectItem>
+                <SelectItem value="Ernakulam">Ernakulam</SelectItem>
+                <SelectItem value="Thrissur">Thrissur</SelectItem>
+                <SelectItem value="Palakkad">Palakkad</SelectItem>
+                <SelectItem value="Malappuram">Malappuram</SelectItem>
+                <SelectItem value="Kozhikode">Kozhikode</SelectItem>
+                <SelectItem value="Wayanad">Wayanad</SelectItem>
+                <SelectItem value="Kannur">Kannur</SelectItem>
+                <SelectItem value="Kasaragod">Kasaragod</SelectItem>
               </SelectContent>
             </Select>
             <Select>
@@ -268,10 +281,9 @@ const AccidentsDashboard = () => {
                   <AccidentLineChart chartData={lineChartData} />
                 </div>
                 <div className="pr-4 lg:pr-6">
-                  <AccidentDashboardPieChart
-                    chartTitle="Accident FIR"
-                    description="Ratio of accident data with FIR & without FIR"
-                    chartData={dashboardData.fir_based_chart}
+                  <AccidentSevertyBarChart
+                    startDate={startDate}
+                    endDate={endDate}
                   />
                 </div>
               </div>

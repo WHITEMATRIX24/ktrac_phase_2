@@ -13,19 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-header',
-})
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-header",
+});
 
 const raleway = Montserrat({
-  subsets: ['latin'],
-  weight: ['100', '400', '600'],
-  variable: '--font-body',
-})
+  subsets: ["latin"],
+  weight: ["100", "400", "600"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
-  title: "Ktrac.in",
+  title: "KTRAC - Your Gateway Towards Gods Own Country",
   description: "Enroute kerala",
 };
 
@@ -36,9 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${raleway.variable} antialiased`}
-      >
+      <body className={`${inter.variable} ${raleway.variable} antialiased`}>
         {children}
       </body>
     </html>

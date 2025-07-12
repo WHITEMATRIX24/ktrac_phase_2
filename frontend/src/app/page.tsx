@@ -98,8 +98,8 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full h-dvh grid grid-cols-6">
-      <div className="relative bg-[url(/landing_bus_2.jpg)] bg-center bg-cover bg-no-repeat col-span-4 flex flex-col justify-between py-10 px-10">
+    <div className="w-full h-dvh grid md:grid-cols-6">
+      <div className="relative bg-[url(/landing_bus_2.jpg)] bg-center bg-cover bg-no-repeat col-span-4 hidden md:flex flex-col justify-between py-10 px-10">
         <div className="absolute inset-0 bg-black/5"></div>
         <div className="flex gap-5 items-center">
           <Image src="/ksrtclogo.png" alt="logo" width={100} height={100} />
@@ -115,8 +115,8 @@ export default function Home() {
         </h5>
       </div>
 
-      <div className="flex flex-col gap-8 justify-between items-center h-full col-span-2">
-        <div className="flex flex-col gap-10 rounded-md px-12 py-5 pb-10 w-[28rem] my-auto">
+      <div className="flex flex-col gap-8 justify-between items-center h-full col-span-4 md:col-span-2">
+        <div className="flex flex-col gap-10 rounded-md px-2 xl:px-12 py-5 pb-10 xl:w-[28rem] my-auto">
           <div className="flex flex-col gap-1">
             <p className="text-themeBlue text-3xl font-semibold m-0">
               KTRAC
@@ -176,7 +176,7 @@ export default function Home() {
             </button>
           </form>
         </div>
-        <p className="text-xs text-gray-400 pb-5">
+        <p className="text-xs text-gray-400 pb-5 text-center">
           Managed by Whitematrix Software Solutions
         </p>
       </div>

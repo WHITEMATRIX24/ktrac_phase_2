@@ -126,6 +126,7 @@ const defaultNavItems: NavItem[] = [
       //   url: "/Reports/Unitwise_bus_deployment",
       // },
       // { title: "Enroute Buses", url: "/Reports/Enroute_buses" },
+      { title: "Accident Month Wise", url: "/Reports/Accidents/Month_Wise" },
       { title: "Accident Bus Type", url: "/Reports/Accidents/Bus_Type_Wise" },
       {
         title: "Accident Collision Type",
@@ -399,7 +400,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcherStatic
           team={{
             name: "KTRAC",
-            logo: "/ksrtclogo.png",
+            logo: "/logo.png",
             plan: "Enroute Kerala",
           }}
         />
