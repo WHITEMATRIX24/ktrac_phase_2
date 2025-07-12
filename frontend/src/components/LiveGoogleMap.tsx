@@ -10,14 +10,17 @@ declare global {
 
 const GOOGLE_MAP_SRC = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyImDLbhEdnr5HQ6UD0L0JOBEU2x7b7BUtU`;
 
-const LiveGoogleMap = () => {
+interface LiveGoogleMapProps {
+  coordinates: { lat: number; lng: number };
+}
+
+const LiveGoogleMap: React.FC<LiveGoogleMapProps> = ({ coordinates }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
-  const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
-  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const markerInstance = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch
+  // Ensure this only runs on client
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -48,74 +51,43 @@ const LiveGoogleMap = () => {
   };
 
   useEffect(() => {
-    let isMounted = true;
+    if (!mounted || !coordinates || !mapRef.current) return;
 
-    const init = async () => {
-      try {
-        await loadGoogleMapsScript();
+    loadGoogleMapsScript()
+      .then(() => {
+        const { lat, lng } = coordinates;
 
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            if (!isMounted) return;
+        if (!mapInstance.current) {
+          // Initialize the map once
+          const map = new window.google.maps.Map(mapRef.current, {
+            center: { lat, lng },
+            zoom: 17,
+          });
+          mapInstance.current = map;
 
-            const coords = {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            };
-
-            setPosition(coords);
-            setAccuracy(pos.coords.accuracy);
-
-            console.log("📍 Accurate Coordinates:", coords, "Accuracy:", pos.coords.accuracy);
-
-            if (pos.coords.accuracy > 100) {
-              alert("⚠️ Location accuracy is low. Try moving outdoors or enabling GPS.");
-            }
-          },
-          (err) => {
-            console.error("❌ Geolocation error:", err);
-            alert("Failed to fetch location. Please enable location services.");
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
+          // Add initial marker
+          const marker = new window.google.maps.Marker({
+            position: { lat, lng },
+            map,
+            title: 'Selected location',
+            icon: {
+              url: 'https://cdn-icons-png.flaticon.com/512/4871/4871384.png',
+              scaledSize: new window.google.maps.Size(32, 32),
+            },
+          });
+          markerInstance.current = marker;
+        } else {
+          // Update center and marker on new coordinates
+          mapInstance.current.setCenter({ lat, lng });
+          if (markerInstance.current) {
+            markerInstance.current.setPosition({ lat, lng });
           }
-        );
-      } catch (err) {
-        console.error("❌ Google Maps init error:", err);
-      }
-    };
-
-    init();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!position || !mounted || mapInstance.current || !mapRef.current) return;
-
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: position,
-      zoom: 17,
-    });
-
-    new window.google.maps.Marker({
-      position,
-      map,
-      title: 'You are here!',
-      icon: {
-        url: 'https://cdn-icons-png.flaticon.com/512/4871/4871384.png',
-        scaledSize: new window.google.maps.Size(32, 32),
-      },
-    });
-
-    mapInstance.current = map;
-  }, [position, mounted]);
-
-  if (!mounted) return null;
+        }
+      })
+      .catch((err) => {
+        console.error("Google Maps init error:", err);
+      });
+  }, [coordinates, mounted]);
 
   return (
     <div className="p-4">
@@ -124,16 +96,7 @@ const LiveGoogleMap = () => {
         ref={mapRef}
         className="w-full h-[300px] rounded shadow bg-gray-100"
         id="map"
-      >
-        {!position && (
-          <p className="text-center pt-10 text-sm text-gray-500">Fetching location...</p>
-        )}
-      </div>
-      {accuracy !== null && (
-        <p className="text-sm text-center mt-2 text-gray-600">
-          Accuracy: ±{Math.round(accuracy)} meters
-        </p>
-      )}
+      />
     </div>
   );
 };

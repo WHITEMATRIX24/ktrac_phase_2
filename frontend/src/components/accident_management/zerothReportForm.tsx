@@ -691,7 +691,9 @@ const handleFiles = async (files: File[]) => {
                 throw new Error('Please upload at least one photo of the accident');
             }
 
-            const photoPromises = mediaFiles.map(file => {
+            const imageFiles = mediaFiles.filter((file)=>file.type==='image')
+
+            const photoPromises = imageFiles.map(file => {
                 return new Promise<string>((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = () => {
@@ -754,7 +756,8 @@ const handleFiles = async (files: File[]) => {
                     vehicle_register_no: "",
                     vehicle_make: ""
                 },
-                photos: photosPayload
+                photos: photosPayload,
+                video_s3_keys: [videoUrl],
             };
 
             const response = await fetch('/api/submitZeroReportDetails', {

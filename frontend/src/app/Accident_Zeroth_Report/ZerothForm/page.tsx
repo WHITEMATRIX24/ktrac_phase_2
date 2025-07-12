@@ -126,6 +126,7 @@ const ZerothReport = () => {
   const [timeSlot, setTimeSlot] = useState("");
   const [driverSearchText, setDriverSearchText] = useState("");
   const [conductorSearchText, setConductorSearchText] = useState("");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const policeStations: PoliceStation[] = [
     {
       id: 1,
@@ -856,6 +857,30 @@ const ZerothReport = () => {
     });
     setShowDriverDropdown(false);
   };
+  const handleLocationSelect = (suggestion: any) => {
+  const address = suggestion.address;
+  const district =
+    address.county || address.district || address.state_district || "";
+
+  const lat = parseFloat(suggestion.lat);
+  const lng = parseFloat(suggestion.lon);
+
+  // ✅ Update coordinates for the map
+  setCoords({ lat, lng });
+
+  setLocationData((prev) => ({
+    ...prev,
+    address: suggestion.display_name,
+    place: address.village || address.town || address.city || "",
+    district: district,
+    state: address.state || "",
+    latitude: suggestion.lat,
+    longitude: suggestion.lon,
+  }));
+
+  setLocationQuery(suggestion.display_name);
+  setShowLocationSuggestions(false);
+};
 
   const filterConductors = (searchTerm: string) => {
     if (!searchTerm) {
@@ -910,7 +935,7 @@ const ZerothReport = () => {
     }
   };
 
-  const handleLocationSelect = (suggestion: any) => {
+  /* const handleLocationSelect = (suggestion: any) => {
     const address = suggestion.address;
     const district =
       address.county || address.district || address.state_district || "";
@@ -927,7 +952,7 @@ const ZerothReport = () => {
 
     setLocationQuery(suggestion.display_name);
     setShowLocationSuggestions(false);
-  };
+  }; */
 
   const calculateTimeSlot = (time: string) => {
     if (!time) return "";
@@ -1070,6 +1095,60 @@ const ZerothReport = () => {
     }
   }, []);
 
+  useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = Number(position.coords.latitude.toFixed(6));
+        const lng = Number(position.coords.longitude.toFixed(6));
+        setLocationPermission(true);
+        setCoords({ lat, lng });
+
+        try {
+          const response = await fetch(
+            'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}'
+          );
+          const data = await response.json();
+          console.log(data);
+          
+          const address = data.address || {};
+          const district =
+            address.county ||
+            address.district ||
+            address.state_district ||
+            "";
+
+          setLocationData({
+            address: data.display_name || "",
+            place: address.village || address.town || address.city || "",
+            district: district,
+            state: address.state || "",
+            latitude: lat.toString(),
+            longitude: lng.toString(),
+            policeStation: "",
+            policeStationName:"",
+            policeStationContact: "",
+          });
+
+          setLocationQuery(data.display_name || "");
+        } catch (error) {
+          console.error("Error fetching address:", error);
+        }
+      },
+      (error) => {
+        console.error("Location permission denied:", error);
+        setLocationPermission(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  } else {
+    console.log("Geolocation not supported");
+  }
+}, []);
   useEffect(() => {
     if (locationQuery.length > 2) {
       const handler = setTimeout(() => {
@@ -1275,7 +1354,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
           vehicle_make: "",
         },
         photos: photosPayload,
-        videos: [videoUrl],
+        video_s3_keys: [videoUrl],
       };  
      /*  const payload = {
         accident_id: accidentRefernceId,
@@ -1474,6 +1553,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                         <MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)
                       </label>
                       <input
+                       suppressHydrationWarning
                         value={locationQuery}
                         onChange={(e) => {
                           setLocationQuery(e.target.value);
@@ -1614,9 +1694,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
 {/*                     <div>  <CurrentLocationMa/></div> 
  */}                    {/* <div>  <MapmyIndiaLiveLocation/></div> */}
                     {/* <TomTomLiveMap /> */}
-                    <div>
-                      <LiveGoogleMap/>
-                    </div>
+                    <div className='mb-5'>  {coords !== null && <LiveGoogleMap coordinates={coords} />}</div>
                   </div>
                 </div>
                 {/* Second Column - Nearby Assistance */}
