@@ -4,6 +4,16 @@ import React, { useState, useEffect, useRef, ChangeEvent, DragEvent, FormEvent, 
 import { Camera, X, ChevronLeft } from 'lucide-react';
 import CombinedAccidentComponent from './zerothreport_modal';
 import { debounce } from '@mui/material';
+import dynamic from 'next/dynamic';
+
+const MapComponent = dynamic(() => import("@/components/MapComponent"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full text-sm text-gray-500">
+      Loading map...
+    </div>
+  ),
+});
 
 type MediaFile = {
     id: string;
@@ -270,6 +280,9 @@ const ZerothReport = () => {
     ];
 
   const [mounted, setMounted] = useState(false);
+  const [uploading, setUploading] = useState(false);
+    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -479,6 +492,18 @@ const ZerothReport = () => {
      const { name, value } = e.target;
      setLocationData((prev) => ({ ...prev, [name]: value }));
    };
+   const fetchPlaceName = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+      );
+      const data = await res.json();
+      return data.display_name || "Unknown location";
+    } catch (error) {
+      console.error("Error fetching place name:", error);
+      return "Unknown location";
+    }
+  };
     const calculateTimeSlot = (time: string) => {
         if (!time) return '';
         const [hoursStr, minutesStr] = time.split(':');
@@ -556,16 +581,77 @@ const ZerothReport = () => {
 
         }
     };
+const handleFiles = async (files: File[]) => {
+    const videoFiles = files.filter((file) => file.type.startsWith("video/"));
+    if (videoFiles.length === 0) {
+      alert("Please upload a valid video file.");
+      return;
+    }
 
+    setUploading(true);
+    try {
+      const formData = new FormData();
+
+      // Append each file with the key 'files'
+      for (const file of videoFiles) {
+        formData.append("files", file);
+      }
+
+      // Optional: add reference number
+      const referenceNumber = "KTRAC123";
+      for (let pair of formData.entries()) {
+        console.log("form field:", pair[0], pair[1]);
+      }
+
+
+      const res = await fetch(`/api/storage/uploadVideo?reference_numner=${referenceNumber}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        return alert("error in uploading files");
+      }
+      const result = await res.json();
+      const fileUploadData: {
+        name: string;
+        key: string;
+      }[] = result.data;
+/*       console.log(fileUploadData[0].key);
+ */      setVideoUrl(fileUploadData[0].key)
+
+/*       console.log(videoUrl);
+ */      // After successful upload
+      const fileUrl = `https://accidentphotos.s3.ap-south-1.amazonaws.com/${videoUrl}`;
+      setUploadedVideoUrl(fileUrl);
+
+
+/*       console.log("Uploaded files:", result);
+ */      alert("Upload successful!");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Upload failed");
+    }
+    setUploading(false);
+  };
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
-        const newFiles: MediaFile[] = Array.from(e.target.files).map(file => ({
-            id: `${file.name}-${Date.now()}`,
-            file,
-            type: file.type.startsWith('video') ? 'video' : 'image',
-            url: URL.createObjectURL(file),
+        const filesArray = Array.from(e.target.files);
+        const newFiles: MediaFile[] = filesArray.map((file) => ({
+          id: `${file.name}-${Date.now()}`,
+          file,
+          type: file.type.startsWith("video") ? "video" : "image",
+          url: URL.createObjectURL(file),
         }));
-        setMediaFiles(prev => [...prev, ...newFiles]);
+        
+        setMediaFiles((prev) => [...prev, ...newFiles]);
+        
+    const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
+    
+      // Step 4: If any video file is present, upload
+      if (videoFiles.length > 0) {
+        handleFiles(videoFiles); // Call your upload logic
+      }
     };
 
     const handleRemoveFile = (id: string) => {
@@ -878,6 +964,34 @@ const ZerothReport = () => {
                                             />
                                         </div>
                                     </div>
+                                    <div className="mt-2 h-48 border rounded overflow-visible relative z-10">
+                                  {locationData.latitude &&
+                                    locationData.longitude &&
+                                    !isNaN(parseFloat(locationData.latitude)) &&
+                                    !isNaN(parseFloat(locationData.longitude)) ? (
+                                    <MapComponent
+                                      latitude={parseFloat(locationData.latitude)}
+                                      longitude={parseFloat(locationData.longitude)}
+                                      onLocationChange={async (lat: number, lng: number) => {
+                                        const placeName = await fetchPlaceName(lat, lng);
+                                        setLocationQuery(placeName) 
+                                        setLocationData((prev)=>({
+                                          ...prev,
+                                          latitude: lat.toFixed(6),
+                                          longitude: lng.toFixed(6),
+                                        }))
+                                        
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                                      Location not selected{" "}
+                                      <span className="text-[10px]">
+                                        (സ്ഥലം തിരഞ്ഞെടുത്തിട്ടില്ല)
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
                                 </div>
 
                                 {/* Second Column - Nearby Assistance */}
@@ -1200,10 +1314,10 @@ const ZerothReport = () => {
                                             <p className="text-sm font-medium text-gray-700">
                                                 {isDragging ? 'Drop files here' : 'Click or drag files to upload'}
                                             </p>
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                Upload images of the accident scene <br />
-                                                <MalayalamText text="അപകട സ്ഥലത്തിന്റെ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
-                                            </p>
+                                             <p className="text-xs text-gray-500 mt-1">
+                        Upload images and Videos of the accident scene <br />
+                        <MalayalamText text="അപകട സ്ഥലത്തിന്റെ ഫോട്ടോകൾ & വീഡിയോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
+                      </p>
                                         </div>
                                     </div>
 

@@ -11,9 +11,15 @@ import React, {
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import 'leaflet/dist/leaflet.css'; // ✅ required
-import VideoUploader from '@/components/accident_management/videoUploader';
-import MapComponent from '@/components/MapComponent';
-// import MapmyIndiaLiveLocation from '@/components/MapmyIndiaLiveLocation';
+import LiveGoogleMap from '@/components/LiveGoogleMap';
+const MapComponent = dynamic(() => import("@/components/MapComponent"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full text-sm text-gray-500">
+      Loading map...
+    </div>
+  ),
+});// import MapmyIndiaLiveLocation from '@/components/MapmyIndiaLiveLocation';
 // const MapmyIndiaLiveLocation = dynamic(() => import('@/components/MapmyIndiaLiveLocation'), {
 //   ssr: false,
 // });
@@ -1225,7 +1231,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
         content_type: "image/jpeg",
       }));
 
-       const payload = {
+        const payload = {
         accident_id: accidentRefernceId,
         location_info: {
           address: locationData.address,
@@ -1269,9 +1275,9 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
           vehicle_make: "",
         },
         photos: photosPayload,
-        videos: videoUrl,
-      }; 
-      /* const payload = {
+        videos: [videoUrl],
+      };  
+     /*  const payload = {
         accident_id: accidentRefernceId,
         location_info: {
           address: locationData.address,
@@ -1320,7 +1326,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
         videos: videoUrl,
         }
         
-      }; */
+      };  */
       console.log(payload);
 
       const response = await fetch("/api/submitZeroReportDetails", {
@@ -1330,11 +1336,12 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
         },
         body: JSON.stringify(payload),
       });
-/*       console.log(response);
- */
+       console.log(response);
+ 
       if (!response.ok) {
-        throw new Error("Failed to submit accident report");
-      }
+        alert('Failed to submit accident report')
+/*         throw new Error("Failed to submit accident report");
+ */      }
 
       const result = await response.json();
       console.log("Accident report submitted successfully:", result);
@@ -1573,6 +1580,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                         />
                       </div>
                     </div>
+                    {/* open street map api, which allows location to plot
                     <div className="mt-2 h-48 border rounded overflow-visible relative z-10">
                                   {locationData.latitude &&
                                     locationData.longitude &&
@@ -1600,12 +1608,15 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                                       </span>
                                     </div>
                                   )}
-                                </div>
+                                </div> */}
 {/*                      <div>  <LiveMap/></div> 
  */}                    {/* <div>  <LiveGoogleMap/></div> */}
 {/*                     <div>  <CurrentLocationMa/></div> 
  */}                    {/* <div>  <MapmyIndiaLiveLocation/></div> */}
                     {/* <TomTomLiveMap /> */}
+                    <div>
+                      <LiveGoogleMap/>
+                    </div>
                   </div>
                 </div>
                 {/* Second Column - Nearby Assistance */}
@@ -2013,8 +2024,8 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                           : "Click or drag files to upload"}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        Upload images of the accident scene <br />
-                        <MalayalamText text="അപകട സ്ഥലത്തിന്റെ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
+                        Upload images and Videos of the accident scene <br />
+                        <MalayalamText text="അപകട സ്ഥലത്തിന്റെ ഫോട്ടോകൾ & വീഡിയോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
                       </p>
                     </div>
                   </div>
@@ -2050,15 +2061,15 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                   <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200 m-[16px]">
                     <h4 className="text-xs font-semibold mb-2">
                       {" "}
-                      Guidelines to Upload Photos (ഫോട്ടോകൾ അപ്‌ലോഡ്
+                      Guidelines to Upload Photos and Videos (ഫോട്ടോകൾ & വീഡിയോകൾ അപ്‌ലോഡ്
                       ചെയ്യുന്നതിനുള്ള മാർഗ്ഗനിർദ്ദേശങ്ങൾ)
                     </h4>
                     <ul className="text-xs text-gray-600 space-y-1">
                       <li>
-                        • Upload clear photos showing the accident from multiple
+                        • Upload clear photos and Videos showing the accident from multiple
                         angles
                         <br />•{" "}
-                        <MalayalamText text="വിവിധ കോണുകളിൽ നിന്ന് അപകടം കാണിക്കുന്ന വ്യക്തമായ ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
+                        <MalayalamText text="വിവിധ കോണുകളിൽ നിന്ന് അപകടം കാണിക്കുന്ന വ്യക്തമായ ഫോട്ടോകൾ & വീഡിയോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
                       </li>
                       <li>
                         • Include close-up shots of any vehicle damage
@@ -2077,8 +2088,8 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                 {/* Right Section - Uploaded Images */}
                 <div className="w-[50%] border-2 border-gray-400 rounded-[8px] overflow-auto">
                   <h3 className="text-[16px] font-[600] pb-2 border-b-2 border-[var(--sidebar)] p-[16px]">
-                    Uploaded Images (
-                    <MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ" />)
+                    Uploaded Images and Videos(
+                    <MalayalamText text="അപ്‌ലോഡ് ചെയ്ത ഫോട്ടോകൾ & വീഡിയോകൾ" />)
                   </h3>
 
                   {mediaFiles.length > 0 || uploadedVideoUrl ? (
@@ -2113,15 +2124,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                             </button>
                           </div>
                         ))}
-                        {/* {uploadedVideoUrl && (
-                          <div className="mt-4 w-full lg:w-1/2">
-                            <video controls className="w-full rounded shadow-lg">
-                              <source src={uploadedVideoUrl} type="video/mp4" />
-                              Your browser does not support the video tag.
-                            </video>
-                            <p className="text-xs mt-2 break-all text-gray-500">{uploadedVideoUrl}</p>
-                          </div>
-                        )} */}
+                       
 
                       </div>
                     </div>

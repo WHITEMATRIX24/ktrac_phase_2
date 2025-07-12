@@ -631,7 +631,7 @@ const PrimaryAccidentReport: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
 
-      const term = value.toLowerCase();
+    const term = value.toLowerCase();
 
     if (name === 'jurisdictionDepot') {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -644,12 +644,12 @@ const PrimaryAccidentReport: React.FC = () => {
     }
     else if (name == 'homeDepot')
       setFormData(prev => ({ ...prev, [name]: value }));
-      setFilteredDepots(
-        depots.filter(d =>
-          d.name.toLowerCase().includes(term) || d.abv.toLowerCase().includes(term)
-        )
-      );
-      setShowDepotDropdown(true);
+    setFilteredDepots(
+      depots.filter(d =>
+        d.name.toLowerCase().includes(term) || d.abv.toLowerCase().includes(term)
+      )
+    );
+    setShowDepotDropdown(true);
 
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -818,32 +818,32 @@ const PrimaryAccidentReport: React.FC = () => {
   };
   const [accidentTypeList, setAccidentTypeList] = React.useState<string[]>([
     "Select Type of Accident (അപകടത്തിന്റെ തരം തിരഞ്ഞെടുക്കുക)",
-    "KSRTC-KSRTC",
-    "KSRTC-KSWIFT",
-    "KSRTC - TWO WHEELER",
-    "KSRTC - AUTORIKSHAW",
-    "KSRTC - FOUR WHEELER",
-    "KSRTC - PICK UP",
-    "KSRTC - PRIVATE BUS",
-    "KSRTC - SCHOOLBUS",
-    "KSRTC - LORRY",
-    "KSRTC - TRUCK",
-    "KSRTC - PEDESTRIAN",
-    "KSRTC - OBJECT",
-    "KSRTC - PASSANGER",
-    "KSRTC - ANIMAL",
-    "KSRTC - BICYCLE",
-    "KSRTC - OTHER VEHICLE",
-    "KSRTC - AMBULANCE",
-    "CAUGHT FIRE",
-    "FELL INTO DEPTH",
-    "JUMP OVER HUMP",
-    "SUDDEN BREAK",
-    "MECHANICAL FAILURE",
-    "PUBLIC THROW STONE",
-    "FRONT GLASS BROKE WITHOUT ANY SPECIFIC REASON",
-
+    "KSRTC-KSRTC ; കെഎസ്ആർടിസി-കെഎസ്ആർടിസി",
+    "KSRTC-KSWIFT ; കെഎസ്ആർടിസി-കേഎസ്ഡബ്ല്യുഐഎഫ്‌ടി",
+    "KSRTC - TWO WHEELER ; കെഎസ്ആർടിസി - ഇരുചക്രവാഹനം",
+    "KSRTC - AUTORIKSHAW ; കെഎസ്ആർടിസി - ഓട്ടോറിക്ഷ",
+    "KSRTC - FOUR WHEELER ; കെഎസ്ആർടിസി - നാലുചക്രവാഹനം",
+    "KSRTC - PICK UP ; കെഎസ്ആർടിസി - പിക്കപ്പ് വാഹനം",
+    "KSRTC - PRIVATE BUS ; കെഎസ്ആർടിസി - സ്വകാര്യ ബസ്",
+    "KSRTC - SCHOOLBUS ; കെഎസ്ആർടിസി - സ്‌കൂൾ ബസ്",
+    "KSRTC - LORRY ; കെഎസ്ആർടിസി - ലോറി",
+    "KSRTC - TRUCK ; കെഎസ്ആർടിസി - ട്രക്ക്",
+    "KSRTC - PEDESTRIAN ; കെഎസ്ആർടിസി - നടന്നു പോകുന്നവൻ",
+    "KSRTC - OBJECT ; കെഎസ്ആർടിസി - വസ്തു",
+    "KSRTC - PASSANGER ; കെഎസ്ആർടിസി - യാത്രക്കാരൻ",
+    "KSRTC - ANIMAL ; കെഎസ്ആർടിസി - മൃഗം",
+    "KSRTC - BICYCLE ; കെഎസ്ആർടിസി - സൈക്കിൾ",
+    "KSRTC - OTHER VEHICLE ; കെഎസ്ആർടിസി - മറ്റ് വാഹനങ്ങൾ",
+    "KSRTC - AMBULANCE ; കെഎസ്ആർടിസി - ആംബുലൻസ്",
+    "CAUGHT FIRE ; തീ പിടിച്ചു",
+    "FELL INTO DEPTH ; ആഴത്തിലേക്ക് വീണു",
+    "JUMP OVER HUMP ; ഹമ്പ് മുകളിലൂടെ ചാടി",
+    "SUDDEN BREAK ; അപ്രതീക്ഷിത ബ്രേക്ക്",
+    "MECHANICAL FAILURE ; മെക്കാനിക്കൽ തകരാർ",
+    "PUBLIC THROW STONE ; പൊതുജനങ്ങൾ കല്ലെറിഞ്ഞു",
+    "FRONT GLASS BROKE WITHOUT ANY SPECIFIC REASON ; മുന്നിലുള്ള ഗ്ലാസ് യാതൊരു പ്രത്യേക കാരണവുമില്ലാതെ പൊട്ടിക്കുകയായിരുന്നു"
   ]);
+
 
   const [customCollision, setCustomCollision] = React.useState<string>("");
   const [customPrimaryResponsibility, setcustomPrimaryResponsibility] = React.useState<string>("");
@@ -936,7 +936,7 @@ const PrimaryAccidentReport: React.FC = () => {
     }));
     setShowDepotDropdown(false);
   };
-const handleHomeDepo = (depo: string) => {
+  const handleHomeDepo = (depo: string) => {
 
     setFormData((prev) => ({
       ...prev,
@@ -1100,8 +1100,8 @@ const handleHomeDepo = (depo: string) => {
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-gray-100"
                                   readOnly
-                                /> 
-                               
+                                />
+
                               </div>
 
                               <div>
@@ -1724,7 +1724,7 @@ const handleHomeDepo = (depo: string) => {
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                 /> */}
-                                 <input
+                                <input
                                   name="homeDepot"
                                   value={formData.homeDepot}
                                   onChange={handleChangeDepoSelect}
@@ -1926,7 +1926,7 @@ const handleHomeDepo = (depo: string) => {
                                 >
 
                                   {accidentTypeList.map((opt) => (
-                                    <option key={opt} value={opt}>
+                                    <option key={opt} value={opt.split(";")}>
                                       {opt}
                                     </option>
                                   ))}
@@ -2060,22 +2060,23 @@ const handleHomeDepo = (depo: string) => {
                                   onChange={handleChange}
                                   className="w-full py-[8px] px-[12px] border border-[#d1d5db] rounded text-xs bg-white"
                                 >
-                                  <option value="">Select Responsibility</option>
-                                  <option value="KSRTC Driver">KSRTC Driver</option>
-                                  <option value="KSWIFT Driver">KSWIFT Driver</option>
-                                  <option value="Two Wheeler Driver">Two Wheeler Driver</option>
-                                  <option value="For Wheeler Driver">For Wheeler Driver</option>
-                                  <option value="Pedestrian">Pedestrian</option>
-                                  <option value="Passenger">Passenger</option>
-                                  <option value="Cyclist">Cyclist</option>
-                                  <option value="Both Drivers">Both Drivers</option>
-                                  <option value="Mechanical Defect">Mechanical Defect</option>
-                                  <option value="Autorickshaw Driver">Autorickshaw Driver</option>
-                                  <option value="Private Bus Driver">Private Bus Driver</option>
-                                  <option value="Lorry Driver">Lorry Driver</option>
-                                  <option value="Truck Driver">Truck Driver</option>
-                                  <option value="Ambulance Driver">Ambulance Driver</option>
-                                  <option value="Other">Other</option>
+                                  <option value="">Select Responsibility (ഉത്തരവാദിത്തം തിരഞ്ഞെടുക്കുക)</option>
+                                  <option value="KSRTC Driver">KSRTC Driver (കെഎസ്ആർടിസി ഡ്രൈവർ)</option>
+                                  <option value="KSWIFT Driver">KSWIFT Driver (കേസ്വിഫ്റ്റ് ഡ്രൈവർ)</option>
+                                  <option value="Two Wheeler Driver">Two Wheeler Driver (ഇരുചക്രവാഹന ഡ്രൈവർ)</option>
+                                  <option value="For Wheeler Driver">Four Wheeler Driver (നാലുചക്രവാഹന ഡ്രൈവർ)</option>
+                                  <option value="Pedestrian">Pedestrian (നടന്നു പോകുന്നയാൾ)</option>
+                                  <option value="Passenger">Passenger (യാത്രക്കാരൻ)</option>
+                                  <option value="Cyclist">Cyclist (സൈക്കിൾ യാത്രികൻ)</option>
+                                  <option value="Both Drivers">Both Drivers (രണ്ടു ഡ്രൈവർമാരും)</option>
+                                  <option value="Mechanical Defect">Mechanical Defect (മെക്കാനിക്കൽ തകരാർ)</option>
+                                  <option value="Autorickshaw Driver">Autorickshaw Driver (ഓട്ടോറിക്ഷ ഡ്രൈവർ)</option>
+                                  <option value="Private Bus Driver">Private Bus Driver (സ്വകാര്യ ബസ് ഡ്രൈവർ)</option>
+                                  <option value="Lorry Driver">Lorry Driver (ലോറി ഡ്രൈവർ)</option>
+                                  <option value="Truck Driver">Truck Driver (ട്രക്ക് ഡ്രൈവർ)</option>
+                                  <option value="Ambulance Driver">Ambulance Driver (ആംബുലൻസ് ഡ്രൈവർ)</option>
+                                  <option value="Other">Other (മറ്റുള്ളവ)</option>
+
                                 </select>
 
                                 {/* Show text input if 'Other' is selected */}

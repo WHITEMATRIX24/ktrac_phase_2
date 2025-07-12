@@ -25,8 +25,9 @@ interface User {
 
 export default function Header() {
   const [roles, setRoles] = useState<string | null>(null);
-  const pathname = usePathname();
-  const pathSegments = pathname.split("/").filter(Boolean);
+  const pathname = usePathname() ?? "";
+const pathSegments = pathname.split("/").filter(Boolean);
+
   const mainTitle = pathSegments[0]
     ? pathSegments[0].charAt(0).toUpperCase() + pathSegments[0].slice(1)
     : "Home";
