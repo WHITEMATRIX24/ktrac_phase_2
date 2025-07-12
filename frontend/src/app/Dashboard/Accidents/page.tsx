@@ -1,5 +1,4 @@
 "use client";
-import { AccidentLineChart } from "@/components/accident_dashboard_linechart";
 import React, { useEffect, useState } from "react";
 import {
   Select,
@@ -12,25 +11,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AccidentDashboardCards } from "@/components/dashboard/accidents/cards";
 import { AccidentSevertyBarChart } from "@/components/dashboard/accidents/accident_severity";
+import { AccidentLineChart } from "@/components/dashboard/accidents/accident_dashboard_linechart";
+import { DashBoardDepoTable } from "@/components/dashboard/accidents/depotable";
+import { ColumnDef } from "@tanstack/react-table";
 
 type CardModel = {
   name: string;
   value: number;
 };
 
-type PieChartModel = {
-  labelData: String;
-  data: number;
-  fill: String;
+type DepodataModel = {
+  depo_name: string;
+  fatal: number;
+  major: number;
+  minor: number;
+  insignificant: number;
 };
 
-const pieChartData = [
-  { labelData: "FIR", key: "with_fir", data: 0, fill: "var(--color-chrome)" },
+const columns: ColumnDef<DepodataModel>[] = [
   {
-    labelData: "No FIR",
-    data: 0,
-    key: "no_fir",
-    fill: "var(--color-safari)",
+    accessorKey: "depo",
+    header: "Depo",
+  },
+  {
+    accessorKey: "fatal",
+    header: "Fatal",
+  },
+  {
+    accessorKey: "major",
+    header: "major",
+  },
+  {
+    accessorKey: "minor",
+    header: "Minor",
+  },
+  {
+    accessorKey: "insignificant",
+    header: "insignificant",
   },
 ];
 
@@ -71,7 +88,6 @@ const getSameDayFromPastSixMonth = () => {
 const AccidentsDashboard = () => {
   const [dashboardData, setDashboardData] = useState<{
     cardData: CardModel[];
-    fir_based_chart: PieChartModel[];
   }>({
     cardData: [
       {
@@ -91,7 +107,6 @@ const AccidentsDashboard = () => {
         value: 0,
       },
     ],
-    fir_based_chart: [],
   });
   const [bonnetSearchNo, setBonnetSearchNo] = useState<string>("");
   const [bonnetNumberList, setBonnetNumberList] = useState<string[]>([]);
@@ -146,18 +161,10 @@ const AccidentsDashboard = () => {
         }
       );
 
-      // pie chart
-      const updatedPieChartData = pieChartData.map((d) => {
-        return {
-          ...d,
-          data: data.fir_chart[d.key],
-        };
-      });
       // console.log(updatedPieChartData);
 
       setDashboardData({
         cardData: finalCardData,
-        fir_based_chart: updatedPieChartData,
       });
     } catch (error) {
       console.log(error);
@@ -285,6 +292,9 @@ const AccidentsDashboard = () => {
                     startDate={startDate}
                     endDate={endDate}
                   />
+                </div>
+                <div className="pl-4 lg:pl-6">
+                  <DashBoardDepoTable columns={columns} data={[]} />
                 </div>
               </div>
             </>
