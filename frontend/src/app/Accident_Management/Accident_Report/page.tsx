@@ -1923,7 +1923,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                 >
 
                                   {accidentTypeList.map((opt) => (
-                                    <option key={opt} value={opt.split(";")}>
+                                    <option key={opt} value={opt.split(";")[0]}>
                                       {opt}
                                     </option>
                                   ))}
