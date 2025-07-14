@@ -223,12 +223,11 @@ export function FatalReportDataTable<TData, TValue>({
           </Popover>
         </div>
       </div>
-      <div className="rounded-md border w-full overflow-x-auto overflow-y-hidden h-[55vh]">
+      <div className="rounded-md border w-[78vw] overflow-auto h-[55vh]">
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          <Table className="min-w-[1000px] table-fixed">
-
+          <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
@@ -244,9 +243,9 @@ export function FatalReportDataTable<TData, TValue>({
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                       </TableHead>
                     );
                   })}
@@ -259,8 +258,9 @@ export function FatalReportDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                      }`}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                    }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell

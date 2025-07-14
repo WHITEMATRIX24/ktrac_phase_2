@@ -11,7 +11,7 @@ export type UnitWiseAccidentDataModel = {
   fatal: number;
   major: number;
   minor: number;
-  total: number;
+  total_accidents: number;
   rate_of_accidents_in_1_lakhs_km: number;
   unit_wise_operated_km: number;
 };
@@ -25,7 +25,7 @@ function addTotalToTableData(
       acc.fatal += data.fatal;
       acc.major += data.major;
       acc.minor += data.minor;
-      acc.total += data.total;
+      acc.total += data.total_accidents;
       acc.unit_wise_operated_km += data.unit_wise_operated_km;
       acc.rate_of_accidents_in_1_lakhs_km +=
         data.rate_of_accidents_in_1_lakhs_km * data.unit_wise_operated_km;
@@ -51,14 +51,14 @@ function addTotalToTableData(
 
   const formattedRate = parseFloat(totalRate.toFixed(2));
 
-  console.log("Total Rate:", formattedRate); // Debugging line
+  console.log(totalData); // Debugging line
 
   const totalEntry: UnitWiseAccidentDataModel = {
     depot_name: "Total",
     fatal: totalData.fatal,
     major: totalData.major,
     minor: totalData.minor,
-    total: totalData.total,
+    total_accidents: totalData.total,
     rate_of_accidents_in_1_lakhs_km: formattedRate,
     unit_wise_operated_km: totalData.unit_wise_operated_km,
   };
@@ -73,24 +73,12 @@ const unitewiseTableColumns: ColumnDef<UnitWiseAccidentDataModel>[] = [
   { accessorKey: "fatal", header: "Fatal" },
   { accessorKey: "major", header: "Major" },
   { accessorKey: "minor", header: "Minor" },
-  { accessorKey: "total", header: "Total" },
+  { accessorKey: "total_accidents", header: "Total" },
   {
     accessorKey: "rate_of_accidents_in_1_lakhs_km",
     header: "Rate of accidents in 1 lakhs km",
   },
   { accessorKey: "unit_wise_operated_km", header: "Unit wise operated km" },
-];
-
-const tableData: UnitWiseAccidentDataModel[] = [
-  {
-    depot_name: "KTM",
-    fatal: 15,
-    major: 10,
-    minor: 45,
-    total: 70,
-    rate_of_accidents_in_1_lakhs_km: 2.1,
-    unit_wise_operated_km: 12000,
-  },
 ];
 
 const formatDateForAPI = (input: string): string => {
@@ -124,54 +112,43 @@ const UnitWiseAccidentReport = () => {
   const [endDate, setEndDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  //   const [tableData, setTableData] = useState<UnitWiseAccidentDataModel[]>([]);
+  const [tableData, setTableData] = useState<UnitWiseAccidentDataModel[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   //   //  report data fetching
-  //   const fetchReportData = async () => {
-  //     try {
-  //       !isLoading && setIsLoading(true);
-  //       const formatedStartDate = formatDateForAPI(startDate);
-  //       const formatedEndDate = formatDateForAPI(endDate);
-  //       //   console.log(formatedDate);
+  const fetchReportData = async () => {
+    try {
+      !isLoading && setIsLoading(true);
+      const formatedStartDate = formatDateForAPI(startDate);
+      const formatedEndDate = formatDateForAPI(endDate);
+      //   console.log(formatedDate);
 
-  //       const response = await fetch(
-  //         `/api/reports/accidents/ksrtc_timewise?start_date=${formatedStartDate}&end_date=${formatedEndDate}`
-  //       );
+      const response = await fetch(
+        `/api/dashboard/accidents?start_date=${formatedStartDate}&end_date=${formatedEndDate}&bonnet_no=&district=&category=&fuel_type=`
+      );
 
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         console.log(errorData);
-  //         return;
-  //       }
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData);
+        return;
+      }
 
-  //       const responseData = await response.json();
-  //       // console.log(responseData);
-  //       const report = responseData.report;
-  //       const formatedReport = report.map((r: TimePeriodAccidentData) => {
-  //         return {
-  //           ...r,
-  //           time_period: r.time_period
-  //             ? r.time_period
-  //             : r.type && r.type.charAt(0).toUpperCase() + r.type.slice(1),
-  //         };
-  //       });
-  //       // console.log(formatedReport);
+      const responseData = await response.json();
+      console.log(responseData.depotData);
+      setTableData(responseData.depotData);
+    } catch (error) {
+      console.log(`something unexpected happen in time wise report`);
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  //       setTableData(formatedReport);
-  //     } catch (error) {
-  //       console.log(`something unexpected happen in time wise report`);
-  //       console.log(error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     if (startDate || endDate) {
-  //       fetchReportData();
-  //     }
-  //   }, [startDate, endDate]);
+  useEffect(() => {
+    if (startDate || endDate) {
+      fetchReportData();
+    }
+  }, [startDate, endDate]);
 
   return (
     <div className="px-5 pt-5 flex flex-col gap-1 h-[85vh] overflow-auto">
@@ -187,7 +164,7 @@ const UnitWiseAccidentReport = () => {
         startDateSetter={setStartDate}
         endDate={endDate}
         endDateSetter={setEndDate}
-        isLoading={false}
+        isLoading={isLoading}
       />
     </div>
   );

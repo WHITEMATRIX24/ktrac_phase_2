@@ -93,8 +93,8 @@ export function UnitWiseReportTable<TData, TValue>({
     const ws_data = [
       ["KSRTC REPORT"],
       [tableLabel],
-      ["ACCIDENT UNITS - 59"],
-      ["ACCIDENT FREE UNITS - 37"],
+      [`ACCIDENT UNITS - ${data.length}`],
+      [`ACCIDENT FREE UNITS - ${73 - data.length}`],
       [],
       columns.map((col) => col.header as string),
       ...formattedData.map((item) =>

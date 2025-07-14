@@ -30,6 +30,13 @@ export interface DashboardAreaChartDataModel {
   inProgress: number;
   completed: number;
 }
+interface DashboardDepoTableDataModel {
+  depot_name: string;
+  fatal: number;
+  major: number;
+  minor: number;
+  insignificant: number;
+}
 
 type DepodataModel = {
   depot_name: string;
@@ -101,6 +108,7 @@ const AccidentsDashboard = () => {
     cardData: CardModel[];
     severityChart: SeverityChartDashboardDataModel[];
     statusChart: DashboardAreaChartDataModel[];
+    depoData: DashboardDepoTableDataModel[];
   }>({
     cardData: [
       {
@@ -122,6 +130,7 @@ const AccidentsDashboard = () => {
     ],
     severityChart: [],
     statusChart: [],
+    depoData: [],
   });
   const [bonnetSearchNo, setBonnetSearchNo] = useState<string>("");
   const [bonnetNumberList, setBonnetNumberList] = useState<string[]>([]);
@@ -192,6 +201,7 @@ const AccidentsDashboard = () => {
         cardData: finalCardData,
         severityChart: data.severityChart,
         statusChart: data.status_based_chart,
+        depoData: data.depotData,
       });
     } catch (error) {
       console.log(error);
@@ -347,15 +357,7 @@ const AccidentsDashboard = () => {
                     startDate={startDate}
                     endDate={endDate}
                     columns={columns}
-                    data={[
-                      {
-                        depot_name: "EKM",
-                        fatal: 6,
-                        major: 3,
-                        minor: 4,
-                        insignificant: 2,
-                      },
-                    ]}
+                    data={dashboardData.depoData}
                   />
                 </div>
               </div>
