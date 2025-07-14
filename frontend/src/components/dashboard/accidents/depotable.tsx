@@ -29,15 +29,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { dateToLocaleFormater } from "@/utils/dateFormater";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  startDate: string;
+  endDate: string;
 }
 
 export function DashBoardDepoTable<TData, TValue>({
   columns,
   data,
+  startDate,
+  endDate,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -62,30 +67,32 @@ export function DashBoardDepoTable<TData, TValue>({
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Depo based Accidents</CardTitle>
-        <CardDescription>
-          Comparison of accidents based on category
-        </CardDescription>
+        <CardTitle>Depot based Accidents</CardTitle>
+        <CardDescription>{`${dateToLocaleFormater(
+          startDate
+        )} - ${dateToLocaleFormater(endDate)}`}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center py-4">
           <Input
-            placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            placeholder="Filter depot"
+            value={
+              (table.getColumn("depot_name")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
+              table.getColumn("depot_name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
         </div>
-        <div className="rounded-md border">
+        <div className="rounded-md border h-96 overflow-auto">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="font-semibold">
                         {header.isPlaceholder
                           ? null
                           : flexRender(

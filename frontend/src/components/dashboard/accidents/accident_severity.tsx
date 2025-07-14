@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis } from "recharts";
 
 import {
   Card,
@@ -18,19 +18,21 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { dateToLocaleFormater } from "@/utils/dateFormater";
+import { SeverityChartDashboardDataModel } from "@/app/Dashboard/Accidents/page";
 
 interface Props {
   startDate: string;
   endDate: string;
+  chartData: SeverityChartDashboardDataModel[];
 }
 
-const chartData = [
-  { severity_type: "Total", value: 186 },
-  { severity_type: "Fatal", value: 73 },
-  { severity_type: "Major", value: 305 },
-  { severity_type: "Minor", value: 1000 },
-  { severity_type: "Insignificant", value: 257 },
-];
+// const chartData = [
+//   { severity_type: "Total", value: 186 },
+//   { severity_type: "Fatal", value: 73 },
+//   { severity_type: "Major", value: 305 },
+//   { severity_type: "Minor", value: 1000 },
+//   { severity_type: "Insignificant", value: 257 },
+// ];
 
 const chartConfig = {
   desktop: {
@@ -53,7 +55,11 @@ function CustomTooltip({ payload, label }: any) {
   );
 }
 
-export function AccidentSevertyBarChart({ startDate, endDate }: Props) {
+export function AccidentSevertyBarChart({
+  startDate,
+  endDate,
+  chartData,
+}: Props) {
   return (
     <Card className="h-full">
       <CardHeader>
@@ -80,7 +86,30 @@ export function AccidentSevertyBarChart({ startDate, endDate }: Props) {
               tickFormatter={(value) => value}
             />
             <ChartTooltip cursor={false} content={<CustomTooltip />} />
-            <Bar dataKey="value" fill="var(--color-desktop)" radius={5}>
+            <Bar dataKey="value" radius={5}>
+              {chartData.map((entry, index) => {
+                let color = "";
+
+                switch (entry.severity_type) {
+                  case "Fatal":
+                    color = "	#ff1a1a";
+                    break;
+                  case "Major":
+                    color = "#ff4d4d";
+                    break;
+                  case "Minor":
+                    color = "#ff8080";
+                    break;
+                  case "Insignificant":
+                    color = "#ffb3b3";
+                    break;
+                  case "Total":
+                    color = "#d9d9d9";
+                    break;
+                }
+
+                return <Cell key={`cell-${index}`} fill={color} />;
+              })}
               <LabelList
                 position="top"
                 offset={12}
@@ -93,7 +122,7 @@ export function AccidentSevertyBarChart({ startDate, endDate }: Props) {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="text-muted-foreground leading-none">
-          Showing severity data for the date seleced
+          Showing severity data for the date selected
         </div>
       </CardFooter>
     </Card>

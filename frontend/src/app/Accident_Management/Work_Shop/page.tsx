@@ -129,6 +129,9 @@ const AccedentWorkshop = () => {
     }
   };
 
+  // HANDLE CANCEL
+  const handelCancel = () => setSelectedAccedentData(null);
+
   useEffect(() => {
     getAllDepoHandler();
   }, []);
@@ -274,7 +277,10 @@ const AccedentWorkshop = () => {
                 )}
               </div>
               <div className="flex gap-3">
-                <button className="border font-[500] px-5 py-2 rounded-xs bg-themeRed">
+                <button
+                  onClick={handelCancel}
+                  className="border font-[500] px-5 py-2 rounded-xs bg-themeRed"
+                >
                   Cancel
                 </button>
                 {/* <button className="border font-[500] px-5 py-1 rounded-xs">

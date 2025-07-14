@@ -246,7 +246,10 @@ const AccedentInspectorForm = () => {
                 )}
               </div>
               <div className="flex gap-3">
-                <button className="border bg-themeRed text-white font-[500] px-5 py-2 rounded-xs">
+                <button
+                  onClick={() => setFetchedDetails(null)}
+                  className="border bg-themeRed text-white font-[500] px-5 py-2 rounded-xs"
+                >
                   Cancel
                 </button>
                 {/* <button className="border font-[500] px-5 py-1 rounded-xs">

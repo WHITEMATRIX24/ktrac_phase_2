@@ -24,7 +24,7 @@ export function AccidentDashboardCards({ data }: Props) {
         className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid #4e5166" }}
       >
-        <CardHeader className="flex flex-col gap-0 w-10/12">
+        <CardHeader className="flex flex-col gap-0 w-10/12 pt-3">
           <CardTitle className="text-[14px] tabular-nums text-black font-medium">
             {(data[0] && data[0].name) || "Total Accidents"}
           </CardTitle>
@@ -41,7 +41,7 @@ export function AccidentDashboardCards({ data }: Props) {
         className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid green" }}
       >
-        <CardHeader className="flex flex-col gap-0 w-10/12">
+        <CardHeader className="flex flex-col gap-0 w-10/12 pt-3">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {(data[1] && data[1].name) || "Primary Stage"}
           </CardTitle>
@@ -57,7 +57,7 @@ export function AccidentDashboardCards({ data }: Props) {
         className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid #C1292E" }}
       >
-        <CardHeader className="flex flex-col gap-0 w-10/12">
+        <CardHeader className="flex flex-col gap-0 w-10/12 pt-3">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {(data[2] && data[2].name) || "In Progress"}
           </CardTitle>
@@ -73,7 +73,7 @@ export function AccidentDashboardCards({ data }: Props) {
         className="@container/card bg-white border-gray relative shadow-md h-[130px] py-1"
         style={{ borderLeft: "8px solid #610345" }}
       >
-        <CardHeader className="flex flex-col gap-0 w-10/12">
+        <CardHeader className="flex flex-col gap-0 w-10/12 pt-3">
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {(data[3] && data[3].name) || "Completed"}
           </CardTitle>

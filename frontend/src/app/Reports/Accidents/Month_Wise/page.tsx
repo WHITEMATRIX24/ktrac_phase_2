@@ -128,9 +128,9 @@ const MonthWiseReport = () => {
       { s: { r: 1, c: 0 }, e: { r: 1, c: columnCount - 1 } },
     ];
 
-    // const workbook = XLSX.utils.book_new();
-    // XLSX.utils.book_append_sheet(workbook, worksheet, "MonthWiseReport");
-    // XLSX.writeFile(workbook, "MonthWiseReport.xlsx");
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "MonthWiseReport");
+    XLSX.writeFile(workbook, "MonthWiseReport.xlsx");
   };
 
   // export pdf

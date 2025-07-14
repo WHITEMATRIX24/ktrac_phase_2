@@ -11,17 +11,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AccidentDashboardCards } from "@/components/dashboard/accidents/cards";
 import { AccidentSevertyBarChart } from "@/components/dashboard/accidents/accident_severity";
-import { AccidentLineChart } from "@/components/dashboard/accidents/accident_dashboard_linechart";
 import { DashBoardDepoTable } from "@/components/dashboard/accidents/depotable";
 import { ColumnDef } from "@tanstack/react-table";
+import { AccidentDashboardAreaChart } from "@/components/dashboard/accidents/accident_dashboard_area";
 
 type CardModel = {
   name: string;
   value: number;
 };
+export interface SeverityChartDashboardDataModel {
+  severity_type: string;
+  value: number;
+}
+export interface DashboardAreaChartDataModel {
+  month: string;
+  all: number;
+  primary: number;
+  inProgress: number;
+  completed: number;
+}
 
 type DepodataModel = {
-  depo_name: string;
+  depot_name: string;
   fatal: number;
   major: number;
   minor: number;
@@ -30,8 +41,8 @@ type DepodataModel = {
 
 const columns: ColumnDef<DepodataModel>[] = [
   {
-    accessorKey: "depo",
-    header: "Depo",
+    accessorKey: "depot_name",
+    header: "Depot",
   },
   {
     accessorKey: "fatal",
@@ -39,7 +50,7 @@ const columns: ColumnDef<DepodataModel>[] = [
   },
   {
     accessorKey: "major",
-    header: "major",
+    header: "Major",
   },
   {
     accessorKey: "minor",
@@ -47,11 +58,11 @@ const columns: ColumnDef<DepodataModel>[] = [
   },
   {
     accessorKey: "insignificant",
-    header: "insignificant",
+    header: "Insignificant",
   },
 ];
 
-const lineChartData = [
+const areaChartData = [
   { month: "January", all: 186, primary: 80, inProgress: 50, completed: 60 },
   { month: "February", all: 305, primary: 200, inProgress: 80, completed: 20 },
   { month: "March", all: 237, primary: 120, inProgress: 20, completed: 40 },
@@ -73,7 +84,7 @@ const getSameDayFromPastSixMonth = () => {
 
   // Handle cases where previous month had fewer days
   if (
-    lastMonth.getMonth() === today.getMonth() - 1 + (12 % 12) &&
+    lastMonth.getMonth() === today.getMonth() - 6 + (12 % 12) &&
     lastMonth.getDate() !== today.getDate()
   ) {
     lastMonth.setDate(0);
@@ -88,6 +99,8 @@ const getSameDayFromPastSixMonth = () => {
 const AccidentsDashboard = () => {
   const [dashboardData, setDashboardData] = useState<{
     cardData: CardModel[];
+    severityChart: SeverityChartDashboardDataModel[];
+    statusChart: DashboardAreaChartDataModel[];
   }>({
     cardData: [
       {
@@ -107,6 +120,8 @@ const AccidentsDashboard = () => {
         value: 0,
       },
     ],
+    severityChart: [],
+    statusChart: [],
   });
   const [bonnetSearchNo, setBonnetSearchNo] = useState<string>("");
   const [bonnetNumberList, setBonnetNumberList] = useState<string[]>([]);
@@ -130,6 +145,16 @@ const AccidentsDashboard = () => {
     }
 
     setBonnetNumberList(["RF1574", "RF1575"]);
+  };
+
+  // HANDLE SEARCH BUTTON CLICK
+  const handleSeacrh = () => fetchData();
+
+  // HANDLE CLEAR FILTER
+  const handleClearFilter = () => {
+    setSelectedCategory("");
+    setSelectedDistrict("");
+    setSelectedFuelType("");
   };
 
   // fetch dashboard data
@@ -165,6 +190,8 @@ const AccidentsDashboard = () => {
 
       setDashboardData({
         cardData: finalCardData,
+        severityChart: data.severityChart,
+        statusChart: data.status_based_chart,
       });
     } catch (error) {
       console.log(error);
@@ -173,13 +200,14 @@ const AccidentsDashboard = () => {
       setIsloading(false);
     }
   };
+  // console.log(dashboardData);
 
   useEffect(() => {
     fetchData();
   }, []);
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col bg-gray-100">
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-3 md:gap-6 md:py-2">
           <div className="flex gap-2 justify-end pr-6">
@@ -205,7 +233,7 @@ const AccidentsDashboard = () => {
               <Input
                 onChange={(e) => handleSearchBonnetnumber(e.target.value)}
                 value={bonnetSearchNo}
-                placeholder="bonnet no"
+                placeholder="Bonnet no"
                 className="bg-white h-8 w-36"
               />
               {bonnetNumberList.length > 0 && (
@@ -222,7 +250,10 @@ const AccidentsDashboard = () => {
                 </div>
               )}
             </div>
-            <Select>
+            <Select
+              onValueChange={(value) => setSelectedDistrict(value)}
+              value={selectedDistrict}
+            >
               <SelectTrigger
                 size="sm"
                 className="w-fit px-3 py-0 bg-white border border-slate-300 rounded-md text-[12px] text-black shadow-sm "
@@ -248,7 +279,10 @@ const AccidentsDashboard = () => {
                 <SelectItem value="Kasaragod">Kasaragod</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select
+              onValueChange={(value) => setSelectedCategory(value)}
+              value={selectedCategory}
+            >
               <SelectTrigger
                 size="sm"
                 className="w-fit px-3 py-0 bg-white border border-slate-300 rounded-md text-[12px] text-black shadow-sm "
@@ -256,12 +290,15 @@ const AccidentsDashboard = () => {
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="depo1">Super Fast</SelectItem>
-                <SelectItem value="depo2">Minnal</SelectItem>
-                <SelectItem value="depo3">Ac lowfloor</SelectItem>
+                <SelectItem value="super fast">Super Fast</SelectItem>
+                <SelectItem value="minal">Minnal</SelectItem>
+                <SelectItem value="ac lowfloor">Ac lowfloor</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select
+              onValueChange={(value) => setSelectedFuelType(value)}
+              value={selectedFuelType}
+            >
               <SelectTrigger
                 size="sm"
                 className="w-fit px-3 py-0 bg-white border border-slate-300 rounded-md text-[12px] text-black shadow-sm "
@@ -269,32 +306,57 @@ const AccidentsDashboard = () => {
                 <SelectValue placeholder="Select Fuel type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="depo1">Diseal</SelectItem>
-                <SelectItem value="depo2">Electric</SelectItem>
-                <SelectItem value="depo3">Cng</SelectItem>
+                <SelectItem value="diesel">Diesel</SelectItem>
+                <SelectItem value="electric">Electric</SelectItem>
+                <SelectItem value="cng">CNG</SelectItem>
               </SelectContent>
             </Select>
-            <Button size={"sm"} className="bg-sidebar">
+            <Button
+              onClick={handleClearFilter}
+              size={"sm"}
+              className="bg-white hover:bg-white hover:cursor-pointer text-black"
+            >
+              clear
+            </Button>
+            <Button onClick={handleSeacrh} size={"sm"} className="bg-sidebar">
               Search
             </Button>
           </div>
           {isLoading ? (
-            <p>loading...</p>
+            <p className="h-[80vh]">loading...</p>
           ) : (
             <>
               <AccidentDashboardCards data={dashboardData.cardData} />
               <div className="grid grid-cols-2 gap-4">
                 <div className="pl-4 lg:pl-6">
-                  <AccidentLineChart chartData={lineChartData} />
+                  <AccidentDashboardAreaChart
+                    startDate={startDate}
+                    endDate={endDate}
+                    chartData={dashboardData.statusChart}
+                  />
                 </div>
                 <div className="pr-4 lg:pr-6">
                   <AccidentSevertyBarChart
                     startDate={startDate}
                     endDate={endDate}
+                    chartData={dashboardData.severityChart}
                   />
                 </div>
-                <div className="pl-4 lg:pl-6">
-                  <DashBoardDepoTable columns={columns} data={[]} />
+                <div className="col-span-2 pl-4 lg:pl-6 pr-4 lg:pr-6">
+                  <DashBoardDepoTable
+                    startDate={startDate}
+                    endDate={endDate}
+                    columns={columns}
+                    data={[
+                      {
+                        depot_name: "EKM",
+                        fatal: 6,
+                        major: 3,
+                        minor: 4,
+                        insignificant: 2,
+                      },
+                    ]}
+                  />
                 </div>
               </div>
             </>

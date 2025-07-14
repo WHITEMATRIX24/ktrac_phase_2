@@ -178,18 +178,22 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                   ref={bonnetNumberContainrerRef}
                   className="absolute border flex flex-col gap-1 top-14 bg-slate-50 rounded-sm px-3 py-2 w-40 h-52 overflow-auto"
                 >
-                  {filteredBusinfo.map((d: any) => (
-                    <button
-                      onClick={() => {
-                        setBonnetNo(d.bonet_number);
-                        setShowBonnetDropDown(false);
-                      }}
-                      className="py-2 text-start"
-                      key={d.bonet_number}
-                    >
-                      {d.bonet_number}
-                    </button>
-                  ))}
+                  {filteredBusinfo ? (
+                    filteredBusinfo.map((d: any) => (
+                      <button
+                        onClick={() => {
+                          setBonnetNo(d.bonet_number);
+                          setShowBonnetDropDown(false);
+                        }}
+                        className="py-2 text-start"
+                        key={d.bonet_number}
+                      >
+                        {d.bonet_number}
+                      </button>
+                    ))
+                  ) : (
+                    <p>something went wrong</p>
+                  )}
                 </div>
               )}
             </div>
