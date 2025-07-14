@@ -581,213 +581,201 @@ const ZerothReport = () => {
 
         }
     };
-const handleFiles = async (files: File[]) => {
-    const videoFiles = files.filter((file) => file.type.startsWith("video/"));
-    if (videoFiles.length === 0) {
-      alert("Please upload a valid video file.");
-      return;
-    }
-
-    setUploading(true);
-    try {
+     // Store videos temporarily for upload on submit
+    const [videoFilesToUpload, setVideoFilesToUpload] = useState<File[]>([]);
+    
+      const uploadVideosToS3 = async (files: File[]) => {
       const formData = new FormData();
-
-      // Append each file with the key 'files'
-      for (const file of videoFiles) {
-        formData.append("files", file);
-      }
-
-      // Optional: add reference number
-      const referenceNumber = "KTRAC123";
-      for (let pair of formData.entries()) {
-        console.log("form field:", pair[0], pair[1]);
-      }
-
-
-      const res = await fetch(`/api/storage/uploadVideo?reference_numner=${referenceNumber}`, {
+      files.forEach((file) => formData.append("files", file));
+    
+      const referenceNumber = accidentRefernceId;
+      const res = await fetch(`/api/storage/uploadVideo?reference_number=${referenceNumber}`, {
         method: "POST",
         body: formData,
       });
-
-      if (!res.ok) {
-        return alert("error in uploading files");
-      }
-      const result = await res.json();
-      const fileUploadData: {
-        name: string;
-        key: string;
-      }[] = result.data;
-/*       console.log(fileUploadData[0].key);
- */      setVideoUrl(fileUploadData[0].key)
-
-/*       console.log(videoUrl);
- */      // After successful upload
-      const fileUrl = `https://accidentphotos.s3.ap-south-1.amazonaws.com/${videoUrl}`;
-      setUploadedVideoUrl(fileUrl);
-
-
-/*       console.log("Uploaded files:", result);
- */      alert("Upload successful!");
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Upload failed");
-    }
-    setUploading(false);
-  };
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const filesArray = Array.from(e.target.files);
-        const newFiles: MediaFile[] = filesArray.map((file) => ({
-          id: `${file.name}-${Date.now()}`,
-          file,
-          type: file.type.startsWith("video") ? "video" : "image",
-          url: URL.createObjectURL(file),
-        }));
-        
-        setMediaFiles((prev) => [...prev, ...newFiles]);
-        
-    const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
     
-      // Step 4: If any video file is present, upload
-      if (videoFiles.length > 0) {
-        handleFiles(videoFiles); // Call your upload logic
+      if (!res.ok) {
+        throw new Error("Failed to upload videos to S3.");
       }
+    
+      const result = await res.json();
+      const fileUploadData: { key: string; name: string }[] = result.data;
+    
+      return fileUploadData.map((f) => f.key); // Return only keys
     };
+  
+const processFiles = (filesArray: File[]) => {
+  const newFiles: MediaFile[] = filesArray.map((file) => ({
+    id: `${file.name}-${Date.now()}`,
+    file,
+    type: file.type.startsWith("video") ? "video" : "image",
+    url: URL.createObjectURL(file),
+  }));
+  setMediaFiles((prev) => [...prev, ...newFiles]);
 
-    const handleRemoveFile = (id: string) => {
-        setMediaFiles(prev => prev.filter(file => file.id !== id));
-    };
+  const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
+  if (videoFiles.length > 0) {
+    setVideoFilesToUpload((prev) => [...prev, ...videoFiles]);
+  }
+};
 
-    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
 
-    const handleDragLeave = () => {
-        setIsDragging(false);
-    };
+const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files) return;
+  processFiles(Array.from(e.target.files));
+};
 
-    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setIsDragging(false);
-        if (!e.dataTransfer.files) return;
+const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragging(false);
+  if (!e.dataTransfer.files) return;
+  processFiles(Array.from(e.dataTransfer.files));
+};
 
-        const newFiles: MediaFile[] = Array.from(e.dataTransfer.files).map(file => ({
-            id: `${file.name}-${Date.now()}`,
-            file,
-            type: file.type.startsWith('video') ? 'video' : 'image',
-            url: URL.createObjectURL(file),
-        }));
-        setMediaFiles(prev => [...prev, ...newFiles]);
-    };
+ const handleRemoveFile = (id: string) => {
+  setMediaFiles((prevMediaFiles) => {
+    const fileToRemove = prevMediaFiles.find((file) => file.id === id);
+
+    // If it's a video, remove it from the pending upload list too
+    if (fileToRemove?.type === "video") {
+      setVideoFilesToUpload((prevVideos) =>
+        prevVideos.filter((videoFile) => videoFile.name !== fileToRemove.file.name)
+      );
+    }
+
+    // Return the filtered media list
+    return prevMediaFiles.filter((file) => file.id !== id);
+  });
+};
+
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
 
     const handleSubmitAccidentDetails = async (e: FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setSubmitError(null);
-
-        try {
-            if (mediaFiles.length === 0) {
-                throw new Error('Please upload at least one photo of the accident');
-            }
-
-            const imageFiles = mediaFiles.filter((file)=>file.type==='image')
-
-            const photoPromises = imageFiles.map(file => {
-                return new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        if (typeof reader.result === 'string') {
-                            resolve(reader.result);
-                        } else {
-                            reject(new Error('Failed to read file'));
-                        }
-                    };
-                    reader.onerror = () => reject(reader.error);
-                    reader.readAsDataURL(file.file);
-                });
-            });
-
-            const photoBase64Strings = await Promise.all(photoPromises);
-            const photosPayload = photoBase64Strings.map(base64 => ({
-                base64: base64.split(',')[1] || base64,
-                content_type: "image/jpeg"
-            }));
-
-            const payload = {
-                accident_id: accidentRefernceId,
-                location_info: {
-                    address: locationData.address,
-                    place: locationData.place,
-                    district: locationData.district,
-                    state: locationData.state,
-                    nearest_depo: formData.nearestDepoName,
-                    nearest_depo_contact_number: formData.depotContact
-                },
-                geolocation: {
-                    latitude: parseFloat(locationData.latitude),
-                    longitude: parseFloat(locationData.longitude),
-          nearest_police_station: locationData.policeStationName,
-                    nearest_police_station_contact_number: locationData.policeStationContact,
-                    timezone_info: {
-                        timezone: "Asia/Kolkata",
-                        offset: "+05:30"
-                    }
-                },
-                accident_details: {
-                    date_of_accident: formData.dateOfAccident,
-                    time_of_accident: formData.timeOfAccident,
-                    time_zone_of_accident: formData.timeZone,
-                    operated_depot: formData.operatedDepot,
-                    schedule_number: formData.scheduleNumber,
-                    description: formData.description
-                },
-                crew_information: {
-                    driver_type_code: driverCategory,
-                    driver_name: formData.driverName,
-                    driver_phn_no: formData.driverPhone,
-                    driver_pen_no: formData.driverPenNo,
-                    conductor_name: formData.conductorName,
-                    conductor_phn_no: formData.conductorPhone,
-                    conductor_pen_no: formData.conductorPenNo
-                },
-                vehicle_info: {
-                    bonet_no: formData.bonnetNumber,
-                    vehicle_register_no: "",
-                    vehicle_make: ""
-                },
-                photos: photosPayload,
-                video_s3_keys: [videoUrl],
+      e.preventDefault();
+      setIsSubmitting(true);
+      setSubmitError(null);
+    
+      try {
+        if (mediaFiles.length === 0) {
+          throw new Error("Please upload at least one photo of the accident");
+        }
+    
+        // Extract only image files
+        const imageFiles = mediaFiles.filter((file) => file.type === "image");
+    
+        const photoPromises = imageFiles.map((file) => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              if (typeof reader.result === "string") {
+                resolve(reader.result);
+              } else {
+                reject(new Error("Failed to read file"));
+              }
             };
-
-            const response = await fetch('/api/submitZeroReportDetails', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to submit accident report');
-            }
-
-            const result = await response.json();
-            console.log('Accident report submitted successfully:', result);
-            setShowSuccessModal(true);
-
-            const id = setTimeout(() => {
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file.file);
+          });
+        });
+    
+        const photoBase64Strings = await Promise.all(photoPromises);
+        const photosPayload = photoBase64Strings.map((base64) => ({
+          base64: base64.split(",")[1] || base64,
+          content_type: "image/jpeg",
+        }));
+    
+        // ✅ Upload all videos to S3 and get the S3 keys
+        let videoS3Keys: string[] = [];
+        if (videoFilesToUpload.length > 0) {
+          videoS3Keys = await uploadVideosToS3(videoFilesToUpload);
+        }
+    
+        // ✅ Construct final payload
+        const payload = {
+          accident_id: accidentRefernceId,
+          location_info: {
+            address: locationData.address,
+            place: locationData.place,
+            district: locationData.district,
+            state: locationData.state,
+            nearest_depo: formData.nearestDepoName,
+            nearest_depo_contact_number: formData.depotContact,
+          },
+          geolocation: {
+            latitude: parseFloat(locationData.latitude),
+            longitude: parseFloat(locationData.longitude),
+            nearest_police_station: locationData.policeStationName,
+            nearest_police_station_contact_number: locationData.policeStationContact,
+            timezone_info: {
+              timezone: "Asia/Kolkata",
+              offset: "+05:30",
+            },
+          },
+          accident_details: {
+            date_of_accident: formData.dateOfAccident,
+            time_of_accident: formData.timeOfAccident,
+            time_zone_of_accident: formData.timeZone,
+            operated_depot: formData.operatedDepot,
+            schedule_number: formData.scheduleNumber,
+            description: formData.description,
+          },
+          crew_information: {
+            driver_type_code: driverCategory,
+            driver_name: formData.driverName,
+            driver_phn_no: formData.driverPhone,
+            driver_pen_no: formData.driverPenNo,
+            conductor_name: formData.conductorName,
+            conductor_phn_no: formData.conductorPhone,
+            conductor_pen_no: formData.conductorPenNo,
+          },
+          vehicle_info: {
+            bonet_no: formData.bonnetNumber,
+            vehicle_register_no: "",
+            vehicle_make: "",
+          },
+          photos: photosPayload,
+          video_s3_keys: videoS3Keys,
+        };
+    
+        const response = await fetch("/api/submitZeroReportDetails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+    
+        if (!response.ok) {
+          return alert("Failed to submit accident report");
+        }
+    
+        const result = await response.json();
+        console.log("Accident report submitted successfully:", result);
+        setShowSuccessModal(true);
+    
+         const id = setTimeout(() => {
                 setSubmissionSuccess(true); // Set success state instead of showing modal
                 sessionStorage.removeItem('accidentData');
             }, 3000);
             setTimeoutId(id);
-
-        } catch (error) {
-            console.error('Error submitting accident report:', error);
-            setSubmitError(error instanceof Error ? error.message : 'Failed to submit accident report. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
+      } catch (error) {
+        console.error("Error submitting accident report:", error);
+        setSubmitError(
+          error instanceof Error
+            ? error.message
+            : "Failed to submit accident report. Please try again."
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     };
 
     useEffect(() => {

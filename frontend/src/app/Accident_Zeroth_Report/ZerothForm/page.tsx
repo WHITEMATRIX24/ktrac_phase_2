@@ -12,30 +12,7 @@ import { AlertTriangle, LogOut, Camera, X, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import 'leaflet/dist/leaflet.css'; // ✅ required
 import LiveGoogleMap from '@/components/LiveGoogleMap';
-const MapComponent = dynamic(() => import("@/components/MapComponent"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full text-sm text-gray-500">
-      Loading map...
-    </div>
-  ),
-});// import MapmyIndiaLiveLocation from '@/components/MapmyIndiaLiveLocation';
-// const MapmyIndiaLiveLocation = dynamic(() => import('@/components/MapmyIndiaLiveLocation'), {
-//   ssr: false,
-// });
-// import TomTomLiveMap from '@/components/TomTomLiveMap';
-// Dynamically import with SSR off to prevent hydration mismatch
-const TomTomLiveMap = dynamic(() => import('@/components/TomTomLiveMap'), {
-  ssr: false,
-});
 
-// const LiveMap = dynamic(() => import('@/components/LiveMap'), {
-//   ssr: false,
-// });
-
-// const CurrentLocationMap  = dynamic(() => import('@/components/CurrentLocationMap'), {
-//   ssr: false,
-// });
 type MediaFile = {
   id: string;
   url: string;
@@ -753,12 +730,12 @@ const ZerothReport = () => {
 
   const [mounted, setMounted] = useState(false);
 
-  /* // Avoid hydration mismatch
+   // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
- */
-
+ 
+//useEffect to fetch accident data from session storage
   useEffect(() => {
     const data = sessionStorage.getItem("accidentData");
     if (data) {
@@ -772,6 +749,7 @@ const ZerothReport = () => {
     }
   }, []);
 
+  //useEffect to fileter police station and depo (nearest)
   useEffect(() => {
     if (locationData.district) {
       const filteredStations = policeStations.filter(
@@ -786,6 +764,7 @@ const ZerothReport = () => {
     }
   }, [locationData.district]);
 
+  //useEffect to fetch conductor and driver details
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -814,6 +793,7 @@ const ZerothReport = () => {
     fetchUsers();
   }, []);
 
+  //useEffect to handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -858,29 +838,29 @@ const ZerothReport = () => {
     setShowDriverDropdown(false);
   };
   const handleLocationSelect = (suggestion: any) => {
-  const address = suggestion.address;
-  const district =
-    address.county || address.district || address.state_district || "";
+    const address = suggestion.address;
+    const district =
+      address.county || address.district || address.state_district || "";
 
-  const lat = parseFloat(suggestion.lat);
-  const lng = parseFloat(suggestion.lon);
+    const lat = parseFloat(suggestion.lat);
+    const lng = parseFloat(suggestion.lon);
 
-  // ✅ Update coordinates for the map
-  setCoords({ lat, lng });
+    // ✅ Update coordinates for the map
+    setCoords({ lat, lng });
 
-  setLocationData((prev) => ({
-    ...prev,
-    address: suggestion.display_name,
-    place: address.village || address.town || address.city || "",
-    district: district,
-    state: address.state || "",
-    latitude: suggestion.lat,
-    longitude: suggestion.lon,
-  }));
+    setLocationData((prev) => ({
+      ...prev,
+      address: suggestion.display_name,
+      place: address.village || address.town || address.city || "",
+      district: district,
+      state: address.state || "",
+      latitude: suggestion.lat,
+      longitude: suggestion.lon,
+    }));
 
-  setLocationQuery(suggestion.display_name);
-  setShowLocationSuggestions(false);
-};
+    setLocationQuery(suggestion.display_name);
+    setShowLocationSuggestions(false);
+  };
 
   const filterConductors = (searchTerm: string) => {
     if (!searchTerm) {
@@ -907,7 +887,7 @@ const ZerothReport = () => {
     setConductorSearchText(conductor.pen_no);
     setShowConductorDropdown(false);
   };
-
+//to manage click outside of conductor dropdown 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -935,25 +915,7 @@ const ZerothReport = () => {
     }
   };
 
-  /* const handleLocationSelect = (suggestion: any) => {
-    const address = suggestion.address;
-    const district =
-      address.county || address.district || address.state_district || "";
-
-    setLocationData((prev) => ({
-      ...prev,
-      address: suggestion.display_name,
-      place: address.village || address.town || address.city || "",
-      district: district,
-      state: address.state || "",
-      latitude: suggestion.lat,
-      longitude: suggestion.lon,
-    }));
-
-    setLocationQuery(suggestion.display_name);
-    setShowLocationSuggestions(false);
-  }; */
-
+  
   const calculateTimeSlot = (time: string) => {
     if (!time) return "";
     const [hoursStr, minutesStr] = time.split(":");
@@ -974,182 +936,32 @@ const ZerothReport = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
 
-  const fileInputRefVideo = useRef<HTMLInputElement>(null);
+  // Store videos temporarily for upload on submit
+const [videoFilesToUpload, setVideoFilesToUpload] = useState<File[]>([]);
 
-  const handleDragOverVideo = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+  const uploadVideosToS3 = async (files: File[]) => {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("files", file));
 
-  const handleDragLeaveVideo = () => setIsDragging(false);
+  const referenceNumber = accidentRefernceId;
+  const res = await fetch(`/api/storage/uploadVideo?reference_number=${referenceNumber}`, {
+    method: "POST",
+    body: formData,
+  });
 
-  const handleDropVideo = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    handleFiles(Array.from(e.dataTransfer.files));
-  };
-
-  const handleFileChangeVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    handleFiles(Array.from(e.target.files));
-  };
-
-  const handleFiles = async (files: File[]) => {
-    const videoFiles = files.filter((file) => file.type.startsWith("video/"));
-    if (videoFiles.length === 0) {
-      alert("Please upload a valid video file.");
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-
-      // Append each file with the key 'files'
-      for (const file of videoFiles) {
-        formData.append("files", file);
-      }
-
-      // Optional: add reference number
-      const referenceNumber = "KTRAC123";
-      for (let pair of formData.entries()) {
-        console.log("form field:", pair[0], pair[1]);
-      }
-
-
-      const res = await fetch(`/api/storage/uploadVideo?reference_numner=${referenceNumber}`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        return alert("error in uploading files");
-      }
-      const result = await res.json();
-      const fileUploadData: {
-        name: string;
-        key: string;
-      }[] = result.data;
-/*       console.log(fileUploadData[0].key);
- */      setVideoUrl(fileUploadData[0].key)
-
-/*       console.log(videoUrl);
- */      // After successful upload
-      const fileUrl = `https://accidentphotos.s3.ap-south-1.amazonaws.com/${videoUrl}`;
-      setUploadedVideoUrl(fileUrl);
-
-
-/*       console.log("Uploaded files:", result);
- */      alert("Upload successful!");
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Upload failed");
-    }
-    setUploading(false);
-  };
-
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude.toFixed(6);
-          const lon = position.coords.longitude.toFixed(6);
-          setLocationPermission(true);
-
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
-            );
-            const data = await response.json();
-            const address = data.address || {};
-            const district =
-              address.county ||
-              address.district ||
-              address.state_district ||
-              "";
-
-            setLocationData({
-              address: data.display_name || "",
-              place: address.village || address.town || address.city || "",
-              district: district,
-              state: address.state || "",
-              latitude: lat,
-              longitude: lon,
-              policeStation: "",
-              policeStationName: "",
-              policeStationContact: "",
-            });
-
-            setLocationQuery(data.display_name || "");
-          } catch (error) {
-            console.error("Error fetching address:", error);
-          }
-        },
-        (error) => {
-          console.error("Location permission denied:", error);
-          setLocationPermission(false);
-        }
-      );
-    } else {
-      console.log("Geolocation not supported");
-    }
-  }, []);
-
-  useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const lat = Number(position.coords.latitude.toFixed(6));
-        const lng = Number(position.coords.longitude.toFixed(6));
-        setLocationPermission(true);
-        setCoords({ lat, lng });
-
-        try {
-          const response = await fetch(
-            'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}'
-          );
-          const data = await response.json();
-          console.log(data);
-          
-          const address = data.address || {};
-          const district =
-            address.county ||
-            address.district ||
-            address.state_district ||
-            "";
-
-          setLocationData({
-            address: data.display_name || "",
-            place: address.village || address.town || address.city || "",
-            district: district,
-            state: address.state || "",
-            latitude: lat.toString(),
-            longitude: lng.toString(),
-            policeStation: "",
-            policeStationName:"",
-            policeStationContact: "",
-          });
-
-          setLocationQuery(data.display_name || "");
-        } catch (error) {
-          console.error("Error fetching address:", error);
-        }
-      },
-      (error) => {
-        console.error("Location permission denied:", error);
-        setLocationPermission(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-  } else {
-    console.log("Geolocation not supported");
+  if (!res.ok) {
+    throw new Error("Failed to upload videos to S3.");
   }
-}, []);
-  useEffect(() => {
+
+  const result = await res.json();
+  const fileUploadData: { key: string; name: string }[] = result.data;
+
+  return fileUploadData.map((f) => f.key); // Return only keys
+};
+
+
+//location query to show location suggestions
+ useEffect(() => {
     if (locationQuery.length > 2) {
       const handler = setTimeout(() => {
         fetchLocationSuggestions(locationQuery);
@@ -1159,6 +971,88 @@ const ZerothReport = () => {
       setLocationSuggestions([]);
     }
   }, [locationQuery]);
+
+
+ //useEffect of gomaps
+useEffect(() => {
+  if (!navigator.geolocation) {
+    console.log("❌ Geolocation not supported");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = Number(position.coords.latitude.toFixed(6));
+      const lng = Number(position.coords.longitude.toFixed(6));
+      setLocationPermission(true);
+      setCoords({ lat, lng });
+
+      try {
+        const response = await fetch(
+          `https://maps.gomaps.pro/maps/api/geocode/json?latlng=${lat},${lng}&key=AlzaSyxYry5klW4Nt35VxHlfdyHoRBdAJA7qu_z`
+        );
+
+        const data = await response.json();
+        console.log("GoMapsPro API response:", data);
+
+        if (data.status === "OK" && data.results.length > 0) {
+          const preferredResult = data.results.find(
+            (r: any) =>
+              !r.formatted_address.startsWith("Unnamed Road") &&
+              !r.formatted_address.match(/^[A-Z0-9]{4}\+/)
+          ) || data.results[0];
+
+          const components = preferredResult.address_components || [];
+
+          const getComponent = (type: string) =>
+            components.find((comp: any) => comp.types.includes(type))?.long_name || "";
+
+          // Extract values
+          const place =
+            getComponent("sublocality") ||
+            getComponent("neighborhood") ||
+            getComponent("locality") ||        // often village/town
+            getComponent("administrative_area_level_3") || "";
+
+          const district =
+            getComponent("administrative_area_level_2") || "";
+
+          const state =
+            getComponent("administrative_area_level_1") || "";
+
+          const pin = getComponent("postal_code") || "";
+
+          setLocationData({
+            address: preferredResult.formatted_address || "",
+            place,
+            district,
+            state,
+            latitude: lat.toString(),
+            longitude: lng.toString(),
+            policeStation: "",
+            policeStationName:"",
+            policeStationContact: "",
+          });
+
+          setLocationQuery(preferredResult.formatted_address || "");
+        } else {
+          console.warn("⚠️ No valid address found from GoMaps Pro", data);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching address from GoMaps Pro:", error);
+      }
+    },
+    (error) => {
+      console.error("❌ Location permission denied:", error);
+      setLocationPermission(false);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    }
+  );
+}, []);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -1177,18 +1071,7 @@ const ZerothReport = () => {
     const { name, value } = e.target;
     setLocationData((prev) => ({ ...prev, [name]: value }));
   };
-   const fetchPlaceName = async (lat: number, lng: number): Promise<string> => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-      );
-      const data = await res.json();
-      return data.display_name || "Unknown location";
-    } catch (error) {
-      console.error("Error fetching place name:", error);
-      return "Unknown location";
-    }
-  };
+  
 
   const handlePoliceStationSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     const stationId = parseInt(e.target.value);
@@ -1228,30 +1111,51 @@ const ZerothReport = () => {
     }
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const filesArray = Array.from(e.target.files);
-    const newFiles: MediaFile[] = filesArray.map((file) => ({
-      id: `${file.name}-${Date.now()}`,
-      file,
-      type: file.type.startsWith("video") ? "video" : "image",
-      url: URL.createObjectURL(file),
-    }));
-    
-    setMediaFiles((prev) => [...prev, ...newFiles]);
-    
-const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
+  
+const processFiles = (filesArray: File[]) => {
+  const newFiles: MediaFile[] = filesArray.map((file) => ({
+    id: `${file.name}-${Date.now()}`,
+    file,
+    type: file.type.startsWith("video") ? "video" : "image",
+    url: URL.createObjectURL(file),
+  }));
+  setMediaFiles((prev) => [...prev, ...newFiles]);
 
-  // Step 4: If any video file is present, upload
+  const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
   if (videoFiles.length > 0) {
-    handleFiles(videoFiles); // Call your upload logic
+    setVideoFilesToUpload((prev) => [...prev, ...videoFiles]);
   }
 };
-  
 
-  const handleRemoveFile = (id: string) => {
-    setMediaFiles((prev) => prev.filter((file) => file.id !== id));
-  };
+
+const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files) return;
+  processFiles(Array.from(e.target.files));
+};
+
+const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragging(false);
+  if (!e.dataTransfer.files) return;
+  processFiles(Array.from(e.dataTransfer.files));
+};
+
+ const handleRemoveFile = (id: string) => {
+  setMediaFiles((prevMediaFiles) => {
+    const fileToRemove = prevMediaFiles.find((file) => file.id === id);
+
+    // If it's a video, remove it from the pending upload list too
+    if (fileToRemove?.type === "video") {
+      setVideoFilesToUpload((prevVideos) =>
+        prevVideos.filter((videoFile) => videoFile.name !== fileToRemove.file.name)
+      );
+    }
+
+    // Return the filtered media list
+    return prevMediaFiles.filter((file) => file.id !== id);
+  });
+};
+
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -1262,186 +1166,127 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
     setIsDragging(false);
   };
 
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (!e.dataTransfer.files) return;
+ const handleSubmitAccidentDetails = async (e: FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitError(null);
 
-    const newFiles: MediaFile[] = Array.from(e.dataTransfer.files).map(
-      (file) => ({
-        id: `${file.name}-${Date.now()}`,
-        file,
-        type: file.type.startsWith("video") ? "video" : "image",
-        url: URL.createObjectURL(file),
-      })
-    );
-    setMediaFiles((prev) => [...prev, ...newFiles]);
-  };
-
-  const handleSubmitAccidentDetails = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError(null);
-
-    try {
-      if (mediaFiles.length === 0) {
-        throw new Error("Please upload at least one photo of the accident");
-      }
-      const imageFiles = mediaFiles.filter((file)=>file.type==='image')
-
-      const photoPromises = imageFiles.map((file) => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            if (typeof reader.result === "string") {
-              resolve(reader.result);
-            } else {
-              reject(new Error("Failed to read file"));
-            }
-          };
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(file.file);
-        });
-      });
-
-      const photoBase64Strings = await Promise.all(photoPromises);
-      const photosPayload = photoBase64Strings.map((base64) => ({
-        base64: base64.split(",")[1] || base64,
-        content_type: "image/jpeg",
-      }));
-
-        const payload = {
-        accident_id: accidentRefernceId,
-        location_info: {
-          address: locationData.address,
-          place: locationData.place,
-          district: locationData.district,
-          state: locationData.state,
-          nearest_depo: formData.nearestDepoName,
-          nearest_depo_contact_number: formData.depotContact,
-        },
-        geolocation: {
-          latitude: parseFloat(locationData.latitude),
-          longitude: parseFloat(locationData.longitude),
-          nearest_police_station: locationData.policeStationName,
-          nearest_police_station_contact_number:
-            locationData.policeStationContact,
-          timezone_info: {
-            timezone: "Asia/Kolkata",
-            offset: "+05:30",
-          },
-        },
-        accident_details: {
-          date_of_accident: formData.dateOfAccident,
-          time_of_accident: formData.timeOfAccident,
-          time_zone_of_accident: formData.timeZone,
-          operated_depot: formData.operatedDepot,
-          schedule_number: formData.scheduleNumber,
-          description: formData.description,
-        },
-        crew_information: {
-          driver_type_code: driverCategory,
-          driver_name: formData.driverName,
-          driver_phn_no: formData.driverPhone,
-          driver_pen_no: formData.driverPenNo,
-          conductor_name: formData.conductorName,
-          conductor_phn_no: formData.conductorPhone,
-          conductor_pen_no: formData.conductorPenNo,
-        },
-        vehicle_info: {
-          bonet_no: formData.bonnetNumber,
-          vehicle_register_no: "",
-          vehicle_make: "",
-        },
-        photos: photosPayload,
-        video_s3_keys: [videoUrl],
-      };  
-     /*  const payload = {
-        accident_id: accidentRefernceId,
-        location_info: {
-          address: locationData.address,
-          place: locationData.place,
-          district: locationData.district,
-          state: locationData.state,
-         latitude: parseFloat(locationData.latitude),
-          longitude: parseFloat(locationData.longitude),
-        },
-          
-        nearby_assistance_details: {
-          nearest_police_station: locationData.policeStationName,
-          nearest_police_station_contact_number:
-            locationData.policeStationContact,
-            nearest_depo: formData.nearestDepoName,
-          nearest_depo_contact_number: formData.depotContact,
-          timezone_info: {
-            timezone: "Asia/Kolkata",
-            offset: "+05:30",
-          },
-        },
-        accident_details: {
-          date_of_accident: formData.dateOfAccident,
-          time_of_accident: formData.timeOfAccident,
-          time_zone_of_accident: formData.timeZone,
-          operated_depot: formData.operatedDepot,
-          schedule_number: formData.scheduleNumber,
-          description: formData.description,
-        },
-        crew_information: {
-          driver_type_code: driverCategory,
-          driver_name: formData.driverName,
-          driver_phn_no: formData.driverPhone,
-          driver_pen_no: formData.driverPenNo,
-          conductor_name: formData.conductorName,
-          conductor_phn_no: formData.conductorPhone,
-          conductor_pen_no: formData.conductorPenNo,
-        },
-        vehicle_info: {
-          bonet_no: formData.bonnetNumber,
-          vehicle_register_no: "",
-          vehicle_make: "",
-        },
-        accident_documentation:{
-        photos: photosPayload,
-        videos: videoUrl,
-        }
-        
-      };  */
-      console.log(payload);
-
-      const response = await fetch("/api/submitZeroReportDetails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-       console.log(response);
- 
-      if (!response.ok) {
-        alert('Failed to submit accident report')
-/*         throw new Error("Failed to submit accident report");
- */      }
-
-      const result = await response.json();
-      console.log("Accident report submitted successfully:", result);
-      setShowSuccessModal(true);
-
-      const id = setTimeout(() => {
-        router.push("/Accident_Zeroth_Report/ZerothReportRegister");
-      }, 3000);
-      setTimeoutId(id);
-    } catch (error) {
-      console.error("Error submitting accident report:", error);
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Failed to submit accident report. Please try again."
-      );
-    } finally {
-      setIsSubmitting(false);
+  try {
+    if (mediaFiles.length === 0) {
+      throw new Error("Please upload at least one photo of the accident");
     }
-  };
 
+    // Extract only image files
+    const imageFiles = mediaFiles.filter((file) => file.type === "image");
+
+    const photoPromises = imageFiles.map((file) => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            resolve(reader.result);
+          } else {
+            reject(new Error("Failed to read file"));
+          }
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file.file);
+      });
+    });
+
+    const photoBase64Strings = await Promise.all(photoPromises);
+    const photosPayload = photoBase64Strings.map((base64) => ({
+      base64: base64.split(",")[1] || base64,
+      content_type: "image/jpeg",
+    }));
+
+    // ✅ Upload all videos to S3 and get the S3 keys
+    let videoS3Keys: string[] = [];
+    if (videoFilesToUpload.length > 0) {
+      videoS3Keys = await uploadVideosToS3(videoFilesToUpload);
+    }
+
+    // ✅ Construct final payload
+    const payload = {
+      accident_id: accidentRefernceId,
+      location_info: {
+        address: locationData.address,
+        place: locationData.place,
+        district: locationData.district,
+        state: locationData.state,
+        nearest_depo: formData.nearestDepoName,
+        nearest_depo_contact_number: formData.depotContact,
+      },
+      geolocation: {
+        latitude: parseFloat(locationData.latitude),
+        longitude: parseFloat(locationData.longitude),
+        nearest_police_station: locationData.policeStationName,
+        nearest_police_station_contact_number: locationData.policeStationContact,
+        timezone_info: {
+          timezone: "Asia/Kolkata",
+          offset: "+05:30",
+        },
+      },
+      accident_details: {
+        date_of_accident: formData.dateOfAccident,
+        time_of_accident: formData.timeOfAccident,
+        time_zone_of_accident: formData.timeZone,
+        operated_depot: formData.operatedDepot,
+        schedule_number: formData.scheduleNumber,
+        description: formData.description,
+      },
+      crew_information: {
+        driver_type_code: driverCategory,
+        driver_name: formData.driverName,
+        driver_phn_no: formData.driverPhone,
+        driver_pen_no: formData.driverPenNo,
+        conductor_name: formData.conductorName,
+        conductor_phn_no: formData.conductorPhone,
+        conductor_pen_no: formData.conductorPenNo,
+      },
+      vehicle_info: {
+        bonet_no: formData.bonnetNumber,
+        vehicle_register_no: "",
+        vehicle_make: "",
+      },
+      photos: photosPayload,
+      video_s3_keys: videoS3Keys,
+    };
+
+    const response = await fetch("/api/submitZeroReportDetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      return alert("Failed to submit accident report");
+    }
+
+    const result = await response.json();
+    console.log("Accident report submitted successfully:", result);
+    setShowSuccessModal(true);
+
+    const id = setTimeout(() => {
+      router.push("/Accident_Zeroth_Report/ZerothReportRegister");
+    }, 3000);
+    setTimeoutId(id);
+  } catch (error) {
+    console.error("Error submitting accident report:", error);
+    setSubmitError(
+      error instanceof Error
+        ? error.message
+        : "Failed to submit accident report. Please try again."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+  
+//useEffect to close success modal
   useEffect(() => {
     if (showSuccessModal) {
       let count = 3;
@@ -1485,8 +1330,8 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
           </button>
         </div>
 
-        <div className='flex justify-center mt-3'>
-          <h2 className="ms-auto text-[16px] text-center font-semibold py-1 text-[var(--sidebar)]">
+        <div className='flex flex-col  mt-3'>
+          <h2 className="text-[18px] font-[600] text-[var(--themeRed)] px-5 mb-2 text-right">
             {accidentRefernceId?.replaceAll("_", "/")}
           </h2>
           <div className='flex ms-auto'>
@@ -1660,41 +1505,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                         />
                       </div>
                     </div>
-                    {/* open street map api, which allows location to plot
-                    <div className="mt-2 h-48 border rounded overflow-visible relative z-10">
-                                  {locationData.latitude &&
-                                    locationData.longitude &&
-                                    !isNaN(parseFloat(locationData.latitude)) &&
-                                    !isNaN(parseFloat(locationData.longitude)) ? (
-                                    <MapComponent
-                                      latitude={parseFloat(locationData.latitude)}
-                                      longitude={parseFloat(locationData.longitude)}
-                                      onLocationChange={async (lat, lng) => {
-                                        const placeName = await fetchPlaceName(lat, lng);
-                                        setLocationQuery(placeName) 
-                                        setLocationData((prev)=>({
-                                          ...prev,
-                                          latitude: lat.toFixed(6),
-                                          longitude: lng.toFixed(6),
-                                        }))
-                                        
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="flex items-center justify-center h-full text-sm text-gray-500">
-                                      Location not selected{" "}
-                                      <span className="text-[10px]">
-                                        (സ്ഥലം തിരഞ്ഞെടുത്തിട്ടില്ല)
-                                      </span>
-                                    </div>
-                                  )}
-                                </div> */}
-{/*                      <div>  <LiveMap/></div> 
- */}                    {/* <div>  <LiveGoogleMap/></div> */}
-{/*                     <div>  <CurrentLocationMa/></div> 
- */}                    {/* <div>  <MapmyIndiaLiveLocation/></div> */}
-                    {/* <TomTomLiveMap /> */}
-                    <div className='mb-5'>  {coords !== null && <LiveGoogleMap coordinates={coords} />}</div>
+                                   <div className='mb-5'>  {coords !== null && <LiveGoogleMap coordinates={coords} />}</div>
                   </div>
                 </div>
                 {/* Second Column - Nearby Assistance */}
@@ -2107,35 +1918,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                       </p>
                     </div>
                   </div>
-                  {/* <div
-                    className={`flex-1 border-2 m-[16px] ${isDragging ? "border-blue-500 bg-blue-50" : "border-dashed border-gray-300"} rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer`}
-                    onDragOver={handleDragOverVideo}
-                    onDragLeave={handleDragLeaveVideo}
-                    onDrop={handleDropVideo}
-                    onClick={() => fileInputRefVideo.current?.click()}
-                  >
-                    <input
-                      type="file"
-                      accept="video/*"
-                      multiple
-                      onChange={handleFileChangeVideo}
-                      className="hidden"
-                      ref={fileInputRefVideo}
-                    />
-                    <div className="text-center">
-                      <div className="bg-gray-100 p-3 rounded-full inline-block mb-3">
-                        <Camera className="w-6 h-6 text-gray-500" />
-                      </div>
-                      <p className="text-sm font-medium text-gray-700">
-                        {isDragging ? "Drop video here" : "Click or drag video to upload"}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Upload accident scene videos <br />
-                        <span className="text-[10px]">അപകട സ്ഥലത്തിന്റെ വീഡിയോ അപ്‌ലോഡ് ചെയ്യുക</span>
-                      </p>
-                      {uploading && <p className="text-blue-500 mt-2">Uploading...</p>}
-                    </div>
-                  </div> */}
+                  
                   <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200 m-[16px]">
                     <h4 className="text-xs font-semibold mb-2">
                       {" "}
@@ -2259,7 +2042,7 @@ const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
                 <button
                   type="button"
                   onClick={handleSubmitAccidentDetails}
-                  disabled={isSubmittingDocumentation}
+                  disabled={isSubmittingDocumentation }
                   className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${isSubmittingDocumentation
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[var(--sidebar)] hover:bg-[#001670]"

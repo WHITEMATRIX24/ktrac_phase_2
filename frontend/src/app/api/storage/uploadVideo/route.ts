@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const referenceNumber = searchParams.get("reference_numner");
+    const referenceNumber = searchParams.get("reference_number");
     const formData = await req.formData();
     const files = formData.getAll("files");
 
@@ -18,7 +18,14 @@ export async function POST(req: NextRequest) {
 
     for (const file of files) {
       if (file instanceof File) {
-        const fileName = `accidents/videos/${referenceNumber}/${file.name}`;
+ const timestamp = new Date()
+          .toISOString()
+          .replace(/[-:T]/g, "")
+          .split(".")[0]; // "20250712T132412" => "20250712T132412"
+        const fileExtension = file.name.split('.').pop(); // e.g., 'mp4'
+        const baseName = file.name.replace(/\.[^/.]+$/, ""); // remove extension
+
+        const fileName = `accidents/videos/${referenceNumber}/${baseName}_${timestamp}.${fileExtension}`;
 
         const body = Buffer.from(await file.arrayBuffer());
 

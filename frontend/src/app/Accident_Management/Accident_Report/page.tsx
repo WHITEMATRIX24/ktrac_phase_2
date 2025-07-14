@@ -143,7 +143,7 @@ const PrimaryAccidentReport: React.FC = () => {
   const [isVehicleSearchOpen, setIsVehicleModalSearch] =
     React.useState<boolean>(false);
 
-  const policeStations: PoliceStation[] = [
+  /* const policeStations: PoliceStation[] = [
     {
       id: 1,
       name: "Cantonment PS",
@@ -249,7 +249,7 @@ const PrimaryAccidentReport: React.FC = () => {
     },
   ];
 
-
+ */
   const handleSearchModalClose = () => setIsReferenceModalSearch(false);
   const handleVehicleModalClose = () => setIsVehicleModalSearch(false);
   const initialFormState = {
@@ -1676,8 +1676,7 @@ const PrimaryAccidentReport: React.FC = () => {
                               </span>
                             </h3>
                             <div className="space-y-4 p-[16px]">
-                              <div className="grid gird-cols-2 md:grid-cols-2 gap-2">
-                                <div>
+                              <div className=""> 
                                   <label className="text-[12px] text-[#374151] mb-[6px] ">
                                     Schedule Number (Cdit){" "}
                                     <span className="text-[10px]">
@@ -1692,8 +1691,7 @@ const PrimaryAccidentReport: React.FC = () => {
                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] bg-gray-50 rounded text-xs"
                                   />
                                 </div>
-
-                                <div>
+                              <div>
                                   <label className="text-[12px] text-[#374151] mb-[6px]">
                                     Schedule Name{" "}
                                     <span className="text-[10px]">
@@ -1708,7 +1706,6 @@ const PrimaryAccidentReport: React.FC = () => {
                                     className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                   />
                                 </div>
-                              </div>
 
                               <div>
                                 <label className="text-[12px] text-[#374151] mb-[6px]">
