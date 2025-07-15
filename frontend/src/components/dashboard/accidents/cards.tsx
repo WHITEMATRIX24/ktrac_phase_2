@@ -29,7 +29,7 @@ export function AccidentDashboardCards({ data }: Props) {
             {(data[0] && data[0].name) || "Total Accidents"}
           </CardTitle>
 
-          <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-Black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center font-medium tabular-nums text-Black drop-shadow-md">
             {(data[0] && data[0].value) || 0}
           </CardDescription>
         </CardHeader>
@@ -45,7 +45,7 @@ export function AccidentDashboardCards({ data }: Props) {
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {(data[1] && data[1].name) || "Primary Stage"}
           </CardTitle>
-          <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center font-medium tabular-nums text-black drop-shadow-md">
             {(data[1] && data[1].value) || 0}
           </CardDescription>
         </CardHeader>
@@ -61,7 +61,7 @@ export function AccidentDashboardCards({ data }: Props) {
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {(data[2] && data[2].name) || "In Progress"}
           </CardTitle>
-          <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center font-medium tabular-nums text-black drop-shadow-md">
             {(data[2] && data[2].value) || 0}
           </CardDescription>
         </CardHeader>
@@ -77,7 +77,7 @@ export function AccidentDashboardCards({ data }: Props) {
           <CardTitle className="text-[14px] font-medium tabular-nums text-black">
             {(data[3] && data[3].name) || "Completed"}
           </CardTitle>
-          <CardDescription className="text-[38px] text-center font-extralight tabular-nums text-black drop-shadow-md">
+          <CardDescription className="text-[38px] text-center font-medium tabular-nums text-black drop-shadow-md">
             {(data[3] && data[3].value) || 0}
           </CardDescription>
         </CardHeader>
