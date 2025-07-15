@@ -145,8 +145,10 @@ const defaultNavItems: NavItem[] = [
         url: "/Reports/Accidents/Responsibility",
       },
       { title: "Accident Time Wise", url: "/Reports/Accidents/Time_Wise" },
-      { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
       { title: "Fatal Report", url: "/Reports/Accidents/Fatal_Report" },
+      { title: "Unit Wise", url: "/Reports/Accidents/Unit_Wise" },
+      { title: "Injuries", url: "/Reports/Accidents/Injuries" },
+      { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
     ],
   },
 ];
