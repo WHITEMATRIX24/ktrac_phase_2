@@ -61,13 +61,7 @@ const dummyData = [
     lng: 76.3610,
     label: "Perumbavoor",
     date: "2025-07-13",
-  },
-  {
-    lat: 12.2958,
-    lng: 76.6394,
-    label: "Wayanad (Kalpetta)",
-    date: "2025-07-11",
-  },
+  }
 ];
 
 
