@@ -1168,13 +1168,67 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
 
  const handleSubmitAccidentDetails = async (e: FormEvent) => {
   e.preventDefault();
+
+  const missingFields: string[] = [];
+
+  // Validate: Accident Reference ID
+  if (!accidentRefernceId) missingFields.push("Accident Reference ID");
+
+  // Validate: Location & Jurisdiction
+  const locationChecks = [
+    [locationData.address, "Accident Address"],
+    [locationData.place, "Place of Accident"],
+    [locationData.district, "Accident District"],
+    [locationData.state, "Accident State"],
+    [locationData.latitude, "Latitude"],
+    [locationData.longitude, "Longitude"],
+    [formData.nearestDepoName, "Nearest Depot Name"],
+    [formData.depotContact, "Depot Contact Number"],
+    [locationData.policeStationName, "Nearest Police Station"],
+    [locationData.policeStationContact, "Police Station Contact Number"],
+  ];
+  locationChecks.forEach(([val, label]) => {
+    if (!val) missingFields.push(label as string);
+  });
+
+  // Validate: Accident Details
+  const accidentChecks = [
+    [formData.dateOfAccident, "Date of Accident"],
+    [formData.timeOfAccident, "Time of Accident"],
+    [formData.timeZone, "Time Zone"],
+    [formData.operatedDepot, "Operated Depot"],
+    [formData.scheduleNumber, "Schedule Number"],
+    [formData.description, "Accident Description"],
+  ];
+  accidentChecks.forEach(([val, label]) => {
+    if (!val) missingFields.push(label as string);
+  });
+
+  // Validate: Crew Info
+  const crewChecks = [
+    [driverCategory, "Driver Category"],
+    [formData.driverName, "Driver Name"],
+    [formData.driverPenNo, "Driver PEN Number"],
+    [formData.conductorName, "Conductor Name"],
+    [formData.conductorPenNo, "Conductor PEN Number"],
+  ];
+  crewChecks.forEach(([val, label]) => {
+    if (!val) missingFields.push(label as string);
+  });
+
+  // Validate: Vehicle Info
+  if (!formData.bonnetNumber) missingFields.push("Bonnet Number");
+
+  // Validate: Media
+  if (mediaFiles.length === 0) missingFields.push("At least one accident photo");
+
+  if (missingFields.length > 0) {
+    alert(`Please fill the following required fields:\n\n• ${missingFields.join("\n• ")}`);
+    return;
+  }
   setIsSubmitting(true);
   setSubmitError(null);
-
-  try {
-    if (mediaFiles.length === 0) {
-      throw new Error("Please upload at least one photo of the accident");
-    }
+    try {
 
     // Extract only image files
     const imageFiles = mediaFiles.filter((file) => file.type === "image");
@@ -1396,6 +1450,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         {/* Increased mb + min-height */}
                         Accident Place (
                         <MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)
+                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
                       </label>
                       <input
                        suppressHydrationWarning
@@ -1430,6 +1485,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         {/* Flex container */}
                         <label className="text-[12px] text-gray-700 mb-2">
                           Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <select
                           name="district"
@@ -1463,6 +1519,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {/* min-height */}
                           Accident State (
                           <MalayalamText text="അപകടം നടന്ന സംസ്ഥാനം" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           name="state"
@@ -1483,6 +1540,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {" "}
                           {/* min-height */}
                           Latitude (<MalayalamText text="അക്ഷാംശം" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           value={locationData.latitude}
@@ -1497,6 +1555,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {" "}
                           {/* min-height */}
                           Longitude (<MalayalamText text="രേഖാംശം" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           value={locationData.longitude}
@@ -1528,6 +1587,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {/* min-height */}
                           Nearest Police Station (
                           <MalayalamText text="സമീപ പോലീസ് സ്റ്റേഷൻ" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <select
                           name="policeStation"
@@ -1573,6 +1633,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           Nearest Depot (
                           <MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />
                           )
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <select
                           value={formData.nearestDepoId}
@@ -1626,6 +1687,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         <label className="text-[12px] text-gray-700 mb-1">
                           Date of Accident (
                           <MalayalamText text="അപകടം നടന്ന തീയതി" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           type="date"
@@ -1639,6 +1701,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         <label className="text-[12px] text-gray-700 mb-1">
                           Time of Accident (
                           <MalayalamText text="അപകടം നടന്ന സമയം" />)
+                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           type="time"
@@ -1667,6 +1730,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <label className="text-[12px] text-gray-700 mb-1">
                         Operated Depot (
                         <MalayalamText text="ഓപ്പറേറ്റഡ് ഡിപോട്" /> )
+                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
                       </label>
                       <input
                         name="operatedDepot"
@@ -1679,6 +1743,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     <div>
                       <label className="text-[12px] text-gray-700 mb-1">
                         Schedule Number (<MalayalamText text="ഷെഡ്യൂൾ നമ്പർ" />)
+                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
                       </label>
                       <input
                         name="scheduleNumber"
@@ -1693,6 +1758,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <label className="text-[12px] text-gray-700 mb-1">
                         Accident Description (
                         <MalayalamText text="അപകടത്തെക്കുറിച്ചുള്ള വിവരണം" />)
+                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
                       </label>
                       <textarea
                         name="description"
@@ -1715,6 +1781,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     <div>
                       <label className="text-[12px] text-gray-700 mb-1">
                         Driver Category (<MalayalamText text="ഡ്രൈവർ വിഭാഗം" />)
+                                                <span className='text-[10px] text-red-600'>{"*"}</span>
                       </label>
                       <select
                         value={driverCategory}
@@ -1730,7 +1797,8 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="relative" ref={driverRef}>
                         <label className="text-[12px] text-gray-700 mb-1">
-                          Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)
+                          Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)                          
+                          <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           type="text"
@@ -1793,6 +1861,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <label className="text-[12px] text-gray-700 mb-1">
                         Conductor PEN Number (
                         <MalayalamText text="കണ്ടക്ടർ പെൻ നമ്പർ" />)
+                        <span className='text-[10px] text-red-600'>{"*"}</span>
                       </label>
                       <input
                         type="text"
@@ -1847,6 +1916,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         <label className="text-[12px] text-gray-700 mb-1">
                           Conductor Name (
                           <MalayalamText text="കണ്ടക്ടറുടെ പേര്" />)
+                          <span className='text-[10px] text-red-600'>{"*"}</span>
                         </label>
                         <input
                           name="conductorName"
@@ -1991,8 +2061,8 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     </div>
                   ) : (
                     <p className="p-[16px] text-sm text-gray-500">
-                      No images are uploaded. (
-                      <MalayalamText text="ഫോട്ടോകളൊന്നും അപ്‌ലോഡ് ചെയ്തിട്ടില്ല." />
+                      No images  and Videos are uploaded. (
+                      <MalayalamText text="ചിത്രങ്ങളോ വീഡിയോകളോ അപ്‌ലോഡ് ചെയ്തിട്ടില്ല" />
                       )
                     </p>
                   )}

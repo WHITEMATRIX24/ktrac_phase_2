@@ -35,6 +35,10 @@ interface Photo {
   download_url: string;
   expires_at: string;
 }
+interface Photo {
+  download_url: string;
+  expires_at: string;
+}
 
 interface AccidentReference {
   id: string;
@@ -48,6 +52,7 @@ interface AccidentReference {
   accidentPlace: string;
   accidentDate: string;
   policeStation: string;
+  /* jurisdiction_depot:string */ 
   timeOfAccident: string;
   homeDepot: string;
   operatedDepot: string;
@@ -62,6 +67,7 @@ interface AccidentReference {
   photos: Photo[];
   accidentLatitude: string;
   accidentLongitude: string;
+  /* videos:Video[]; */
 }
 interface Driver {
   id: number;
@@ -378,15 +384,19 @@ const PrimaryAccidentReport: React.FC = () => {
       refNo: accidentData.accident_id,
       busNo: accidentData.vehicle_info.bonet_no,
       regNo: accidentData.vehicle_info.vehicle_register_no,
-      accidentPlace: (accidentData.location_info.address).split(",")[0],
+/*       accidentPlace: (accidentData.accident_location_details.accident_place),
+ */      accidentPlace: (accidentData.location_info.address).split(",")[0],
       accidentDate: accidentData.accident_details.date_of_accident,
       policeStation: accidentData.geolocation.nearest_police_station,
+      /* policeStation: accidentData.nearby_assistance_details.nearest_police_station, */
+      /* jurisdiction_depo : accidentData.nearby_assistance_details.nearest_depot, */
       timeOfAccident: accidentData.accident_details.time_of_accident,
       ksrcOrKswift: "", // not provided
       busClass: "", // not provided
       operatedDepotZone: "", // not provided
       ageOfBus: 0, // not provided
-      operatedDepot: accidentData.accident_details.operated_depot,
+/*       operatedDepot: accidentData.accident_details.operated_depot,
+ */   operatedDepot: accidentData.location_info.operated_depot,   
       homeDepot: "",
       scheduleNumber: accidentData.accident_details.schedule_number,
       driverName: accidentData.crew_information.driver_name,
@@ -397,12 +407,30 @@ const PrimaryAccidentReport: React.FC = () => {
       accidentDistrict: accidentData.location_info.district,
       accidentLatitude: accidentData.geolocation.latitude.toString(),
       accidentLongitude: accidentData.geolocation.longitude.toString(),
+      /* accidentState: accidentData.accident_location_details.accident_state,
+      accidentDistrict: accidentData.accident_location_details.accident_district,
+      accidentLatitude: accidentData.accident_location_details.latitude.toString(),
+      accidentLongitude: accidentData.accident_location_details.longitude.toString(),
+      
+       */
       description: accidentData.accident_details.description,
+      /*description: accidentData.accident_details.accident_description,  */
       photos:
         accidentData?.photos?.download_urls?.map((item: any) => ({
           download_url: item.download_url,
           expires_at: item.generated_at,
         })) || [],
+        
+        /* photos:
+        accidentData?.accident_documentation.?photos?.download_urls?.map((item: any) => ({
+          download_url: item.download_url,
+          expires_at: item.generated_at,
+        })) || [],
+         videos: accidentData?.videos?.download_urls?.map((item: any) => ({
+          download_url: item.download_url,
+          expires_at: item.generated_at,
+        })) || [], 
+         */
     };
     console.log("photo check", mappedData);
 
@@ -421,7 +449,8 @@ const PrimaryAccidentReport: React.FC = () => {
       accidentPlace: mappedData.accidentPlace,
       dateOfAccident: mappedData.accidentDate,
       nearestPoliceStation: mappedData.policeStation,
-      timeOfAccident: mappedData.timeOfAccident,
+/*       jurisdictionDepot:mappedData.jurisdiction_depo,
+ */      timeOfAccident: mappedData.timeOfAccident,
       homeDepot: mappedData.homeDepot,
       operatedDepot: mappedData.operatedDepot,
       scheduleNumber: mappedData.scheduleNumber,
@@ -675,6 +704,59 @@ const PrimaryAccidentReport: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Stop page refresh
+    // ✅ Validate required fields
+  
+  // Map field keys to user-friendly names
+  const fieldLabels: { [key: string]: string } = {
+    accidentRefNo: "Accident Reference Number",
+/*     operatedDepotZone: "Operated Depot Zone",
+ */    operatedScheduleName: "Operated Schedule Name",
+    homeDepot: "Home Depot",
+    jurisdictionDepot: "Jurisdiction Depot",
+    nearestPoliceStation: "Nearest Police Station",
+    accidentState: "Accident State",
+    accidentDistrict: "Accident District",
+    accidentPlace: "Accident Place",
+    damageToBus: "Damage to Bus",
+    thirdPartyPropertiesDamaged: "Third Party Properties Damaged",
+    accidentOccurred: "Accident Occurred",
+    accidentType: "Accident Type",
+    typeOfCollision: "Type of Collision",
+    primaryCause: "Primary Cause of Accident",
+    primaryResponsibility: "Primary Responsibility",
+    roadClassification: "Road Classification",
+    roadCondition: "Road Condition",
+    weatherCondition: "Weather Condition",
+    trafficDensity: "Traffic Density",
+    dockedOrServiceAfter: "Docked or Service After Accident",
+    takenForRepair: "Taken for Repair",
+   gdEntered: "GD Entered",
+    costOfDamage: "Cost of Damage",
+    amountSettledWithDriver: "Amount Settled With Driver",
+    codSettledWithOtherVehicle: "COD Settled With Other Vehicle",
+    codRecovered: "COD Recovered",
+    caseSettled: "Case Settled",
+    severity: "Severity",
+  };
+
+  // Utility function to check for empty values
+const isEmpty = (value: any) =>
+  value === undefined || value === null || value === "";
+
+// Find missing required fields
+const missingFields = Object.entries(fieldLabels).filter(
+  ([key]) => isEmpty(formData[key as keyof typeof formData])
+);
+
+if (missingFields.length > 0) {
+  const missingFieldNames = missingFields
+    .map(([, label]) => `• ${label}`)
+    .join("\n");
+
+  alert(`Please fill the following required fields:\n\n${missingFieldNames}`);
+  return;
+}
+
 
     const datePart = formData.dateOfAccident; // e.g. "2025-06-17"
     const timePart = formData.timeOfAccident; // e.g. "14:30:00"
@@ -856,6 +938,9 @@ const PrimaryAccidentReport: React.FC = () => {
 
   const handleCollisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, typeOfCollision: e.target.value }));
+  };
+   const handleAccidentOccuredChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({ ...prev, accidentOccurred: e.target.value }));
   };
 
   const handleAddCustomCollision = () => {
@@ -1682,6 +1767,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                     <span className="text-[10px]">
                                       (ഷെഡ്യൂൾ നമ്പർ (സിഡിറ്റ്))
                                     </span>
+                                    <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                   </label>
                                   <input
                                     type="text"
@@ -1696,6 +1784,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                     Schedule Name{" "}
                                     <span className="text-[10px]">
                                       (ഷെഡ്യൂൾ പേര്)
+                                    </span>
+                                    <span className="text-[10px] text-red-600">
+                                      {"*"}
                                     </span>
                                   </label>
                                   <input
@@ -1713,6 +1804,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (ഹോം ഡിപ്പോ)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 {/* <input
                                   type="text"
@@ -1898,6 +1992,9 @@ const PrimaryAccidentReport: React.FC = () => {
                               <span className="text-[14px]">
                                 (അപകട വിവരങ്ങൾ)
                               </span>
+                              <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                             </h3>
                             <div className="space-y-4 p-[16px]">
                               <div>
@@ -1906,6 +2003,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (അപകടത്തിന്റെ തരം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
 
                                 {/* <input
@@ -1949,10 +2049,15 @@ const PrimaryAccidentReport: React.FC = () => {
                                   Accident Occurred{" "}
                                   <span className="text-[10px]">
                                     (അപകടം സംഭവിച്ചത്)
+                                    <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                   </span>
                                 </label>
                                 <select
                                   name="accidentOccurred"
+                                   value={formData.accidentOccurred}
+                                  onChange={handleAccidentOccuredChange}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-[10px]  bg-white"
                                 >
                                   <option value="" >
@@ -1976,6 +2081,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (ഘർഷണത്തിന്റെ തരം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
 
                                 <select
@@ -2033,6 +2141,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (അപകടത്തിന്റെ പ്രാഥമിക കാരണം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <textarea
                                   name="primaryCause"
@@ -2049,6 +2160,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (അപകടത്തിനുള്ള പ്രാഥമിക ഉത്തരവാദിത്തം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
 
                                 <select
@@ -2111,6 +2225,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (റോഡ് വർഗ്ഗീകരണം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <select
                                   name="roadClassification"
@@ -2146,6 +2263,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (റോഡിന്റെ അവസ്ഥ )
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <select
                                   name="roadCondition"
@@ -2173,6 +2293,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (കാലാവസ്ഥ)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <select
                                   name="weatherCondition"
@@ -2202,6 +2325,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (ട്രാഫിക് സാന്ദ്രത)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <select
                                   name="trafficDensity"
@@ -2256,6 +2382,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (ബസ്സിനുണ്ടായ നാശനഷ്ടം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
 
                                 <textarea
@@ -2274,6 +2403,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                     (മൂന്നാം കക്ഷിയുടെ സ്വത്തുക്കൾക്കുണ്ടായ
                                     നാശനഷ്ടം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <input
                                   type="text"
@@ -2322,6 +2454,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (അധികാരപരിധി (ഡിപ്പോ))
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 {/* <input
                                   name="jurisdictionDepot"
@@ -2622,6 +2757,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (ഡോക്ക് ചെയ്തത്/അപകടത്തിന് ശേഷം സേവനം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
                                   <label className="flex items-center gap-2 cursor-pointer">
@@ -2672,6 +2810,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (റിപ്പയർ ജോലിക്കായി എടുത്തത്)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
                                   <label className="flex items-center gap-2 cursor-pointer">
@@ -2716,6 +2857,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (പോലീസ് സ്റ്റേഷനിൽ ജി.ഡി. എൻറർ ചെയ്തത്)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
                                   <label className="flex items-center gap-2 cursor-pointer">
@@ -2759,6 +2903,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (കേസ് തീർന്നതാണോ?)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
                                   <label className="flex items-center gap-2 cursor-pointer">
@@ -2815,6 +2962,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <input
                                   type="number"
@@ -2832,6 +2982,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                     (കെ.എസ്.ആർ.ടി.സി ഡ്രൈവറുമായി തീർപ്പാക്കിയ
                                     തുക)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <input
                                   type="number"
@@ -2847,6 +3000,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (നാശനഷ്ടത്തിനുള്ള മൂല്യനിർണ്ണയം)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 {/* <input
                                   type="text"
@@ -2880,6 +3036,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (മറ്റ് വാഹനവുമായി തീർപ്പാക്കിയ സി.ഒ.ഡി.)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
                                   <label className="flex items-center gap-2 cursor-pointer">
@@ -2928,6 +3087,9 @@ const PrimaryAccidentReport: React.FC = () => {
                                   <span className="text-[10px]">
                                     (സി.ഒ.ഡി. വീണ്ടെടുത്തത്)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span>
                                 </label>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-5 gap-y-2 mt-2">
                                   <label className="flex items-center gap-2 cursor-pointer">

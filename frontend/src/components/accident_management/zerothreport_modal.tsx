@@ -147,14 +147,18 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
           )}`
         );
         const data = await response.json();
-        // console.log(data);
+        console.log(data.data);
 
         setAccidentList(data.data ? [data.data] : []);
       } else {
+        console.log(date, district, depo, bonnetNo);
+        
         const response = await fetch(
           `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
         );
         const data = await response.json();
+        console.log(data.data);
+        
         setAccidentList(data.data || []);
       }
     } catch (error) {
@@ -166,12 +170,14 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
 
   // clear handler
   const handleClear = () => {
-    setAccidentList(null);
-    setDate("");
-    setBonnetNo("");
-    setDistrict("");
-    setDepo("");
-  };
+  setAccidentList(null);
+  setAccidentReferencenumber("");
+  setDate(new Date().toISOString().split("T")[0]); // sets to today's date in 'YYYY-MM-DD' format
+  setBonnetNo("");
+  setDistrict("");
+  setDepo("");
+};
+
 
   // handle case select
   const handlecaseSelect = (selectedData: any) => {
@@ -510,7 +516,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                       </label>
                       <select
                         onChange={(e) => setDistrict(e.target.value)}
-                        className="px-3 py-2 border rounded-sm"
+                        className="px-3 py-3 border rounded-sm"
                         value={district}
                       >
                         <option value="">Select District</option>
@@ -536,7 +542,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                         </label>
                                         <select
                                             onChange={(e) => setDepo(e.target.value)}
-                                            className="px-3 py-2 border rounded-sm"
+                                            className="px-3 py-3 border rounded-sm"
                                             value={depo}
                                         >
                                             <option value="" disabled>
@@ -556,16 +562,19 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                     </div>
                   </div>
                   <div className="h-full border w-0"></div>
-                  <div className="flex flex-col gap-3 w-[40%]">
+                  <div className="flex flex-col w-[40%]">
                     <h6>
-                      Accident Reference Number <span className="text-red-600">*</span>
+                      Accident Reference Number 
+                      <span className="text-[10px] text-gray-500">
+      (അപകട റഫറൻസ് നമ്പർ)
+    </span>
                     </h6>
                     <input
                       type="text"
                       placeholder="Enter Accident Reference"
                       value={accidentReferenceNumber}
                       onChange={(e) => setAccidentReferencenumber(e.target.value)}
-                      className="flex-1 border px-3 py-1 bg-white rounded-sm"
+                      className="flex-1 border px-3 py-2 bg-white rounded-sm"
                     />
                   </div>
                 </div>
@@ -600,7 +609,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                   <p>no data found</p>
                 ) : (
                   accidentList &&
-                  accidentList.map((d: any) => (
+                  accidentList?.map((d: any) => (
                     <div
                       key={d.accident_id}
                       className="w-full px-3 py-5 flex flex-col bg-white cursor-pointer rounded-sm"
@@ -618,13 +627,22 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                           <span className="ml-1">{d.vehicle_info.bonet_no}</span>
                         </p>
                         <p>
-                          Accident Place:{" "}
-                          <span className="ml-1">{d.location_info.place}</span>
-                        </p>
-                        <p>
-                          Operated Depot:{" "}
-                          <span className="ml-1">{d.location_info.operated_depot}</span>
-                        </p>
+  Accident Place:{" "}
+  <span className="ml-1">
+    {d.location_info?.place ?? "N/A"}
+{/*         {d.accident_location_details?.accident_place ?? "N/A"}
+ */}
+  </span>
+</p>
+<p>
+  Operated Depot:{" "}
+  <span className="ml-1">
+    {d.location_info?.operated_depot ?? "N/A"}
+{/*         {d.accident_details?.operated_depot ?? "N/A"}
+ */}
+  </span>
+</p>
+
                         <p>
                           Accident Date:{" "}
                           <span className="ml-1">

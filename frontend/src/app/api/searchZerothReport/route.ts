@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `${LAMBDA_FILTER_URL}date=${date}&district=${district}&bonnet_no=${bonnetNo}&depot=${depo}`,
+      url: `${LAMBDA_FILTER_URL}date=${date}&district=${district}&bonet_no=${bonnetNo}&depot=${depo}`,
       headers: {
         "content-type": "application/json",
       },

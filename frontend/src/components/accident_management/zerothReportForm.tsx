@@ -660,13 +660,67 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
 
     const handleSubmitAccidentDetails = async (e: FormEvent) => {
       e.preventDefault();
+    
+      const missingFields: string[] = [];
+    
+      // Validate: Accident Reference ID
+      if (!accidentRefernceId) missingFields.push("Accident Reference ID");
+    
+      // Validate: Location & Jurisdiction
+      const locationChecks = [
+        [locationData.address, "Accident Address"],
+        [locationData.place, "Place of Accident"],
+        [locationData.district, "Accident District"],
+        [locationData.state, "Accident State"],
+        [locationData.latitude, "Latitude"],
+        [locationData.longitude, "Longitude"],
+        [formData.nearestDepoName, "Nearest Depot Name"],
+        [formData.depotContact, "Depot Contact Number"],
+        [locationData.policeStationName, "Nearest Police Station"],
+        [locationData.policeStationContact, "Police Station Contact Number"],
+      ];
+      locationChecks.forEach(([val, label]) => {
+        if (!val) missingFields.push(label as string);
+      });
+    
+      // Validate: Accident Details
+      const accidentChecks = [
+        [formData.dateOfAccident, "Date of Accident"],
+        [formData.timeOfAccident, "Time of Accident"],
+        [formData.timeZone, "Time Zone"],
+        [formData.operatedDepot, "Operated Depot"],
+        [formData.scheduleNumber, "Schedule Number"],
+        [formData.description, "Accident Description"],
+      ];
+      accidentChecks.forEach(([val, label]) => {
+        if (!val) missingFields.push(label as string);
+      });
+    
+      // Validate: Crew Info
+      const crewChecks = [
+        [driverCategory, "Driver Category"],
+        [formData.driverName, "Driver Name"],
+        [formData.driverPenNo, "Driver PEN Number"],
+        [formData.conductorName, "Conductor Name"],
+        [formData.conductorPenNo, "Conductor PEN Number"],
+      ];
+      crewChecks.forEach(([val, label]) => {
+        if (!val) missingFields.push(label as string);
+      });
+    
+      // Validate: Vehicle Info
+      if (!formData.bonnetNumber) missingFields.push("Bonnet Number");
+    
+      // Validate: Media
+      if (mediaFiles.length === 0) missingFields.push("At least one accident photo");
+    
+      if (missingFields.length > 0) {
+        alert(`Please fill the following required fields:\n\n• ${missingFields.join("\n• ")}`);
+        return;
+      }
       setIsSubmitting(true);
       setSubmitError(null);
-    
-      try {
-        if (mediaFiles.length === 0) {
-          throw new Error("Please upload at least one photo of the accident");
-        }
+        try {
     
         // Extract only image files
         const imageFiles = mediaFiles.filter((file) => file.type === "image");
