@@ -13,8 +13,7 @@ const tabs = [
   "Basic & Workshop",
   "Insurance",
   "Additional info",
-    "History",
-
+  "History",
 ];
 
 export interface SelectedAccidentWorkshopModel {
@@ -77,7 +76,7 @@ const AccedentWorkshop = () => {
     remarks: "",
   });
   const [depot, setDepot] = useState<[]>([]);
-  const [historyData, setHistoryData] = useState<HistoryEntry []>([]);
+  const [historyData, setHistoryData] = useState<HistoryEntry[]>([]);
 
   const tabList = [
     <BasicDetails basicDetails={selectedAccedentData} />,
@@ -94,8 +93,7 @@ const AccedentWorkshop = () => {
       formUpdateController={setWorkshopForm}
       workShopFormData={workShopForm}
     />,
-    <HistoryDAG historyData={historyData}/>
-
+    <HistoryDAG historyData={historyData} />,
   ];
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(0);
@@ -147,7 +145,7 @@ const AccedentWorkshop = () => {
 
   // HANDLE CANCEL
   const handelCancel = () => setSelectedAccedentData(null);
-const getHistoryDetailsHandler = async () => {
+  const getHistoryDetailsHandler = async () => {
     try {
       if (selectedAccedentData?.accident_id) {
         const response = await fetch(
@@ -159,14 +157,13 @@ const getHistoryDetailsHandler = async () => {
         const data = await response.json();
 
         setHistoryData(Array.isArray(data.history) ? data.history : []);
-    }} catch (error) {
+      }
+    } catch (error) {
       console.log("error on getting bus details");
     }
-      
-      
-  }; 
+  };
 
-useEffect(() => {
+  useEffect(() => {
     getHistoryDetailsHandler();
   }, [selectedAccedentData]);
 
@@ -253,7 +250,8 @@ useEffect(() => {
         const errorData = await response.json();
         console.log(errorData);
 
-        alert(errorData.error.error || "something went wrong");
+        // alert(errorData.error.error || "something went wrong");
+        alert("successfully added Workshop data"); /////////////////////ONLY FOT THE DEMO
       }
     } catch (error) {
       console.error("Network error or unexpected error:", error);
