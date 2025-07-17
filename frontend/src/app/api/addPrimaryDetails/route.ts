@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-const LAMBDA_URL = 'https://nt83vxabz0.execute-api.ap-south-1.amazonaws.com/DEV/post';
+const LAMBDA_URL = 'https://qs04ltqgv5.execute-api.ap-south-1.amazonaws.com/DEV/create';
+
+
 
 export async function POST(request: NextRequest) {
     try {

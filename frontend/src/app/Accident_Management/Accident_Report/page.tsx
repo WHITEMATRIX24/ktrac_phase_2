@@ -737,6 +737,8 @@ const PrimaryAccidentReport: React.FC = () => {
     codRecovered: "COD Recovered",
     caseSettled: "Case Settled",
     severity: "Severity",
+    inquiryInspectorName:"Inspector Name",
+    inspectorPhone:"Inspector Phone Number"
   };
 
   // Utility function to check for empty values
@@ -756,6 +758,25 @@ if (missingFields.length > 0) {
   alert(`Please fill the following required fields:\n\n${missingFieldNames}`);
   return;
 }
+const minLengthFields: { [key: string]: number } = {
+  primaryCause: 10,
+  damageToBus: 10,
+};
+
+const shortFields = Object.entries(minLengthFields).filter(([key, minLength]) => {
+  const value = formData[key as keyof typeof formData];
+  return String(value ?? "").trim().length < minLength;
+});
+
+if (shortFields.length > 0) {
+  const shortFieldNames = shortFields
+    .map(([key]) => `• ${fieldLabels[key] || key} (Minimum ${minLengthFields[key]} characters)`)
+    .join("\n");
+
+  alert(`Minimum 10 charaters required for :\n\n${shortFieldNames}`);
+  return;
+}
+
 
 
     const datePart = formData.dateOfAccident; // e.g. "2025-06-17"
@@ -764,7 +785,7 @@ if (missingFields.length > 0) {
 
     const primaryPayload = {
       accident_id: formData.accidentRefNo,
-      operated_depot_zone: formData.operatedDepotZone,
+      operated_depot_zone: formData.operatedDepot,
       operated_schedule_name: formData.operatedScheduleName,
       type_of_other_vehicle: formData.typeOfOtherVehicle,
       involved_vehicle_reg_numbers: formData.involvedVehicleRegNumbers,
@@ -830,41 +851,31 @@ if (missingFields.length > 0) {
     };
 
     try {
-      await Promise.all([
-        fetch("/api/addPrimaryDetails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(primaryPayload),
-        }),
-        fetch("/api/addDamageDetails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(damagePayload),
-        }),
-        fetch("/api/addAccidentDetails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(accidentDetailsPayload),
-        }),
-        fetch("/api/addPrimaryInspectorDetails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(inspectorPayload),
-        }),
-        fetch("/api/addOnRoadDetails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(onRoadPayload),
-        }),
-        fetch("/api/addRecoveryDetails", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(recoveryPayload),
-        }),
-      ]);
+     // Helper to handle fetch with detailed error reporting
+  const submitWithAlert = async (label: string, url: string, payload: any) => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      alert("All accident details submitted successfully.");
-      window.location.reload();
+    if (!(res.status>=200 && res.status<300 )) {
+      const errorText = await res.text(); // Try to read response body      
+      alert(`Already Saved Data`)
+      throw new Error(`${label} failed: ${res.status} ${res.statusText}\n${errorText}`);
+    
+    }
+  };
+
+  await submitWithAlert("Primary Details", "/api/addPrimaryDetails", primaryPayload);
+  await submitWithAlert("Damage Details", "/api/addDamageDetails", damagePayload);
+  await submitWithAlert("Accident Details", "/api/addAccidentDetails", accidentDetailsPayload);
+  await submitWithAlert("Inspector Details", "/api/addPrimaryInspectorDetails", inspectorPayload);
+  await submitWithAlert("On-Road Details", "/api/addOnRoadDetails", onRoadPayload);
+  await submitWithAlert("Recovery Details", "/api/addRecoveryDetails", recoveryPayload);
+
+       alert("All accident details submitted successfully.");
+        window.location.reload();
     } catch (error) {
       console.error("Submission failed", error);
       alert("Error during submission. Please check logs.");

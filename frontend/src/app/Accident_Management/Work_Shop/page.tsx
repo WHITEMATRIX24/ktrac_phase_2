@@ -4,6 +4,7 @@ import BasicDetails from "@/components/accident_management/workshop/basic_detail
 import AdditionalInfoForm from "@/components/accident_management/workshop/form_additional";
 import BasicAndWorkShopForm from "@/components/accident_management/workshop/form_basicWorkshop";
 import InsuranceAndCostForm from "@/components/accident_management/workshop/form_insuranceCost";
+import HistoryDAG from "@/components/accident_management/workshop/history_DAG";
 import { AccidentWorkshopReport } from "@/models/AccidentData";
 import React, { useEffect, useState } from "react";
 
@@ -12,6 +13,8 @@ const tabs = [
   "Basic & Workshop",
   "Insurance",
   "Additional info",
+    "History",
+
 ];
 
 export interface SelectedAccidentWorkshopModel {
@@ -26,6 +29,14 @@ export interface SelectedAccidentWorkshopModel {
       download_url: string;
     }[];
   };
+}
+interface HistoryEntry {
+  version: number;
+  operation: string;
+  changed_by: string;
+  changed_at: string;
+  old_data: Record<string, any>;
+  new_data: Record<string, any>;
 }
 
 const AccedentWorkshop = () => {
@@ -66,6 +77,7 @@ const AccedentWorkshop = () => {
     remarks: "",
   });
   const [depot, setDepot] = useState<[]>([]);
+  const [historyData, setHistoryData] = useState<HistoryEntry []>([]);
 
   const tabList = [
     <BasicDetails basicDetails={selectedAccedentData} />,
@@ -82,6 +94,8 @@ const AccedentWorkshop = () => {
       formUpdateController={setWorkshopForm}
       workShopFormData={workShopForm}
     />,
+    <HistoryDAG historyData={historyData}/>
+
   ];
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(0);
@@ -133,6 +147,28 @@ const AccedentWorkshop = () => {
 
   // HANDLE CANCEL
   const handelCancel = () => setSelectedAccedentData(null);
+const getHistoryDetailsHandler = async () => {
+    try {
+      if (selectedAccedentData?.accident_id) {
+        const response = await fetch(
+          `/api/getWorkshopHistoryData?accident_reference_number=${selectedAccedentData?.accident_id.replaceAll(
+            "/",
+            "_"
+          )}`
+        );
+        const data = await response.json();
+
+        setHistoryData(Array.isArray(data.history) ? data.history : []);
+    }} catch (error) {
+      console.log("error on getting bus details");
+    }
+      
+      
+  }; 
+
+useEffect(() => {
+    getHistoryDetailsHandler();
+  }, [selectedAccedentData]);
 
   useEffect(() => {
     getAllDepoHandler();
