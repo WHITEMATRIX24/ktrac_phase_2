@@ -48,7 +48,10 @@ const sampleQA = [
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [chat, setChat] = useState([
-    { from: "bot", text: "Hi there! How can I help you today?" },
+    {
+      from: "bot",
+      text: "Hi there! How can I help you today?",
+    },
   ]);
   const [input, setInput] = useState("");
   const [showTyping, setShowTyping] = useState(false);
@@ -56,7 +59,12 @@ export default function ChatBot() {
   // Clear chat when closing modal
   const closeChat = () => {
     setIsOpen(false);
-    setChat([{ from: "bot", text: "Hi there! How can I help you today?" }]);
+    setChat([
+      {
+        from: "bot",
+        text: "Hi there! How can I help you today?",
+      },
+    ]);
     setInput("");
     setShowTyping(false);
   };
@@ -95,13 +103,20 @@ export default function ChatBot() {
       if (!responseFromChatBot.ok) {
         setChat((prevChat) => [
           ...prevChat,
-          { from: "bot", text: data.error || "something went wrong" },
+          {
+            from: "bot",
+            text: data.error || "something went wrong",
+          },
         ]);
         return;
       }
-
+      setInput("");
       setChat((prevChat) => [
         ...prevChat,
+        {
+          from: "user",
+          text: input,
+        },
         {
           from: "bot",
           text: data.result,
@@ -161,17 +176,48 @@ export default function ChatBot() {
             </div>
 
             {/* Chat messages container */}
-            <div className="flex-1 h-64 overflow-y-auto space-y-2 mb-4 px-1">
+            <div className="flex flex-col gap-3 h-64 overflow-y-scroll overflow-x-hidden space-y-2 mb-4 px-1">
               {chat.map((msg, i) => (
                 <div
                   key={i}
                   className={`text-[12px] px-2 py-2 rounded-[5px] max-w-[80ch] w-fit animate-fadeBounce ${
                     msg.from === "bot"
-                      ? "bg-gray-100 text-gray-800 self-start"
+                      ? "bg-gray-100 text-gray-800 self-start flex flex-col gap-2"
                       : "bg-[#235789] text-white self-end ml-auto"
                   }`}
                 >
-                  {msg.text}
+                  {Array.isArray(msg.text) ? (
+                    <div className="max-h-32 overflow-auto">
+                      <table className="border-collapse w-full">
+                        <thead>
+                          <tr>
+                            {Object.keys(msg.text[0]).map((key) => (
+                              <th key={key} className="border p-2">
+                                {key}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {msg.text.map((item, index) => (
+                            <tr key={index}>
+                              {Object.values(item).map((value: any, idx) => (
+                                <td key={idx} className="border p-2">
+                                  {value}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : typeof msg.text === "string" ? (
+                    <p className="p-1">{msg.text}</p>
+                  ) : (
+                    typeof msg.text === "number" && (
+                      <p className="p-1">{`${msg.text}`}</p>
+                    )
+                  )}
                 </div>
               ))}
 
