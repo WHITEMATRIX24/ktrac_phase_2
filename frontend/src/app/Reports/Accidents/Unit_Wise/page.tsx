@@ -12,8 +12,8 @@ export type UnitWiseAccidentDataModel = {
   major: number;
   minor: number;
   total_accidents: number;
-  rate_of_accidents_in_1_lakhs_km: number;
-  unit_wise_operated_km: number;
+  // rate_of_accidents_in_1_lakhs_km: number;
+  // unit_wise_operated_km: number;
 };
 
 // FUNCTION FOR ADDING TOTAL ROW DATA
@@ -26,9 +26,9 @@ function addTotalToTableData(
       acc.major += data.major;
       acc.minor += data.minor;
       acc.total += data.total_accidents;
-      acc.unit_wise_operated_km += data.unit_wise_operated_km;
-      acc.rate_of_accidents_in_1_lakhs_km +=
-        data.rate_of_accidents_in_1_lakhs_km * data.unit_wise_operated_km;
+      // acc.unit_wise_operated_km += data.unit_wise_operated_km;
+      // acc.rate_of_accidents_in_1_lakhs_km +=
+      //   data.rate_of_accidents_in_1_lakhs_km * data.unit_wise_operated_km;
 
       return acc;
     },
@@ -59,8 +59,8 @@ function addTotalToTableData(
     major: totalData.major,
     minor: totalData.minor,
     total_accidents: totalData.total,
-    rate_of_accidents_in_1_lakhs_km: formattedRate,
-    unit_wise_operated_km: totalData.unit_wise_operated_km,
+    // rate_of_accidents_in_1_lakhs_km: formattedRate,
+    // unit_wise_operated_km: totalData.unit_wise_operated_km,
   };
 
   // Add the "Total" entry to the data
@@ -74,11 +74,11 @@ const unitewiseTableColumns: ColumnDef<UnitWiseAccidentDataModel>[] = [
   { accessorKey: "major", header: "Major" },
   { accessorKey: "minor", header: "Minor" },
   { accessorKey: "total_accidents", header: "Total" },
-  {
-    accessorKey: "rate_of_accidents_in_1_lakhs_km",
-    header: "Rate of accidents in 1 lakhs km",
-  },
-  { accessorKey: "unit_wise_operated_km", header: "Unit wise operated km" },
+  // {
+  //   accessorKey: "rate_of_accidents_in_1_lakhs_km",
+  //   header: "Rate of accidents in 1 lakhs km",
+  // },
+  // { accessorKey: "unit_wise_operated_km", header: "Unit wise operated km" },
 ];
 
 const formatDateForAPI = (input: string): string => {

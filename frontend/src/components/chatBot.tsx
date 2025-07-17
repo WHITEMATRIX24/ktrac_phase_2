@@ -18,19 +18,22 @@ const sampleQA = [
   },
   {
     question: "Which route generated the highest revenue in May 2025?",
-    answer: "Ernakulam to Thiruvananthapuram route generated the highest revenue of ₹85,000.",
+    answer:
+      "Ernakulam to Thiruvananthapuram route generated the highest revenue of ₹85,000.",
   },
   {
     question: "How many buses were under maintenance on 17th May 2025?",
     answer: "12 buses were under maintenance on that day.",
   },
   {
-    question: "What was the average occupancy rate for the Thrissur depot in May?",
+    question:
+      "What was the average occupancy rate for the Thrissur depot in May?",
     answer: "The average occupancy rate was 87%.",
   },
   {
     question: "List all depots with revenue above ₹1,00,000 for May 2025.",
-    answer: "Kozhikode, Ernakulam, and Thiruvananthapuram depots reported revenues above ₹1,00,000.",
+    answer:
+      "Kozhikode, Ernakulam, and Thiruvananthapuram depots reported revenues above ₹1,00,000.",
   },
   {
     question: "Which day in May 2025 had the lowest revenue?",
@@ -39,9 +42,8 @@ const sampleQA = [
   {
     question: "Count of passengers on 16th May 2025?",
     answer: "4,365",
-  }
+  },
 ];
-
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,25 +61,59 @@ export default function ChatBot() {
     setShowTyping(false);
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // const handleSend = () => {
+  //   if (!input.trim()) return;
 
-    const newUserMessage = { from: "user", text: input };
-    const matchedQA = sampleQA.find(
-      (qa) => qa.question.toLowerCase() === input.toLowerCase()
-    );
+  //   const newUserMessage = { from: "user", text: input };
+  //   const matchedQA = sampleQA.find(
+  //     (qa) => qa.question.toLowerCase() === input.toLowerCase()
+  //   );
 
-    setChat((prev) => [...prev, newUserMessage]);
-    setShowTyping(true);
-    setInput("");
+  //   setChat((prev) => [...prev, newUserMessage]);
+  //   setShowTyping(true);
+  //   setInput("");
 
-    setTimeout(() => {
-      const botResponse = matchedQA
-        ? { from: "bot", text: matchedQA.answer }
-        : { from: "bot", text: "Sorry, I'm not able to fetch that right now." };
-      setChat((prev) => [...prev, botResponse]);
+  //   setTimeout(() => {
+  //     const botResponse = matchedQA
+  //       ? { from: "bot", text: matchedQA.answer }
+  //       : { from: "bot", text: "Sorry, I'm not able to fetch that right now." };
+  //     setChat((prev) => [...prev, botResponse]);
+  //     setShowTyping(false);
+  //   }, 1000);
+  // };
+
+  const handleSend = async () => {
+    try {
+      !showTyping && setShowTyping(true);
+
+      const responseFromChatBot = await fetch("/api/chatBot", {
+        method: "POST",
+        body: JSON.stringify({ query: input }),
+      });
+      const data = await responseFromChatBot.json();
+
+      if (!responseFromChatBot.ok) {
+        setChat((prevChat) => [
+          ...prevChat,
+          { from: "bot", text: data.error || "something went wrong" },
+        ]);
+        return;
+      }
+
+      setChat((prevChat) => [
+        ...prevChat,
+        {
+          from: "bot",
+          text: data.result,
+        },
+      ]);
+
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
       setShowTyping(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -129,10 +165,11 @@ export default function ChatBot() {
               {chat.map((msg, i) => (
                 <div
                   key={i}
-                  className={`text-[12px] px-2 py-2 rounded-[5px] max-w-[80ch] w-fit animate-fadeBounce ${msg.from === "bot"
-                    ? "bg-gray-100 text-gray-800 self-start"
-                    : "bg-[#235789] text-white self-end ml-auto"
-                    }`}
+                  className={`text-[12px] px-2 py-2 rounded-[5px] max-w-[80ch] w-fit animate-fadeBounce ${
+                    msg.from === "bot"
+                      ? "bg-gray-100 text-gray-800 self-start"
+                      : "bg-[#235789] text-white self-end ml-auto"
+                  }`}
                 >
                   {msg.text}
                 </div>

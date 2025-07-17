@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
-const LAMBDA_URL =
-  "https://fdzauph2n1.execute-api.ap-south-1.amazonaws.com/DEV";
+const LAMBDA_URL = "http://15.207.68.224:8000/chat";
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
 
-    if (!data.accident_id) {
-      return NextResponse.json(
-        { error: "accident  information is required" },
-        { status: 400 }
-      );
+    if (!data) {
+      return NextResponse.json({ error: "query required" }, { status: 400 });
     }
 
     const config = {

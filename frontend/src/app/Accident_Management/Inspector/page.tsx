@@ -140,6 +140,66 @@ const AccedentInspectorForm = () => {
     />,
   ];
 
+  // HANDLE CANCEL
+  const handelCancel = () => {
+    setInspectorReportData({
+      accident_uuid: "",
+      jurisdiction_of_inspector: "",
+      accident_id: "",
+      date_of_accident: "",
+      bonet_no: "",
+      inquiry_inspector_name: "",
+      fir_registered: false,
+      fir_number: "",
+      under_section_details: "",
+      accused_in_accident_in_fir: "",
+      fir_case_against_ksrtc: false,
+      date_of_bus_released_from_police_station: "",
+      enquiry_police_person_name: "",
+      enquiry_police_phone_number: "",
+      witness: "",
+      primary_cause_of_accident_in_insp_report: "",
+      responsibility_of_accident_in_insp_report: "",
+      if_not_ksrtc_responsible_action_taken: "",
+      whether_fir_is_modified_or_not: false,
+      responsibility_changed_from_ksrtc_as_per_evidence_submitted: false,
+      total_no_of_days_bus_docked_due_to_accident: 0,
+      revenue_loss_due_to_dock_of_bus: 0,
+      inspector_report_additional_details: "",
+      remarks: "",
+      whether_bus_have_valid_insurance_or_not: false,
+      created_by: "",
+      digital_evidence_files: [],
+      summary_of_inspector_report: "",
+      unit: "",
+      upload_document: "",
+      waybill: "",
+      schedule_details: "",
+      document_content_type: "",
+      document_filename: "",
+    });
+    setInsuranceReportData({
+      accident_id: "",
+      type_of_insurance: "",
+      insurance_claim_applied: false,
+      insurance_company_name: "",
+      policy_number: "",
+      claim_number: "",
+      date_of_insurance_claim_applied: "",
+      name_of_spot_surveyor: "",
+      spot_surveyor_phone_number: "",
+      final_bill_submitted_insurance_co: false,
+      final_bill_amount_to_ksrtc: 0,
+      approved_amount_by_insurance_co: 0,
+      admitted_amount_by_insurance_co: 0,
+      payment_settled: false,
+      date_of_payment_settled: null,
+      remarks: "",
+      created_by: "",
+    });
+    setFetchedDetails(null);
+  };
+
   // submit handler
   const handleSubmit = async () => {
     const inspectorReportBody = {
@@ -247,7 +307,7 @@ const AccedentInspectorForm = () => {
               </div>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setFetchedDetails(null)}
+                  onClick={handelCancel}
                   className="border bg-themeRed text-white font-[500] px-5 py-2 rounded-xs"
                 >
                   Cancel

@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 const tabs = [
   "Basic Details",
   "Basic & Workshop",
-  "Insurance & Cost",
+  "Insurance",
   "Additional info",
 ];
 
@@ -22,8 +22,10 @@ export interface SelectedAccidentWorkshopModel {
   district: string;
   operated_depot: string;
   photos: {
-    download_url: string;
-  }[];
+    download_urls: {
+      download_url: string;
+    }[];
+  };
 }
 
 const AccedentWorkshop = () => {
@@ -91,7 +93,7 @@ const AccedentWorkshop = () => {
     const description = selectedData.accident_details.description;
     const district = selectedData.location_info.district;
     const operatedDepot = selectedData.location_info.operated_depot;
-    const photos = selectedData.photos.download_urls;
+    const photos = selectedData.photos;
 
     setSelectedAccedentData({
       accident_id: accidentId,

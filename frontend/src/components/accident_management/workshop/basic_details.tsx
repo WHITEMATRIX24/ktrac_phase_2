@@ -6,6 +6,8 @@ interface Props {
 }
 
 const BasicDetails = ({ basicDetails }: Props) => {
+  console.log(basicDetails?.photos.download_urls[0].download_url);
+
   return (
     <div className="relative grid grid-cols-2 gap-3 overflow-auto h-full mx-3 rounded-m">
       <div className="p-3 overflow-y-auto bg-white border rounded-sm flex flex-col gap-3 w-full">
@@ -49,7 +51,7 @@ const BasicDetails = ({ basicDetails }: Props) => {
           <h6 className="text-sm font-semibold">Photos</h6>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          {basicDetails?.photos.map((photo, index) => (
+          {basicDetails?.photos.download_urls.map((photo, index) => (
             <div
               key={index}
               className="bg-gray-200 border border-gray-300 rounded h-auto flex items-center justify-center"

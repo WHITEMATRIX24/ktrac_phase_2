@@ -28,11 +28,12 @@ const BasicAndWorkShopForm = ({
   const [selectedDepot, setSelectedDepot] = useState<string>("");
   const depoInputRef = useRef<HTMLInputElement | null>(null);
   const depoUlRef = useRef<HTMLUListElement | null>(null);
-  // console.log(depot);
+  // console.log(selectedDepot);
 
   //  DEPO SELECT HANDLER
   const handleSelectDepo = (depo: { name: string; abv: string }) => {
-    setSelectedDepot(depo.name);
+    // setSelectedDepot(depo.name);
+
     formUpdateController((prev) => ({
       ...prev,
       workshop_depot_name: depo.name,
@@ -43,7 +44,10 @@ const BasicAndWorkShopForm = ({
   // SELECT DEPO HANDLER
   const filterDepoHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const filterValue = e.target.value.toLowerCase();
-    setSelectedDepot(filterValue);
+    formUpdateController((prev) => ({
+      ...prev,
+      workshop_depot_name: filterValue,
+    }));
 
     setFilteredDepot((_prev) => {
       const filteredDepot = depot.filter((d: any) => {
@@ -193,7 +197,7 @@ const BasicAndWorkShopForm = ({
             ref={depoInputRef}
             onClick={() => setShowDepot(true)}
             onChange={filterDepoHandler}
-            value={selectedDepot}
+            value={workShopFormData?.workshop_depot_name}
           />
 
           {showDepot && (
@@ -232,7 +236,7 @@ const BasicAndWorkShopForm = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
-            Date Of Work Start /
+            Date Of Work Start (DD-MM-YYYY) /
             <span className="text-[10px]">ജോലി ആരംഭിക്കുന്ന തീയതി</span>
           </label>
           <Input

@@ -55,14 +55,15 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           )}`
         );
         const data = await response.json();
-        // console.log(data);
 
         setAccidentList(data.data ? [data.data] : []);
       } else {
         const response = await fetch(
-          `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
+          `/api/zerothForInspectorAndWorkshop?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
         );
         const data = await response.json();
+        console.log(data);
+
         setAccidentList(data.data || []);
       }
     } catch (error) {
@@ -250,16 +251,14 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
             </div>
           </div>
           <div className="h-full border w-0"></div>
-          <div className="flex flex-col gap-3 w-[40%]">
-            <h6>
-              Accident Reference Number <span className="text-red-600">*</span>
-            </h6>
+          <div className="flex flex-col w-[40%]">
+            <h6>Accident Reference Number</h6>
             <input
               type="text"
               placeholder="Enter Accident Reference"
               value={accidentReferenceNumber}
               onChange={(e) => setAccidentReferencenumber(e.target.value)}
-              className="flex-1 border px-3 py-1 bg-white rounded-sm"
+              className="flex-1 border px-3 py-2 bg-white rounded-sm"
             />
           </div>
         </div>

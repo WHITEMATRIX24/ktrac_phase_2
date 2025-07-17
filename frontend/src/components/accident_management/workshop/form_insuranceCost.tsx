@@ -15,7 +15,7 @@ const InsuranceAndCostForm = ({
   workShopFormData,
 }: Props) => {
   return (
-    <div className="relative grid grid-cols-2 gap-3 overflow-auto h-full mx-3 rounded-m">
+    <div className="relative grid grid-cols-1 gap-3 overflow-auto h-full mx-3 rounded-m">
       <div className="overflow-y-auto p-3 bg-white border rounded-sm flex flex-col gap-3">
         <div className="border-b-2 border-sidebar py-2">
           <h6 className="text-sm font-semibold">Insurance</h6>
@@ -53,13 +53,13 @@ const InsuranceAndCostForm = ({
           />
         </div>
       </div>
-      <div className="overflow-y-auto p-3 bg-white border rounded-sm flex flex-col gap-3">
+      {/* <div className="overflow-y-auto p-3 bg-white border rounded-sm flex flex-col gap-3">
         <div className="border-b-2 border-sidebar py-2">
           <h6 className="text-sm font-semibold">
             Cost /<span className="text-[10px]">ചെലവ്</span>
           </h6>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
