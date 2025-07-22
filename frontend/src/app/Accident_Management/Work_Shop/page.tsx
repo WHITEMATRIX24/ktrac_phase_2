@@ -181,6 +181,7 @@ const AccedentWorkshop = () => {
       date_of_accident: selectedAccedentData?.date_of_accident,
       accident_reference_number: selectedAccedentData?.accident_id,
       created_by: "admin",
+      status: "processing",
     };
 
     try {
@@ -250,8 +251,7 @@ const AccedentWorkshop = () => {
         const errorData = await response.json();
         console.log(errorData);
 
-        // alert(errorData.error.error || "something went wrong");
-        alert("successfully added Workshop data"); /////////////////////ONLY FOT THE DEMO
+        alert(errorData.error.error || "something went wrong");
       }
     } catch (error) {
       console.error("Network error or unexpected error:", error);
@@ -322,7 +322,7 @@ const AccedentWorkshop = () => {
                 {/* <button className="border font-[500] px-5 py-1 rounded-xs">
                   Save Draft
                 </button> */}
-                {selectedTab === tabs.length - 1 && (
+                {selectedTab === tabs.length - 2 && (
                   <button
                     onClick={handleSubmit}
                     className="border font-[500] px-5 py-2 rounded-xs bg-sidebar text-white"

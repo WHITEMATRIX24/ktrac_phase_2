@@ -6,6 +6,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -29,17 +36,43 @@ type MonthwiseReport = {
   year: string;
 };
 
-const getTodayDate = (): string => {
-  return new Date().toISOString().split("T")[0];
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const getTodayMonth = (): string => {
+  const month = new Date().getMonth();
+  return months[month];
 };
 
-const formatDateForAPI = (input: string): string => {
-  const [year, month, day] = input.split("-");
-  return `${day}-${month}-${year}`;
+const getYears = (): string[] => {
+  const currentYear = new Date().getFullYear();
+  const years: string[] = [];
+
+  for (let i = 0; i < 5; i++) {
+    years.push((currentYear - i).toString());
+  }
+
+  return years;
 };
+
+const getCurrentYear = () => new Date().getFullYear().toString();
 
 const MonthWiseReport = () => {
-  const [date, setDate] = useState<string>(getTodayDate());
+  const [month, setMonth] = useState<string>(getTodayMonth());
+  const [yearList, setYearList] = useState<string[]>(getYears());
+  const [selectedYear, setSelectedYear] = useState<string>(getCurrentYear());
   const [reportData, setReportData] = useState<MonthwiseReport[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -47,11 +80,10 @@ const MonthWiseReport = () => {
   const fetchReportData = async () => {
     try {
       !isLoading && setIsLoading(true);
-      const formatedDate = formatDateForAPI(date);
-      //   console.log(formatedDate);
+      const formatedMonth = month.toLowerCase();
 
       const response = await fetch(
-        `/api/reports/accidents/month_wise?date=${formatedDate}`
+        `/api/reports/accidents/month_wise?month=${formatedMonth}&year=${selectedYear}`
       );
 
       if (!response.ok) {
@@ -159,9 +191,7 @@ const MonthWiseReport = () => {
     doc.text("KSRTC REPORT", 105, 10, { align: "center" });
 
     doc.setFontSize(14);
-    const tableLabel = `Accident Month Wise Report (${dateToLocaleFormater(
-      date
-    )})`;
+    const tableLabel = `Accident Month Wise Report ${month} ${selectedYear}`;
     doc.text(tableLabel, 13, 30, { align: "left" });
 
     // Add the table using autoTable
@@ -177,14 +207,14 @@ const MonthWiseReport = () => {
         valign: "middle",
       },
     });
-    doc.save(`Accident Month Wise Report (${dateToLocaleFormater(date)})`);
+    doc.save(`Accident Month Wise Report ${month} ${selectedYear}`);
   };
 
   useEffect(() => {
-    if (date) {
+    if (month && selectedYear) {
       fetchReportData();
     }
-  }, [date]);
+  }, []);
 
   return (
     <div className="px-5 pt-5 flex flex-col gap-7 h-[85vh] overflow-auto">
@@ -192,17 +222,45 @@ const MonthWiseReport = () => {
       <div className="flex flex-col gap-5">
         <div className="flex items-center justify-between">
           <div className="flex gap-5">
-            <div className="flex gap-1 items-center">
-              <h6 className="font-medium text-[14px] text-grey-300">Date :</h6>
-              <div className="flex items-center border rounded-md p-2 w-fit">
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="border-none p-0 text-sm focus:ring-0 focus:outline-none w-32 h-full"
-                />
-              </div>
-            </div>
+            <Select onValueChange={(value) => setMonth(value)} value={month}>
+              <SelectTrigger
+                size="sm"
+                className="w-fit px-3 py-0 bg-white border border-slate-300 rounded-md text-[12px] text-black shadow-sm "
+              >
+                <SelectValue>{month}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => (
+                  <SelectItem key={month} value={month}>
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              onValueChange={(value) => setSelectedYear(value)}
+              value={selectedYear}
+            >
+              <SelectTrigger
+                size="sm"
+                className="w-fit px-3 py-0 bg-white border border-slate-300 rounded-md text-[12px] text-black shadow-sm "
+              >
+                <SelectValue>{selectedYear}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {yearList.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <button
+              onClick={fetchReportData}
+              className="px-2 py-1 bg-sidebar rounded-md text-white text-sm"
+            >
+              search
+            </button>
           </div>
           <div className="flex gap-2">
             <Popover>

@@ -325,6 +325,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: Bus,
           items: [
+            { title: "Add Vehicle", url: "/Depot/Add_Vehicle" },
             { title: "Schedule Vehicle", url: "#" },
             { title: "Maintenance Log", url: "#" },
             { title: "Vehicle Status", url: "#" },

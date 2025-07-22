@@ -14,6 +14,7 @@ import { AccidentSevertyBarChart } from "@/components/dashboard/accidents/accide
 import { DashBoardDepoTable } from "@/components/dashboard/accidents/depotable";
 import { ColumnDef } from "@tanstack/react-table";
 import { AccidentDashboardAreaChart } from "@/components/dashboard/accidents/accident_dashboard_area";
+import Loading from "@/components/loading";
 
 type CardModel = {
   name: string;
@@ -442,7 +443,9 @@ const AccidentsDashboard = () => {
             </div>
           </div>
           {isLoading ? (
-            <p className="h-[80vh]">loading...</p>
+            <div className="h-[68vh] flex justify-center items-center">
+              <Loading />
+            </div>
           ) : (
             <>
               <AccidentDashboardCards data={dashboardData.cardData} />

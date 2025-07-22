@@ -2,20 +2,24 @@ import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 const LAMBDA_URL =
-  "https://jvipjbehy1.execute-api.ap-south-1.amazonaws.com/DEV/accident-comparison";
+  "https://9uicld54la.execute-api.ap-south-1.amazonaws.com/DEV/accident-comparison";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const date = searchParams.get("date");
+    const month = searchParams.get("month");
+    const year = searchParams.get("year");
 
-    if (!date) {
-      return NextResponse.json({ error: "Date is required" }, { status: 400 });
+    if (!month || !year) {
+      return NextResponse.json(
+        { error: "Month and Year is required" },
+        { status: 400 }
+      );
     }
 
     const config = {
       method: "get",
-      url: `${LAMBDA_URL}?date=${date}`,
+      url: `${LAMBDA_URL}?month=${month}&year=${year}`,
       timeout: 30000,
       maxBodyLength: Infinity,
     };
