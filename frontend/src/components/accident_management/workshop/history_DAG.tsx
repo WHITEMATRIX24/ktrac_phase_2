@@ -31,7 +31,7 @@ const HistoryDAG: React.FC<HistoryDAGProps> = ({ historyData }) => {
 };
 
   if (!historyData || historyData.length === 0)
-    return <p>No version history available.</p>;
+    return <p className="p-5">No version history available.</p>;
   // 🔧 Helper to shorten long values
   const shortValue = (val: any): string => {
     if (val === null || val === undefined) return "null";

@@ -806,6 +806,76 @@ const ZerothReport = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+/* const fetchNearbyPoliceStations = async (lat: number, lng: number) => {
+  const query = `
+    [out:json];
+    (
+      node["amenity"="police"](around:2000,${lat},${lng});
+      way["amenity"="police"](around:2000,${lat},${lng});
+      relation["amenity"="police"](around:2000,${lat},${lng});
+    );
+    out center;
+  `;
+
+  try {
+    const response = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: query,
+    });
+   const  reverseGeocode= async (lat: number, lng: number): Promise<string> => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+      );
+      const data = await res.json();
+      return data.display_name || "Unknown location";
+    } catch (error) {
+      console.error("Error fetching place name:", error);
+      return "Unknown location";
+    }
+};
+
+
+    const data = await response.json();
+    const stations = await Promise.all(data.elements.map(async (el: any) => {
+  const name = el.tags?.name;
+  const lat = el.lat || el.center?.lat;
+  const lng = el.lon || el.center?.lon;
+  const fallbackName = await reverseGeocode(lat, lng);
+
+  return {
+    id: el.id,
+    name: name || fallbackName || "Unnamed Police Station",
+    lat,
+    lng,
+    tags: el.tags,
+  };
+}));
+
+
+    console.log("Nearby Police Stations from OSM:", stations);
+    return stations;
+  } catch (error) {
+    console.error("❌ Error fetching police stations from OSM:", error);
+    return [];
+  }
+};
+
+useEffect(() => {
+  if (coords) {
+    fetchNearbyPoliceStations(coords.lat, coords.lng).then((stations) => {
+      if (stations.length > 0) {
+        const nearest = stations[0];
+        setLocationData((prev) => ({
+          ...prev,
+          policeStation: nearest.name,
+          policeStationName: nearest.name,
+          // optionally add lat/lng
+        }));
+      }
+    });
+  }
+}, [coords]); */
 
   const filterDrivers = (searchTerm: string) => {
     if (!searchTerm) {
@@ -837,30 +907,61 @@ const ZerothReport = () => {
     });
     setShowDriverDropdown(false);
   };
-  const handleLocationSelect = (suggestion: any) => {
-    const address = suggestion.address;
-    const district =
-      address.county || address.district || address.state_district || "";
 
-    const lat = parseFloat(suggestion.lat);
-    const lng = parseFloat(suggestion.lon);
+  const keralaDistricts = [
+  "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha", "Kottayam",
+  "Idukki", "Ernakulam", "Thrissur", "Palakkad", "Malappuram",
+  "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
+];
 
-    // ✅ Update coordinates for the map
-    setCoords({ lat, lng });
+const normalize = (str: string) => str.trim().toLowerCase();
 
-    setLocationData((prev) => ({
-      ...prev,
-      address: suggestion.display_name,
-      place: address.village || address.town || address.city || "",
-      district: district,
-      state: address.state || "",
-      latitude: suggestion.lat,
-      longitude: suggestion.lon,
-    }));
+const handleLocationSelect = (suggestion: any) => {
+  console.log(suggestion);
 
-    setLocationQuery(suggestion.display_name);
-    setShowLocationSuggestions(false);
-  };
+  const address = suggestion.address;
+  const lat = parseFloat(suggestion.lat);
+  const lng = parseFloat(suggestion.lon);
+
+  // Extract district candidates from multiple levels
+  const districtCandidates = [
+    address.county,
+    address.district,
+    address.state_district,
+    address.city_district,
+    address.region
+  ];
+
+  // Try to match any candidate with known Kerala districts
+  let matchedDistrict = "";
+  for (const candidate of districtCandidates) {
+    if (!candidate) continue;
+    const normalized = normalize(candidate);
+    const match = keralaDistricts.find(
+      (district) => normalize(district) === normalized
+    );
+    if (match) {
+      matchedDistrict = match;
+      break;
+    }
+  }
+
+  setCoords({ lat, lng });
+
+  setLocationData((prev) => ({
+    ...prev,
+    address: suggestion.display_name,
+    place: address.village || address.town || address.city || "",
+    district: matchedDistrict, // 🟢 Auto-selected
+    state: address.state || "",
+    latitude: suggestion.lat,
+    longitude: suggestion.lon,
+  }));
+
+  setLocationQuery(suggestion.display_name);
+  setShowLocationSuggestions(false);
+};
+
 
   const filterConductors = (searchTerm: string) => {
     if (!searchTerm) {
@@ -904,7 +1005,7 @@ const ZerothReport = () => {
   const fetchLocationSuggestions = async (query: string) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&q=${encodeURIComponent(
           query
         )}&addressdetails=1&limit=5`
       );
@@ -1168,6 +1269,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
 
  const handleSubmitAccidentDetails = async (e: FormEvent) => {
   e.preventDefault();
+  setIsSubmitting(true);
 
   const missingFields: string[] = [];
 
@@ -1177,8 +1279,8 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
   // Validate: Location & Jurisdiction
   const locationChecks = [
     [locationData.address, "Accident Address"],
-    [locationData.place, "Place of Accident"],
-    [locationData.district, "Accident District"],
+/*     [locationData.place, "Place of Accident"],
+ */    [locationData.district, "Accident District"],
     [locationData.state, "Accident State"],
     [locationData.latitude, "Latitude"],
     [locationData.longitude, "Longitude"],
@@ -1224,9 +1326,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
 
   if (missingFields.length > 0) {
     alert(`Please fill the following required fields:\n\n• ${missingFields.join("\n• ")}`);
+    setIsSubmitting(false)
     return;
   }
-  setIsSubmitting(true);
   setSubmitError(null);
     try {
 
@@ -1328,12 +1430,15 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     }, 3000);
     setTimeoutId(id);
   } catch (error) {
-    console.error("Error submitting accident report:", error);
-    setSubmitError(
-      error instanceof Error
-        ? error.message
-        : "Failed to submit accident report. Please try again."
-    );
+  console.error("Error submitting accident report:", error);
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : "Failed to submit accident report. Please try again.";
+
+  setSubmitError(errorMessage);
+  alert(`❌ Error saving accident report:\n\n${errorMessage}`);
+
   } finally {
     setIsSubmitting(false);
   }
@@ -2087,7 +2192,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                 </button>
               )}
 
-              {activeTab <= 3 && (
+              {activeTab !== 3 - 1 && (
                 <button
                   type="button"
                   onClick={() => setActiveTab(activeTab + 1)}
@@ -2112,13 +2217,13 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                 <button
                   type="button"
                   onClick={handleSubmitAccidentDetails}
-                  disabled={isSubmittingDocumentation }
+                  disabled={isSubmitting }
                   className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${isSubmittingDocumentation
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[var(--sidebar)] hover:bg-[#001670]"
                     }`}
                 >
-                  {isSubmittingDocumentation ? (
+                  {isSubmitting ? (
                     <span className="flex items-center">
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"

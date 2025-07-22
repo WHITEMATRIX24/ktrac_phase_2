@@ -5,17 +5,29 @@ import {
   MapContainer,
   TileLayer,
   Marker,
+  Popup,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { LatLngTuple } from "leaflet";
 import { Input } from "@/components/ui/input";
 
+interface SeverityDistribution {
+  minor: number;
+  major: number;
+  fatal: number;
+}
+
 interface Coordinate {
   lat: number;
   lng: number;
-  label?: string;
-  date?: string;
+  label: string;
+  severity: "Minor" | "Major" | "Fatal";
+  details: {
+    total: number;
+    fatalities: number;
+    severity_distribution: SeverityDistribution;
+  };
 }
 
 interface ReportMapProps {
@@ -24,11 +36,28 @@ interface ReportMapProps {
   isLoading?: boolean;
 }
 
-const customIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
+const getSeverityColor = (severity?: string) => {
+  switch (severity) {
+    case "Fatal":
+      return "red";
+    case "Major":
+      return "orange";
+    case "Minor":
+      return "green";
+    default:
+      return "blue";
+  }
+};
+
+const getCustomIcon = (severity?: string) =>
+  new L.Icon({
+    iconUrl: `/marker-icon-${getSeverityColor(severity)}.png`,
+    shadowUrl: "/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
 
 const AutoFitBounds = ({ coordinates }: { coordinates: [number, number][] }) => {
   const map = useMap();
@@ -44,87 +73,60 @@ const AutoFitBounds = ({ coordinates }: { coordinates: [number, number][] }) => 
 };
 
 const ReportMap: React.FC<ReportMapProps> = ({ data, title, isLoading }) => {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+    
 
-  const filteredLocations = data.filter((item) => {
-    const matchesSearch =
-      !searchTerm ||
-      item.label?.toLowerCase().includes(searchTerm.toLowerCase());
+ // const center: LatLngTuple = [10.0, 76.0];
+ const center: LatLngTuple = [10.8505, 76.2711]; // Approx. center of Kerala
 
-    const matchesStartDate =
-      !startDate || new Date(item.date || "") >= new Date(startDate);
-
-    const matchesEndDate =
-      !endDate || new Date(item.date || "") <= new Date(endDate);
-
-    return matchesSearch && matchesStartDate && matchesEndDate;
-  });
-
-  const center: LatLngTuple = [10.0, 76.0]; // Initial center (used just to initialize)
-
-  const boundsCoords: [number, number][] = filteredLocations.map((loc) => [
+  const boundsCoords: [number, number][] = data.map((loc) => [
     loc.lat,
     loc.lng,
   ]);
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      {title && <h2 className="text-lg font-semibold">{title}</h2>}
-
-      {/* Filters */}
-      <div className="flex items-center justify-between py-2 flex-wrap gap-4">
-        <div className="flex gap-4">
-          <div className="flex gap-1 items-center">
-            <label className="text-sm font-medium">From</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="border rounded-md p-1 text-sm w-[130px] bg-gray-100"
-            />
-          </div>
-          <div className="flex gap-1 items-center">
-            <label className="text-sm font-medium">To</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="border rounded-md p-1 text-sm w-[130px] bg-gray-100"
-            />
-          </div>
-        </div>
-        <Input
-          placeholder="Search by location"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm bg-gray-100"
-        />
-      </div>
-
+    <div className="flex flex-col gap-4 w-[90%] border m-5 p-5">
+{/*       {title && <h2 className="text-lg font-semibold">{title}</h2>}
+ */}
+      
       {/* Map */}
       <div className="rounded-md border w-full overflow-hidden h-[60vh] relative">
         {isLoading ? (
-          <p className="text-center mt-10">Loading map...</p>
+          <div className="flex justify-center items-center h-full">
+            <p className="text-center text-gray-500">Loading map...</p>
+          </div>
         ) : (
           <MapContainer
             center={center}
-            zoom={10}
+            zoom={18}
             scrollWheelZoom={true}
             className="w-full h-full z-10"
           >
             <TileLayer
-              attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {filteredLocations.map((loc, index) => (
-              <Marker
-                key={index}
-                position={[loc.lat, loc.lng]}
-                icon={customIcon}
-              />
-            ))}
+  attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+  url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+/>
+
+            {data
+  .filter((loc) => loc.details.total >1)
+  .map((loc, index) => (
+    <Marker
+      key={index}
+      position={[loc.lat, loc.lng]}
+      icon={getCustomIcon(loc.severity)}
+    >
+      <Popup>
+        <div className="text-sm">
+          <strong>{loc.label}</strong><br />
+          Total Accidents: {loc.details.total}<br />
+          Fatalities: {loc.details.fatalities}<br />
+          Minor: {loc.details.severity_distribution.minor},{" "}
+          Major: {loc.details.severity_distribution.major},{" "}
+          Fatal: {loc.details.severity_distribution.fatal}
+        </div>
+      </Popup>
+    </Marker>
+))}
+
             <AutoFitBounds coordinates={boundsCoords} />
           </MapContainer>
         )}

@@ -44,7 +44,7 @@ type ApiResponse = {
 };
 
 
-const dateToday = () => {
+const dateToday:any = () => {
   const date = new Date();
   const isoString = date.toISOString();
   const dateToday = isoString.split("T")[0];
@@ -54,6 +54,7 @@ const dateToday = () => {
 const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: (selectedData: any) => void }) => {
   const [date, setDate] = useState(dateToday());
   const [district, setDistrict] = useState("");
+  const [stage, setStage] = useState("All");
   const [depo, setDepo] = useState("");
   const [bonnetNo, setBonnetNo] = useState("");
   const [showBonnetDropDown, setShowBonnetDropDown] = useState(false);
@@ -155,7 +156,10 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
         
         const response = await fetch(
           `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
-        );
+        );/* 
+        const response = await fetch(
+          `/api/searchZerothReport?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}&stage=${stage}`
+        ); */
         const data = await response.json();
         console.log(data.data);
         
@@ -175,6 +179,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
   setDate(new Date().toISOString().split("T")[0]); // sets to today's date in 'YYYY-MM-DD' format
   setBonnetNo("");
   setDistrict("");
+  setStage("All")
   setDepo("");
 };
 
@@ -561,8 +566,8 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                                         </select>
                                     </div>
                   </div>
-                  <div className="h-full border w-0"></div>
-                  <div className="flex flex-col w-[40%]">
+                  <div className="grid grid-cols-1 gap-5 items-end text-[12px] w-[40%]">
+                  <div className="flex flex-col w-[80%]">
                     <h6>
                       Accident Reference Number 
                       <span className="text-[10px] text-gray-500">
@@ -576,6 +581,21 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                       onChange={(e) => setAccidentReferencenumber(e.target.value)}
                       className="flex-1 border px-3 py-2 bg-white rounded-sm"
                     />
+                  </div>
+                  <div className="flex flex-col w-[80%]">
+                      <label>
+                        Accident Status <span className="text-[10px]"> </span>
+                      </label>
+                      <select
+                        onChange={(e) => setStage(e.target.value)}
+                        className="px-3 py-3 border rounded-sm"
+                        value={district}
+                      >
+                        <option value="">Select Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Comapleted">Completed</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center px-3 py-2 bg-slate-50">

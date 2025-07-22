@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-const GOOGLE_MAP_SRC = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyxYry5klW4Nt35VxHlfdyHoRBdAJA7qu_z`;
+const GOOGLE_MAP_SRC = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyozSLmgmjwpdua0_uRVHIdkcxLqyjWrdza`;
 
 interface LiveGoogleMapProps {
   coordinates: { lat: number; lng: number };

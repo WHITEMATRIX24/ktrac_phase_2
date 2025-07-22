@@ -5,6 +5,7 @@ import FormInspectorReport from "@/components/accident_management/inspector/form
 import FormInsurenceReport from "@/components/accident_management/inspector/form_insurence_report";
 import ReferenceNumberSearchModal from "@/components/accident_management/search_referencenumber_modal";
 import { Input } from "@/components/ui/input";
+import HistoryDAG from "@/components/accident_management/workshop/history_DAG";
 import {
   AccidentInsuranceModel,
   InspectorReportData,
@@ -13,7 +14,15 @@ import { Autocomplete, TextField } from "@mui/material";
 import { User2, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-const tabs = ["Basic Details", "Inspector Report", "Insurance"];
+const tabs = ["Basic Details", "Inspector Report", "Insurance","History"];
+interface HistoryEntry {
+  version: number;
+  operation: string;
+  changed_by: string;
+  changed_at: string;
+  old_data: Record<string, any>;
+  new_data: Record<string, any>;
+}
 
 const AccedentInspectorForm = () => {
   const [inspectorReportData, setInspectorReportData] =
@@ -85,6 +94,8 @@ const AccedentInspectorForm = () => {
   } | null>(null);
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(50);
+  const [historyData, setHistoryData] = useState<HistoryEntry[]>([]);
+  
 
   const handleSearchSelect = (selectedData: any) => {
     console.log(selectedData);
@@ -138,6 +149,8 @@ const AccedentInspectorForm = () => {
       inspectorReport={inspectorReportData}
       inspectorUpdateFunction={setInspectorReportData}
     />,
+    <HistoryDAG historyData={historyData} />,
+
   ];
 
   // HANDLE CANCEL
@@ -199,6 +212,27 @@ const AccedentInspectorForm = () => {
     });
     setFetchedDetails(null);
   };
+  const getHistoryDetailsHandler = async () => {
+      try {
+        if (fetchedDetails?.accident_id) {
+          const response = await fetch(
+            `/api/getInspectorHistoryData?accident_reference_number=${fetchedDetails?.accident_id.replaceAll(
+              "/",
+              "_"
+            )}`
+          );
+          const data = await response.json();
+  
+          setHistoryData(Array.isArray(data.history) ? data.history : []);
+        }
+      } catch (error) {
+        console.log("error on getting bus details");
+      }
+    };
+  
+    useEffect(() => {
+      getHistoryDetailsHandler();
+    }, [fetchedDetails]);
 
   // submit handler
   const handleSubmit = async () => {

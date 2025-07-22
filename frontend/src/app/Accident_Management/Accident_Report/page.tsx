@@ -343,6 +343,8 @@ const PrimaryAccidentReport: React.FC = () => {
   const [depots, setDepots] = React.useState<{ name: string; abv: string }[]>([]);
   const depotRef = React.useRef<HTMLDivElement>(null);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+    const [timeoutId, setTimeoutId] = React.useState<NodeJS.Timeout | null>(null);
 
 
   const [filteredDepots, setFilteredDepots] = React.useState<{ name: string; abv: string }[]>([]);
@@ -385,7 +387,7 @@ const PrimaryAccidentReport: React.FC = () => {
       busNo: accidentData.vehicle_info.bonet_no,
       regNo: accidentData.vehicle_info.vehicle_register_no,
 /*       accidentPlace: (accidentData.accident_location_details.accident_place),
- */      accidentPlace: (accidentData.location_info.address).split(",")[0],
+ */      accidentPlace: (accidentData.location_info.address),
       accidentDate: accidentData.accident_details.date_of_accident,
       policeStation: accidentData.geolocation.nearest_police_station,
       /* policeStation: accidentData.nearby_assistance_details.nearest_police_station, */
@@ -705,7 +707,7 @@ const PrimaryAccidentReport: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Stop page refresh
     // ✅ Validate required fields
-  
+setIsSubmitting(true)
   // Map field keys to user-friendly names
   const fieldLabels: { [key: string]: string } = {
     accidentRefNo: "Accident Reference Number",
@@ -721,8 +723,8 @@ const PrimaryAccidentReport: React.FC = () => {
     thirdPartyPropertiesDamaged: "Third Party Properties Damaged",
     accidentOccurred: "Accident Occurred",
     accidentType: "Accident Type",
-    typeOfCollision: "Type of Collision",
-    primaryCause: "Primary Cause of Accident",
+/*     typeOfCollision: "Type of Collision",
+ */    primaryCause: "Primary Cause of Accident",
     primaryResponsibility: "Primary Responsibility",
     roadClassification: "Road Classification",
     roadCondition: "Road Condition",
@@ -756,6 +758,7 @@ if (missingFields.length > 0) {
     .join("\n");
 
   alert(`Please fill the following required fields:\n\n${missingFieldNames}`);
+  setIsSubmitting(false)
   return;
 }
 const minLengthFields: { [key: string]: number } = {
@@ -774,6 +777,7 @@ if (shortFields.length > 0) {
     .join("\n");
 
   alert(`Minimum 10 charaters required for :\n\n${shortFieldNames}`);
+    setIsSubmitting(false)
   return;
 }
 
@@ -787,16 +791,18 @@ if (shortFields.length > 0) {
       accident_id: formData.accidentRefNo,
       operated_depot_zone: formData.operatedDepot,
       operated_schedule_name: formData.operatedScheduleName,
-      type_of_other_vehicle: formData.typeOfOtherVehicle,
+      schedule_number: formData.scheduleNumber,
+      type_of_other_vehicles: formData.typeOfOtherVehicle,
       involved_vehicle_reg_numbers: formData.involvedVehicleRegNumbers,
       home_depot: formData.homeDepot,
-      jurisdiction_depot: formData.jurisdictionDepot,
+      jurisdiction_of_accident_depot: formData.jurisdictionDepot,
       police_station_jurisdiction: formData.nearestPoliceStation,
       accident_state: formData.accidentState,
       accident_district: formData.accidentDistrict,
       accident_place: formData.accidentPlace,
       created_by: "adminksrtc",
     };
+    console.log(primaryPayload);
     const damagePayload = {
       accident_id: formData.accidentRefNo,
       damage_description: formData.damageToBus,
@@ -819,6 +825,8 @@ if (shortFields.length > 0) {
       minor_injuries_passengers: formData.minorInjuriesPassengers,
       major_injuries_third_party: formData.majorInjuriesThirdParty,
       minor_injuries_third_party: formData.minorInjuriesThirdParty,
+      created_by: "admin@ktrac",
+
     };
     const inspectorPayload = {
       accident_id: formData.accidentRefNo,
@@ -859,26 +867,37 @@ if (shortFields.length > 0) {
       body: JSON.stringify(payload),
     });
 
+    console.log(res);
+    
     if (!(res.status>=200 && res.status<300 )) {
       const errorText = await res.text(); // Try to read response body      
-      alert(`Already Saved Data`)
+     // alert(`Already Saved Data`)
       throw new Error(`${label} failed: ${res.status} ${res.statusText}\n${errorText}`);
-    
+      setIsSubmitting(false)
     }
   };
+  console.log(primaryPayload);
+  
 
-  await submitWithAlert("Primary Details", "/api/addPrimaryDetails", primaryPayload);
-  await submitWithAlert("Damage Details", "/api/addDamageDetails", damagePayload);
-  await submitWithAlert("Accident Details", "/api/addAccidentDetails", accidentDetailsPayload);
-  await submitWithAlert("Inspector Details", "/api/addPrimaryInspectorDetails", inspectorPayload);
-  await submitWithAlert("On-Road Details", "/api/addOnRoadDetails", onRoadPayload);
-  await submitWithAlert("Recovery Details", "/api/addRecoveryDetails", recoveryPayload);
+ await submitWithAlert("Primary Details", "/api/addPrimaryDetails", primaryPayload);
+ await submitWithAlert("Damage Details", "/api/addDamageDetails", damagePayload);
+ await submitWithAlert("Accident Details", "/api/addAccidentDetails", accidentDetailsPayload);
+ await submitWithAlert("Inspector Details", "/api/addPrimaryInspectorDetails", inspectorPayload);
+ await submitWithAlert("On-Road Details", "/api/addOnRoadDetails", onRoadPayload);
+ await submitWithAlert("Recovery Details", "/api/addRecoveryDetails", recoveryPayload); 
 
-       alert("All accident details submitted successfully.");
+      // alert("All accident details submitted successfully.");
+           setShowSuccessModal(true);
+
+         setIsSubmitting(false)
+         const id = setTimeout(() => {
         window.location.reload();
+    }, 3000);
+    setTimeoutId(id);
     } catch (error) {
       console.error("Submission failed", error);
-      alert("Error during submission. Please check logs.");
+      alert("Submission Failed");
+        setIsSubmitting(false)
     }
   };
 
@@ -897,6 +916,7 @@ if (shortFields.length > 0) {
     "Hit Front by KSRTC (കെഎസ്ആർടിസി മുൻഭാഗത്ത് ഇടിച്ച അപകടം)",
   ]);
   const [customAccidentType, setCustomAccidentType] = React.useState<string>("");
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const handleAccidentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, accidentType: e.target.value }));
@@ -2258,9 +2278,9 @@ if (shortFields.length > 0) {
                                   <option value="DR_ROAD">
                                     District Road (ജില്ലാ റോഡ്)
                                   </option>
-                                  <option value="RR_ROAD">
+                                 <option value="RU_ROAD">
                                     Rural Road (ഗ്രാമീണ റോഡ്)
-                                  </option>
+                                  </option> 
                                   <option value="BUS_STATION">
                                     Bus Station (ബസ് സ്റ്റേഷൻ)
                                   </option>
@@ -3193,7 +3213,7 @@ if (shortFields.length > 0) {
                           Cancel
                         </button>
 
-                        {activeTab > 0 && (
+                        {/* {activeTab > 0 && (
                           <button
                             type="button"
                             onClick={() => setActiveTab(activeTab + 1)}
@@ -3201,7 +3221,7 @@ if (shortFields.length > 0) {
                           >
                             Save Draft
                           </button>
-                        )}
+                        )} */}
 
                         {/* Submit if severity is insignificant and on tab 2 */}
                         {activeTab === 2 &&
@@ -3210,7 +3230,8 @@ if (shortFields.length > 0) {
                               type="submit"
                               className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
                             >
-                              Submit Report
+                              {isSubmitting ?<span>Submitting</span>:
+                              <span>Submit Report</span>}
                             </button>
                           )}
 
@@ -3220,8 +3241,8 @@ if (shortFields.length > 0) {
                             type="submit"
                             className="bg-sidebar font-[500] text-white px-5 py-1 rounded-xs disabled:bg-gray-400"
                           >
-                            Submit Report
-                          </button>
+                              {isSubmitting ?<span>Submitting</span>:
+                              <span>Submit Report</span>}                          </button>
                         )}
                       </div>
                     </div>
@@ -3238,6 +3259,51 @@ if (shortFields.length > 0) {
       )}
       {isVehicleSearchOpen && (
         <CombinedAccidentComponent caseSelectHandler={handleVehicleSelect} />
+      )}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-xl p-8 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 animate-scaleIn">
+            <div className="flex flex-col items-center">
+              {/* Success icon animation */}
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-pulseOnce">
+                <svg
+                  className="w-12 h-12 text-green-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+
+              {/* Success message */}
+              <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
+                Accident Primary Report Submitted Successfully!
+              </h3>
+              <p className="text-gray-600 text-center mb-6">
+                Reference ID: {formData.accidentRefNo}
+              </p>
+
+              {/* OK button */}
+              <button
+                onClick={() => {
+                  if (timeoutId) clearTimeout(timeoutId);
+                  setShowSuccessModal(false);
+                  setSelectedVehicle(null);
+                    window.location.reload();
+                }}
+                className="px-8 py-3 bg-[var(--sidebar)] text-white rounded-lg hover:bg-[#001670] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--sidebar)] focus:ring-opacity-50 transform hover:scale-105 transition-transform duration-200"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
