@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Input } from "../ui/input";
 
 interface AddInsurance {
-  bonnet_no: string;
+  bonet_no: string;
   type_of_insurance: string;
   insurance_company_name: string;
   policy_number: string;
@@ -11,7 +11,7 @@ interface AddInsurance {
 }
 
 const initialInsuranceData = {
-  bonnet_no: "",
+  bonet_no: "",
   type_of_insurance: "",
   insurance_company_name: "",
   policy_number: "",
@@ -33,7 +33,7 @@ const AddInsuranceForm = () => {
   const handleSearchBonnetnumber = (searchValue: string) => {
     setInsuranceData({
       ...insuranceData,
-      bonnet_no: searchValue,
+      bonet_no: searchValue,
     });
     if (searchValue === "") {
       setBonnetNumberList([]);
@@ -53,7 +53,7 @@ const AddInsuranceForm = () => {
   const handleSelectBonnetNumber = (selectedValue: string) => {
     setInsuranceData({
       ...insuranceData,
-      bonnet_no: selectedValue,
+      bonet_no: selectedValue,
     });
     setShowBonnetNumberList(false);
   };
@@ -74,6 +74,68 @@ const AddInsuranceForm = () => {
     }
   };
 
+  // HANDLE SUBMIT
+  const handleSubmit = async () => {
+    try {
+      const {
+        bonet_no,
+        insurance_company_name,
+        insurance_end_date,
+        insurance_start_date,
+        policy_number,
+        type_of_insurance,
+      } = insuranceData;
+
+      if (
+        !bonet_no ||
+        !insurance_company_name ||
+        !insurance_end_date ||
+        !insurance_start_date ||
+        !policy_number ||
+        !type_of_insurance
+      ) {
+        return alert("requires full fields");
+      }
+
+      // const startDate = new Date(insurance_start_date);
+      // startDate.setUTCHours(0, 0, 0, 0);
+      // const endDate = new Date(insurance_end_date);
+      // endDate.setUTCHours(23, 59, 59, 999);
+
+      const body: AddInsurance = {
+        bonet_no,
+        policy_number,
+        type_of_insurance,
+        insurance_company_name,
+        insurance_end_date,
+        insurance_start_date,
+      };
+
+      const response = await fetch("/api/Insurance/add_insurance", {
+        method: "post",
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log(`error in adding insurance error`);
+        console.log(data);
+
+        return alert("something went wrong");
+      }
+      console.log(data);
+      alert("successfully added insurance");
+    } catch (error) {
+      alert("error in adding insurance");
+      console.error(`error in adding insurance error:${error}`);
+    }
+  };
+
+  // HANDLE CANCEL
+  const handleCancel = () => {
+    setInsuranceData(initialInsuranceData);
+  };
+
   useEffect(() => {
     fetchBusInfo();
   }, []);
@@ -86,7 +148,7 @@ const AddInsuranceForm = () => {
           <div className="relative">
             <Input
               onChange={(e) => handleSearchBonnetnumber(e.target.value)}
-              value={insuranceData.bonnet_no}
+              value={insuranceData.bonet_no}
               placeholder="Bonnet no"
               className="bg-white h-8 w-full"
             />
@@ -178,10 +240,16 @@ const AddInsuranceForm = () => {
         </div>
       </div>
       <div className="flex gap-3 ms-auto">
-        <button className="text-sm bg-themeRed px-2 py-2 rounded-sm text-white">
+        <button
+          onClick={handleCancel}
+          className="text-sm bg-themeRed px-2 py-2 rounded-sm text-white"
+        >
           Cancel
         </button>
-        <button className="text-sm bg-sidebar px-2 py-2 rounded-sm text-white">
+        <button
+          onClick={handleSubmit}
+          className="text-sm bg-sidebar px-2 py-2 rounded-sm text-white"
+        >
           Add Insurance
         </button>
       </div>
