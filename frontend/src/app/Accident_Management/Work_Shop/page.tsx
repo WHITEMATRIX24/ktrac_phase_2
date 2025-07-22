@@ -234,7 +234,6 @@ const AccedentWorkshop = () => {
         body.individual_bill_document_s3_path = billFile?.key;
         body.total_bill_document_s3_path = totalBillFile?.key;
       }
-      console.log(body);
 
       // // FORM UPLOAD
       const response = await fetch("/api/submitAccidentWorkshopForm", {
@@ -266,7 +265,7 @@ const AccedentWorkshop = () => {
         ) : (
           <>
             <div className="pt-5 px-3 flex justify-end">
-              <h6 className="text-[16px] font-semibold">
+              <h6 className="text-[16px] font-semibold text-themeRed">
                 {selectedAccedentData.accident_id.replaceAll("_", "/")}
               </h6>
             </div>

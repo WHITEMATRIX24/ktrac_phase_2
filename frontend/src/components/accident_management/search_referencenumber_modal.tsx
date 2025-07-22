@@ -55,6 +55,7 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           )}`
         );
         const data = await response.json();
+        console.log(data);
 
         setAccidentList(data.data ? [data.data] : []);
       } else {
@@ -62,7 +63,6 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
           `/api/zerothForInspectorAndWorkshop?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
         );
         const data = await response.json();
-        console.log(data);
 
         setAccidentList(data.data || []);
       }
@@ -306,11 +306,22 @@ const ReferenceNumberSearchModal = ({ caseSelectHandler }: Props) => {
                 </p>
                 <p>
                   Accident Place:{" "}
-                  <span className="ml-1">{d.location_info.place}</span>
+                  <span className="ml-1">
+                    {d.location_info?.place
+                      ? d.location_info?.place
+                      : d.accident_location_details?.accident_place ||
+                        "No place available"}
+                  </span>
                 </p>
                 <p>
                   Operated Depot:{" "}
-                  <span className="ml-1">{d.location_info.operated_depot}</span>
+                  <span className="ml-1">
+                    {d.location_info?.operated_depot
+                      ? d.location_info.operated_depot
+                      : d.accident_details.operated_depot ||
+                        "depot not available"}{" "}
+                    {/* raise after demo same data on 2 different keys while using filter and search with reference number */}
+                  </span>
                 </p>
                 <p>
                   Accident Date:{" "}
