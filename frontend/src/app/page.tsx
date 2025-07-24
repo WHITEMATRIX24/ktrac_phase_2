@@ -73,8 +73,8 @@ export default function Home() {
     );
 
     if (user) {
-      localStorage.setItem("userRole", user.role);
-      localStorage.setItem("userDepo", user.depo);
+      sessionStorage.setItem("userRole", user.role);
+      sessionStorage.setItem("userDepo", user.depo);
       if (user.role === "Admin") {
         router.replace("/Dashboard/Accidents");
       } else if (user.role === "Finance") {

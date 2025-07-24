@@ -156,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [navItems, setNavItems] = React.useState<NavItem[]>(defaultNavItems);
 
   React.useEffect(() => {
-    const role = localStorage.getItem("userRole");
+    const role = sessionStorage.getItem("userRole");
     let computedNavItems: NavItem[] = [];
 
     if (role === "Finance") {

@@ -1,12 +1,17 @@
 "use client";
+import AddScheduleForm from "@/components/depot/add_schedule_form";
 import AddVehicleForm from "@/components/depot/add_vehicle_form";
 import AddInsuranceForm from "@/components/insurance/add_insurance_form";
 import React, { useState } from "react";
 
-const tabs = ["Add Vehicle", "Insurance"];
+const tabs = ["Add Vehicle", "Add Schedule", "Insurance"];
 const AddVehicle = () => {
   const [selectedTab, setSelectedtab] = useState<number>(0);
-  const tabList = [<AddVehicleForm />, <AddInsuranceForm />];
+  const tabList = [
+    <AddVehicleForm />,
+    <AddScheduleForm />,
+    <AddInsuranceForm />,
+  ];
   return (
     <div className="h-[86vh] px-5 py-3 pt-5 flex flex-col">
       <div className="flex flex-col bg-white">

@@ -1,5 +1,5 @@
 "use client";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import React, {
   useState,
   useEffect,
@@ -10,8 +10,8 @@ import React, {
 } from "react";
 import { AlertTriangle, LogOut, Camera, X, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import 'leaflet/dist/leaflet.css'; // ✅ required
-import LiveGoogleMap from '@/components/LiveGoogleMap';
+import "leaflet/dist/leaflet.css"; // ✅ required
+import LiveGoogleMap from "@/components/LiveGoogleMap";
 
 type MediaFile = {
   id: string;
@@ -103,7 +103,9 @@ const ZerothReport = () => {
   const [timeSlot, setTimeSlot] = useState("");
   const [driverSearchText, setDriverSearchText] = useState("");
   const [conductorSearchText, setConductorSearchText] = useState("");
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const policeStations: PoliceStation[] = [
     {
       id: 1,
@@ -720,8 +722,8 @@ const ZerothReport = () => {
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
-  const [policeControlRoom, setPoliceControlRoom] = useState("")
-  const [nearestDepoNum, setNearestDepoNum] = useState("")
+  const [policeControlRoom, setPoliceControlRoom] = useState("");
+  const [nearestDepoNum, setNearestDepoNum] = useState("");
   const tabLabels = [
     { label: "Location Details" },
     { label: "Accident & Crew" },
@@ -730,12 +732,12 @@ const ZerothReport = () => {
 
   const [mounted, setMounted] = useState(false);
 
-   // Avoid hydration mismatch
+  // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
- 
-//useEffect to fetch accident data from session storage
+
+  //useEffect to fetch accident data from session storage
   useEffect(() => {
     const data = sessionStorage.getItem("accidentData");
     if (data) {
@@ -806,7 +808,7 @@ const ZerothReport = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-/* const fetchNearbyPoliceStations = async (lat: number, lng: number) => {
+  /* const fetchNearbyPoliceStations = async (lat: number, lng: number) => {
   const query = `
     [out:json];
     (
@@ -909,59 +911,69 @@ useEffect(() => {
   };
 
   const keralaDistricts = [
-  "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha", "Kottayam",
-  "Idukki", "Ernakulam", "Thrissur", "Palakkad", "Malappuram",
-  "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
-];
-
-const normalize = (str: string) => str.trim().toLowerCase();
-
-const handleLocationSelect = (suggestion: any) => {
-  console.log(suggestion);
-
-  const address = suggestion.address;
-  const lat = parseFloat(suggestion.lat);
-  const lng = parseFloat(suggestion.lon);
-
-  // Extract district candidates from multiple levels
-  const districtCandidates = [
-    address.county,
-    address.district,
-    address.state_district,
-    address.city_district,
-    address.region
+    "Thiruvananthapuram",
+    "Kollam",
+    "Pathanamthitta",
+    "Alappuzha",
+    "Kottayam",
+    "Idukki",
+    "Ernakulam",
+    "Thrissur",
+    "Palakkad",
+    "Malappuram",
+    "Kozhikode",
+    "Wayanad",
+    "Kannur",
+    "Kasaragod",
   ];
 
-  // Try to match any candidate with known Kerala districts
-  let matchedDistrict = "";
-  for (const candidate of districtCandidates) {
-    if (!candidate) continue;
-    const normalized = normalize(candidate);
-    const match = keralaDistricts.find(
-      (district) => normalize(district) === normalized
-    );
-    if (match) {
-      matchedDistrict = match;
-      break;
+  const normalize = (str: string) => str.trim().toLowerCase();
+
+  const handleLocationSelect = (suggestion: any) => {
+    console.log(suggestion);
+
+    const address = suggestion.address;
+    const lat = parseFloat(suggestion.lat);
+    const lng = parseFloat(suggestion.lon);
+
+    // Extract district candidates from multiple levels
+    const districtCandidates = [
+      address.county,
+      address.district,
+      address.state_district,
+      address.city_district,
+      address.region,
+    ];
+
+    // Try to match any candidate with known Kerala districts
+    let matchedDistrict = "";
+    for (const candidate of districtCandidates) {
+      if (!candidate) continue;
+      const normalized = normalize(candidate);
+      const match = keralaDistricts.find(
+        (district) => normalize(district) === normalized
+      );
+      if (match) {
+        matchedDistrict = match;
+        break;
+      }
     }
-  }
 
-  setCoords({ lat, lng });
+    setCoords({ lat, lng });
 
-  setLocationData((prev) => ({
-    ...prev,
-    address: suggestion.display_name,
-    place: address.village || address.town || address.city || "",
-    district: matchedDistrict, // 🟢 Auto-selected
-    state: address.state || "",
-    latitude: suggestion.lat,
-    longitude: suggestion.lon,
-  }));
+    setLocationData((prev) => ({
+      ...prev,
+      address: suggestion.display_name,
+      place: address.village || address.town || address.city || "",
+      district: matchedDistrict, // 🟢 Auto-selected
+      state: address.state || "",
+      latitude: suggestion.lat,
+      longitude: suggestion.lon,
+    }));
 
-  setLocationQuery(suggestion.display_name);
-  setShowLocationSuggestions(false);
-};
-
+    setLocationQuery(suggestion.display_name);
+    setShowLocationSuggestions(false);
+  };
 
   const filterConductors = (searchTerm: string) => {
     if (!searchTerm) {
@@ -988,7 +1000,7 @@ const handleLocationSelect = (suggestion: any) => {
     setConductorSearchText(conductor.pen_no);
     setShowConductorDropdown(false);
   };
-//to manage click outside of conductor dropdown 
+  //to manage click outside of conductor dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -1016,7 +1028,6 @@ const handleLocationSelect = (suggestion: any) => {
     }
   };
 
-  
   const calculateTimeSlot = (time: string) => {
     if (!time) return "";
     const [hoursStr, minutesStr] = time.split(":");
@@ -1038,31 +1049,33 @@ const handleLocationSelect = (suggestion: any) => {
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
 
   // Store videos temporarily for upload on submit
-const [videoFilesToUpload, setVideoFilesToUpload] = useState<File[]>([]);
+  const [videoFilesToUpload, setVideoFilesToUpload] = useState<File[]>([]);
 
   const uploadVideosToS3 = async (files: File[]) => {
-  const formData = new FormData();
-  files.forEach((file) => formData.append("files", file));
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
 
-  const referenceNumber = accidentRefernceId;
-  const res = await fetch(`/api/storage/uploadVideo?reference_number=${referenceNumber}`, {
-    method: "POST",
-    body: formData,
-  });
+    const referenceNumber = accidentRefernceId;
+    const res = await fetch(
+      `/api/storage/uploadVideo?reference_number=${referenceNumber}`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
-  if (!res.ok) {
-    throw new Error("Failed to upload videos to S3.");
-  }
+    if (!res.ok) {
+      throw new Error("Failed to upload videos to S3.");
+    }
 
-  const result = await res.json();
-  const fileUploadData: { key: string; name: string }[] = result.data;
+    const result = await res.json();
+    const fileUploadData: { key: string; name: string }[] = result.data;
 
-  return fileUploadData.map((f) => f.key); // Return only keys
-};
+    return fileUploadData.map((f) => f.key); // Return only keys
+  };
 
-
-//location query to show location suggestions
- useEffect(() => {
+  //location query to show location suggestions
+  useEffect(() => {
     if (locationQuery.length > 2) {
       const handler = setTimeout(() => {
         fetchLocationSuggestions(locationQuery);
@@ -1073,87 +1086,87 @@ const [videoFilesToUpload, setVideoFilesToUpload] = useState<File[]>([]);
     }
   }, [locationQuery]);
 
-
- //useEffect of gomaps
-useEffect(() => {
-  if (!navigator.geolocation) {
-    console.log("❌ Geolocation not supported");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const lat = Number(position.coords.latitude.toFixed(6));
-      const lng = Number(position.coords.longitude.toFixed(6));
-      setLocationPermission(true);
-      setCoords({ lat, lng });
-
-      try {
-        const response = await fetch(
-          `https://maps.gomaps.pro/maps/api/geocode/json?latlng=${lat},${lng}&key=AlzaSyxYry5klW4Nt35VxHlfdyHoRBdAJA7qu_z`
-        );
-
-        const data = await response.json();
-        console.log("GoMapsPro API response:", data);
-
-        if (data.status === "OK" && data.results.length > 0) {
-          const preferredResult = data.results.find(
-            (r: any) =>
-              !r.formatted_address.startsWith("Unnamed Road") &&
-              !r.formatted_address.match(/^[A-Z0-9]{4}\+/)
-          ) || data.results[0];
-
-          const components = preferredResult.address_components || [];
-
-          const getComponent = (type: string) =>
-            components.find((comp: any) => comp.types.includes(type))?.long_name || "";
-
-          // Extract values
-          const place =
-            getComponent("sublocality") ||
-            getComponent("neighborhood") ||
-            getComponent("locality") ||        // often village/town
-            getComponent("administrative_area_level_3") || "";
-
-          const district =
-            getComponent("administrative_area_level_2") || "";
-
-          const state =
-            getComponent("administrative_area_level_1") || "";
-
-          const pin = getComponent("postal_code") || "";
-
-          setLocationData({
-            address: preferredResult.formatted_address || "",
-            place,
-            district,
-            state,
-            latitude: lat.toString(),
-            longitude: lng.toString(),
-            policeStation: "",
-            policeStationName:"",
-            policeStationContact: "",
-          });
-
-          setLocationQuery(preferredResult.formatted_address || "");
-        } else {
-          console.warn("⚠️ No valid address found from GoMaps Pro", data);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching address from GoMaps Pro:", error);
-      }
-    },
-    (error) => {
-      console.error("❌ Location permission denied:", error);
-      setLocationPermission(false);
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0,
+  //useEffect of gomaps
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.log("❌ Geolocation not supported");
+      return;
     }
-  );
-}, []);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = Number(position.coords.latitude.toFixed(6));
+        const lng = Number(position.coords.longitude.toFixed(6));
+        setLocationPermission(true);
+        setCoords({ lat, lng });
+
+        try {
+          const response = await fetch(
+            `https://maps.gomaps.pro/maps/api/geocode/json?latlng=${lat},${lng}&key=AlzaSyxYry5klW4Nt35VxHlfdyHoRBdAJA7qu_z`
+          );
+
+          const data = await response.json();
+          console.log("GoMapsPro API response:", data);
+
+          if (data.status === "OK" && data.results.length > 0) {
+            const preferredResult =
+              data.results.find(
+                (r: any) =>
+                  !r.formatted_address.startsWith("Unnamed Road") &&
+                  !r.formatted_address.match(/^[A-Z0-9]{4}\+/)
+              ) || data.results[0];
+
+            const components = preferredResult.address_components || [];
+
+            const getComponent = (type: string) =>
+              components.find((comp: any) => comp.types.includes(type))
+                ?.long_name || "";
+
+            // Extract values
+            const place =
+              getComponent("sublocality") ||
+              getComponent("neighborhood") ||
+              getComponent("locality") || // often village/town
+              getComponent("administrative_area_level_3") ||
+              "";
+
+            const district = getComponent("administrative_area_level_2") || "";
+
+            const state = getComponent("administrative_area_level_1") || "";
+
+            const pin = getComponent("postal_code") || "";
+
+            setLocationData({
+              address: preferredResult.formatted_address || "",
+              place,
+              district,
+              state,
+              latitude: lat.toString(),
+              longitude: lng.toString(),
+              policeStation: "",
+              policeStationName: "",
+              policeStationContact: "",
+            });
+
+            setLocationQuery(preferredResult.formatted_address || "");
+          } else {
+            console.warn("⚠️ No valid address found from GoMaps Pro", data);
+          }
+        } catch (error) {
+          console.error("❌ Error fetching address from GoMaps Pro:", error);
+        }
+      },
+      (error) => {
+        console.error("❌ Location permission denied:", error);
+        setLocationPermission(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  }, []);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -1168,11 +1181,12 @@ useEffect(() => {
     }
   };
 
-  const handleLocationChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleLocationChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setLocationData((prev) => ({ ...prev, [name]: value }));
   };
-  
 
   const handlePoliceStationSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     const stationId = parseInt(e.target.value);
@@ -1185,7 +1199,7 @@ useEffect(() => {
         policeStationName: station.name,
         policeStationContact: station.contact,
       }));
-      setPoliceControlRoom(station.contact)
+      setPoliceControlRoom(station.contact);
     } else {
       setLocationData((prev) => ({
         ...prev,
@@ -1207,56 +1221,56 @@ useEffect(() => {
         nearestDepoName: depot.name,
         depotContact: depot.contact,
       }));
-      setNearestDepoNum(depot.contact)
-
+      setNearestDepoNum(depot.contact);
     }
   };
 
-  
-const processFiles = (filesArray: File[]) => {
-  const newFiles: MediaFile[] = filesArray.map((file) => ({
-    id: `${file.name}-${Date.now()}`,
-    file,
-    type: file.type.startsWith("video") ? "video" : "image",
-    url: URL.createObjectURL(file),
-  }));
-  setMediaFiles((prev) => [...prev, ...newFiles]);
+  const processFiles = (filesArray: File[]) => {
+    const newFiles: MediaFile[] = filesArray.map((file) => ({
+      id: `${file.name}-${Date.now()}`,
+      file,
+      type: file.type.startsWith("video") ? "video" : "image",
+      url: URL.createObjectURL(file),
+    }));
+    setMediaFiles((prev) => [...prev, ...newFiles]);
 
-  const videoFiles = filesArray.filter((file) => file.type.startsWith("video"));
-  if (videoFiles.length > 0) {
-    setVideoFilesToUpload((prev) => [...prev, ...videoFiles]);
-  }
-};
-
-
-const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files) return;
-  processFiles(Array.from(e.target.files));
-};
-
-const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-  setIsDragging(false);
-  if (!e.dataTransfer.files) return;
-  processFiles(Array.from(e.dataTransfer.files));
-};
-
- const handleRemoveFile = (id: string) => {
-  setMediaFiles((prevMediaFiles) => {
-    const fileToRemove = prevMediaFiles.find((file) => file.id === id);
-
-    // If it's a video, remove it from the pending upload list too
-    if (fileToRemove?.type === "video") {
-      setVideoFilesToUpload((prevVideos) =>
-        prevVideos.filter((videoFile) => videoFile.name !== fileToRemove.file.name)
-      );
+    const videoFiles = filesArray.filter((file) =>
+      file.type.startsWith("video")
+    );
+    if (videoFiles.length > 0) {
+      setVideoFilesToUpload((prev) => [...prev, ...videoFiles]);
     }
+  };
 
-    // Return the filtered media list
-    return prevMediaFiles.filter((file) => file.id !== id);
-  });
-};
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    processFiles(Array.from(e.target.files));
+  };
 
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (!e.dataTransfer.files) return;
+    processFiles(Array.from(e.dataTransfer.files));
+  };
+
+  const handleRemoveFile = (id: string) => {
+    setMediaFiles((prevMediaFiles) => {
+      const fileToRemove = prevMediaFiles.find((file) => file.id === id);
+
+      // If it's a video, remove it from the pending upload list too
+      if (fileToRemove?.type === "video") {
+        setVideoFilesToUpload((prevVideos) =>
+          prevVideos.filter(
+            (videoFile) => videoFile.name !== fileToRemove.file.name
+          )
+        );
+      }
+
+      // Return the filtered media list
+      return prevMediaFiles.filter((file) => file.id !== id);
+    });
+  };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -1267,185 +1281,188 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     setIsDragging(false);
   };
 
- const handleSubmitAccidentDetails = async (e: FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
+  const handleSubmitAccidentDetails = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  const missingFields: string[] = [];
+    const missingFields: string[] = [];
 
-  // Validate: Accident Reference ID
-  if (!accidentRefernceId) missingFields.push("Accident Reference ID");
+    // Validate: Accident Reference ID
+    if (!accidentRefernceId) missingFields.push("Accident Reference ID");
 
-  // Validate: Location & Jurisdiction
-  const locationChecks = [
-    [locationData.address, "Accident Address"],
-/*     [locationData.place, "Place of Accident"],
- */    [locationData.district, "Accident District"],
-    [locationData.state, "Accident State"],
-    [locationData.latitude, "Latitude"],
-    [locationData.longitude, "Longitude"],
-    [formData.nearestDepoName, "Nearest Depot Name"],
-    [formData.depotContact, "Depot Contact Number"],
-    [locationData.policeStationName, "Nearest Police Station"],
-    [locationData.policeStationContact, "Police Station Contact Number"],
-  ];
-  locationChecks.forEach(([val, label]) => {
-    if (!val) missingFields.push(label as string);
-  });
+    // Validate: Location & Jurisdiction
+    const locationChecks = [
+      [locationData.address, "Accident Address"],
+      /*     [locationData.place, "Place of Accident"],
+       */ [locationData.district, "Accident District"],
+      [locationData.state, "Accident State"],
+      [locationData.latitude, "Latitude"],
+      [locationData.longitude, "Longitude"],
+      [formData.nearestDepoName, "Nearest Depot Name"],
+      [formData.depotContact, "Depot Contact Number"],
+      [locationData.policeStationName, "Nearest Police Station"],
+      [locationData.policeStationContact, "Police Station Contact Number"],
+    ];
+    locationChecks.forEach(([val, label]) => {
+      if (!val) missingFields.push(label as string);
+    });
 
-  // Validate: Accident Details
-  const accidentChecks = [
-    [formData.dateOfAccident, "Date of Accident"],
-    [formData.timeOfAccident, "Time of Accident"],
-    [formData.timeZone, "Time Zone"],
-    [formData.operatedDepot, "Operated Depot"],
-    [formData.scheduleNumber, "Schedule Number"],
-    [formData.description, "Accident Description"],
-  ];
-  accidentChecks.forEach(([val, label]) => {
-    if (!val) missingFields.push(label as string);
-  });
+    // Validate: Accident Details
+    const accidentChecks = [
+      [formData.dateOfAccident, "Date of Accident"],
+      [formData.timeOfAccident, "Time of Accident"],
+      [formData.timeZone, "Time Zone"],
+      [formData.operatedDepot, "Operated Depot"],
+      [formData.scheduleNumber, "Schedule Number"],
+      [formData.description, "Accident Description"],
+    ];
+    accidentChecks.forEach(([val, label]) => {
+      if (!val) missingFields.push(label as string);
+    });
 
-  // Validate: Crew Info
-  const crewChecks = [
-    [driverCategory, "Driver Category"],
-    [formData.driverName, "Driver Name"],
-    [formData.driverPenNo, "Driver PEN Number"],
-    [formData.conductorName, "Conductor Name"],
-    [formData.conductorPenNo, "Conductor PEN Number"],
-  ];
-  crewChecks.forEach(([val, label]) => {
-    if (!val) missingFields.push(label as string);
-  });
+    // Validate: Crew Info
+    const crewChecks = [
+      [driverCategory, "Driver Category"],
+      [formData.driverName, "Driver Name"],
+      [formData.driverPenNo, "Driver PEN Number"],
+      [formData.conductorName, "Conductor Name"],
+      [formData.conductorPenNo, "Conductor PEN Number"],
+    ];
+    crewChecks.forEach(([val, label]) => {
+      if (!val) missingFields.push(label as string);
+    });
 
-  // Validate: Vehicle Info
-  if (!formData.bonnetNumber) missingFields.push("Bonnet Number");
+    // Validate: Vehicle Info
+    if (!formData.bonnetNumber) missingFields.push("Bonnet Number");
 
-  // Validate: Media
-  if (mediaFiles.length === 0) missingFields.push("At least one accident photo");
+    // Validate: Media
+    if (mediaFiles.length === 0)
+      missingFields.push("At least one accident photo");
 
-  if (missingFields.length > 0) {
-    alert(`Please fill the following required fields:\n\n• ${missingFields.join("\n• ")}`);
-    setIsSubmitting(false)
-    return;
-  }
-  setSubmitError(null);
+    if (missingFields.length > 0) {
+      alert(
+        `Please fill the following required fields:\n\n• ${missingFields.join(
+          "\n• "
+        )}`
+      );
+      setIsSubmitting(false);
+      return;
+    }
+    setSubmitError(null);
     try {
+      // Extract only image files
+      const imageFiles = mediaFiles.filter((file) => file.type === "image");
 
-    // Extract only image files
-    const imageFiles = mediaFiles.filter((file) => file.type === "image");
-
-    const photoPromises = imageFiles.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Failed to read file"));
-          }
-        };
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file.file);
+      const photoPromises = imageFiles.map((file) => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            if (typeof reader.result === "string") {
+              resolve(reader.result);
+            } else {
+              reject(new Error("Failed to read file"));
+            }
+          };
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file.file);
+        });
       });
-    });
 
-    const photoBase64Strings = await Promise.all(photoPromises);
-    const photosPayload = photoBase64Strings.map((base64) => ({
-      base64: base64.split(",")[1] || base64,
-      content_type: "image/jpeg",
-    }));
+      const photoBase64Strings = await Promise.all(photoPromises);
+      const photosPayload = photoBase64Strings.map((base64) => ({
+        base64: base64.split(",")[1] || base64,
+        content_type: "image/jpeg",
+      }));
 
-    // ✅ Upload all videos to S3 and get the S3 keys
-    let videoS3Keys: string[] = [];
-    if (videoFilesToUpload.length > 0) {
-      videoS3Keys = await uploadVideosToS3(videoFilesToUpload);
-    }
+      // ✅ Upload all videos to S3 and get the S3 keys
+      let videoS3Keys: string[] = [];
+      if (videoFilesToUpload.length > 0) {
+        videoS3Keys = await uploadVideosToS3(videoFilesToUpload);
+      }
 
-    // ✅ Construct final payload
-    const payload = {
-      accident_id: accidentRefernceId,
-      location_info: {
-        address: locationData.address,
-        place: locationData.place,
-        district: locationData.district,
-        state: locationData.state,
-        nearest_depo: formData.nearestDepoName,
-        nearest_depo_contact_number: formData.depotContact,
-      },
-      geolocation: {
-        latitude: parseFloat(locationData.latitude),
-        longitude: parseFloat(locationData.longitude),
-        nearest_police_station: locationData.policeStationName,
-        nearest_police_station_contact_number: locationData.policeStationContact,
-        timezone_info: {
-          timezone: "Asia/Kolkata",
-          offset: "+05:30",
+      // ✅ Construct final payload
+      const payload = {
+        accident_id: accidentRefernceId,
+        location_info: {
+          address: locationData.address,
+          place: locationData.place,
+          district: locationData.district,
+          state: locationData.state,
+          nearest_depo: formData.nearestDepoName,
+          nearest_depo_contact_number: formData.depotContact,
         },
-      },
-      accident_details: {
-        date_of_accident: formData.dateOfAccident,
-        time_of_accident: formData.timeOfAccident,
-        time_zone_of_accident: formData.timeZone,
-        operated_depot: formData.operatedDepot,
-        schedule_number: formData.scheduleNumber,
-        description: formData.description,
-      },
-      crew_information: {
-        driver_type_code: driverCategory,
-        driver_name: formData.driverName,
-        driver_phn_no: formData.driverPhone,
-        driver_pen_no: formData.driverPenNo,
-        conductor_name: formData.conductorName,
-        conductor_phn_no: formData.conductorPhone,
-        conductor_pen_no: formData.conductorPenNo,
-      },
-      vehicle_info: {
-        bonet_no: formData.bonnetNumber,
-        vehicle_register_no: "",
-        vehicle_make: "",
-      },
-      photos: photosPayload,
-      video_s3_keys: videoS3Keys,
-    };
+        geolocation: {
+          latitude: parseFloat(locationData.latitude),
+          longitude: parseFloat(locationData.longitude),
+          nearest_police_station: locationData.policeStationName,
+          nearest_police_station_contact_number:
+            locationData.policeStationContact,
+          timezone_info: {
+            timezone: "Asia/Kolkata",
+            offset: "+05:30",
+          },
+        },
+        accident_details: {
+          date_of_accident: formData.dateOfAccident,
+          time_of_accident: formData.timeOfAccident,
+          time_zone_of_accident: formData.timeZone,
+          operated_depot: formData.operatedDepot,
+          schedule_number: formData.scheduleNumber,
+          description: formData.description,
+        },
+        crew_information: {
+          driver_type_code: driverCategory,
+          driver_name: formData.driverName,
+          driver_phn_no: formData.driverPhone,
+          driver_pen_no: formData.driverPenNo,
+          conductor_name: formData.conductorName,
+          conductor_phn_no: formData.conductorPhone,
+          conductor_pen_no: formData.conductorPenNo,
+        },
+        vehicle_info: {
+          bonet_no: formData.bonnetNumber,
+          vehicle_register_no: "",
+          vehicle_make: "",
+        },
+        photos: photosPayload,
+        video_s3_keys: videoS3Keys,
+      };
 
-    const response = await fetch("/api/submitZeroReportDetails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      const response = await fetch("/api/submitZeroReportDetails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) {
-      return alert("Failed to submit accident report");
+      if (!response.ok) {
+        return alert("Failed to submit accident report");
+      }
+
+      const result = await response.json();
+      console.log("Accident report submitted successfully:", result);
+      setShowSuccessModal(true);
+
+      const id = setTimeout(() => {
+        router.push("/Accident_Zeroth_Report/ZerothReportRegister");
+      }, 3000);
+      setTimeoutId(id);
+    } catch (error) {
+      console.error("Error submitting accident report:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to submit accident report. Please try again.";
+
+      setSubmitError(errorMessage);
+      alert(`❌ Error saving accident report:\n\n${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    const result = await response.json();
-    console.log("Accident report submitted successfully:", result);
-    setShowSuccessModal(true);
-
-    const id = setTimeout(() => {
-      router.push("/Accident_Zeroth_Report/ZerothReportRegister");
-    }, 3000);
-    setTimeoutId(id);
-  } catch (error) {
-  console.error("Error submitting accident report:", error);
-  const errorMessage =
-    error instanceof Error
-      ? error.message
-      : "Failed to submit accident report. Please try again.";
-
-  setSubmitError(errorMessage);
-  alert(`❌ Error saving accident report:\n\n${errorMessage}`);
-
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
-  
-//useEffect to close success modal
+  //useEffect to close success modal
   useEffect(() => {
     if (showSuccessModal) {
       let count = 3;
@@ -1459,7 +1476,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
   }, [showSuccessModal]);
 
   const handleLogout = () => {
-    localStorage.clear();
+    sessionStorage.clear();
     router.push("/");
   };
 
@@ -1489,14 +1506,22 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
           </button>
         </div>
 
-        <div className='flex flex-col  mt-3'>
+        <div className="flex flex-col  mt-3">
           <h2 className="text-[18px] font-[600] text-[var(--themeRed)] px-5 mb-2 text-right">
             {accidentRefernceId?.replaceAll("_", "/")}
           </h2>
-          <div className='flex ms-auto'>
-            {policeControlRoom && (<h6 className='text-[14px] text-blue-600 text-center'>ControlRoom Number {"  "}{policeControlRoom}</h6>)}
-            {nearestDepoNum && (<h6 className='text-[14px] text-blue-600 text-center ms-3'>Depo Number{" "}{nearestDepoNum}</h6>)}
-
+          <div className="flex ms-auto">
+            {policeControlRoom && (
+              <h6 className="text-[14px] text-blue-600 text-center">
+                ControlRoom Number {"  "}
+                {policeControlRoom}
+              </h6>
+            )}
+            {nearestDepoNum && (
+              <h6 className="text-[14px] text-blue-600 text-center ms-3">
+                Depo Number {nearestDepoNum}
+              </h6>
+            )}
           </div>
         </div>
       </div>
@@ -1513,10 +1538,11 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     key={index}
                     type="button"
                     className={`flex items-center px-4 py-2.5 text-[12px] text-white font-medium whitespace-nowrap bg-transparent transition-all duration-200 border-b-2
-                                            ${activeTab === index
-                        ? "text-[var(--sidebar-bg)] border-white bg-gray-500"
-                        : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
-                      }`}
+                                            ${
+                                              activeTab === index
+                                                ? "text-[var(--sidebar-bg)] border-white bg-gray-500"
+                                                : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
+                                            }`}
                     onClick={() => setActiveTab(index)}
                   >
                     {tab.label}
@@ -1555,10 +1581,10 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         {/* Increased mb + min-height */}
                         Accident Place (
                         <MalayalamText text="അപകടം നടന്ന സ്ഥലം" />)
-                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
+                        <span className="text-[10px] text-red-600">{"*"}</span>
                       </label>
                       <input
-                       suppressHydrationWarning
+                        suppressHydrationWarning
                         value={locationQuery}
                         onChange={(e) => {
                           setLocationQuery(e.target.value);
@@ -1589,8 +1615,11 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <div className="flex flex-col h-full">
                         {/* Flex container */}
                         <label className="text-[12px] text-gray-700 mb-2">
-                          Accident District (<MalayalamText text="അപകടം നടന്ന ജില്ല" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          Accident District (
+                          <MalayalamText text="അപകടം നടന്ന ജില്ല" />)
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <select
                           name="district"
@@ -1599,7 +1628,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           className="w-full py-2 px-3 border border-gray-300 rounded text-xs mt-auto bg-white"
                         >
                           <option value="">Select District</option>
-                          <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                          <option value="Thiruvananthapuram">
+                            Thiruvananthapuram
+                          </option>
                           <option value="Kollam">Kollam</option>
                           <option value="Pathanamthitta">Pathanamthitta</option>
                           <option value="Alappuzha">Alappuzha</option>
@@ -1615,7 +1646,6 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           <option value="Kasaragod">Kasaragod</option>
                         </select>
                       </div>
-
                       <div className="flex flex-col h-full">
                         {" "}
                         {/* Flex container */}
@@ -1624,7 +1654,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {/* min-height */}
                           Accident State (
                           <MalayalamText text="അപകടം നടന്ന സംസ്ഥാനം" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           name="state"
@@ -1645,7 +1677,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {" "}
                           {/* min-height */}
                           Latitude (<MalayalamText text="അക്ഷാംശം" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           value={locationData.latitude}
@@ -1660,7 +1694,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {" "}
                           {/* min-height */}
                           Longitude (<MalayalamText text="രേഖാംശം" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           value={locationData.longitude}
@@ -1669,7 +1705,12 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         />
                       </div>
                     </div>
-                                   <div className='mb-5'>  {coords !== null && <LiveGoogleMap coordinates={coords} />}</div>
+                    <div className="mb-5">
+                      {" "}
+                      {coords !== null && (
+                        <LiveGoogleMap coordinates={coords} />
+                      )}
+                    </div>
                   </div>
                 </div>
                 {/* Second Column - Nearby Assistance */}
@@ -1692,7 +1733,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           {/* min-height */}
                           Nearest Police Station (
                           <MalayalamText text="സമീപ പോലീസ് സ്റ്റേഷൻ" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <select
                           name="policeStation"
@@ -1738,7 +1781,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                           Nearest Depot (
                           <MalayalamText text="അപകടം നടന്ന സ്ഥലത്തോട് അടുത്തുള്ള ഡിപ്പോ" />
                           )
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <select
                           value={formData.nearestDepoId}
@@ -1792,7 +1837,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         <label className="text-[12px] text-gray-700 mb-1">
                           Date of Accident (
                           <MalayalamText text="അപകടം നടന്ന തീയതി" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           type="date"
@@ -1806,7 +1853,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         <label className="text-[12px] text-gray-700 mb-1">
                           Time of Accident (
                           <MalayalamText text="അപകടം നടന്ന സമയം" />)
-                                                    <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           type="time"
@@ -1835,7 +1884,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <label className="text-[12px] text-gray-700 mb-1">
                         Operated Depot (
                         <MalayalamText text="ഓപ്പറേറ്റഡ് ഡിപോട്" /> )
-                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
+                        <span className="text-[10px] text-red-600">{"*"}</span>
                       </label>
                       <input
                         name="operatedDepot"
@@ -1848,7 +1897,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     <div>
                       <label className="text-[12px] text-gray-700 mb-1">
                         Schedule Number (<MalayalamText text="ഷെഡ്യൂൾ നമ്പർ" />)
-                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
+                        <span className="text-[10px] text-red-600">{"*"}</span>
                       </label>
                       <input
                         name="scheduleNumber"
@@ -1863,7 +1912,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <label className="text-[12px] text-gray-700 mb-1">
                         Accident Description (
                         <MalayalamText text="അപകടത്തെക്കുറിച്ചുള്ള വിവരണം" />)
-                                                  <span className='text-[10px] text-red-600'>{"*"}</span>
+                        <span className="text-[10px] text-red-600">{"*"}</span>
                       </label>
                       <textarea
                         name="description"
@@ -1886,7 +1935,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     <div>
                       <label className="text-[12px] text-gray-700 mb-1">
                         Driver Category (<MalayalamText text="ഡ്രൈവർ വിഭാഗം" />)
-                                                <span className='text-[10px] text-red-600'>{"*"}</span>
+                        <span className="text-[10px] text-red-600">{"*"}</span>
                       </label>
                       <select
                         value={driverCategory}
@@ -1902,8 +1951,10 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="relative" ref={driverRef}>
                         <label className="text-[12px] text-gray-700 mb-1">
-                          Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)                          
-                          <span className='text-[10px] text-red-600'>{"*"}</span>
+                          Driver Name (<MalayalamText text="ഡ്രൈവറുടെ പേര്" />)
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           type="text"
@@ -1966,7 +2017,7 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       <label className="text-[12px] text-gray-700 mb-1">
                         Conductor PEN Number (
                         <MalayalamText text="കണ്ടക്ടർ പെൻ നമ്പർ" />)
-                        <span className='text-[10px] text-red-600'>{"*"}</span>
+                        <span className="text-[10px] text-red-600">{"*"}</span>
                       </label>
                       <input
                         type="text"
@@ -2021,7 +2072,9 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                         <label className="text-[12px] text-gray-700 mb-1">
                           Conductor Name (
                           <MalayalamText text="കണ്ടക്ടറുടെ പേര്" />)
-                          <span className='text-[10px] text-red-600'>{"*"}</span>
+                          <span className="text-[10px] text-red-600">
+                            {"*"}
+                          </span>
                         </label>
                         <input
                           name="conductorName"
@@ -2061,10 +2114,11 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                   </h3>
 
                   <div
-                    className={`flex-1 border-2 m-[16px] ${isDragging
+                    className={`flex-1 border-2 m-[16px] ${
+                      isDragging
                         ? "border-blue-500 bg-blue-50"
                         : "border-dashed border-gray-300"
-                      } 
+                    } 
                 rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -2093,17 +2147,17 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto p-3 bg-gray-50 rounded border border-gray-200 m-[16px]">
                     <h4 className="text-xs font-semibold mb-2">
                       {" "}
-                      Guidelines to Upload Photos and Videos (ഫോട്ടോകൾ & വീഡിയോകൾ അപ്‌ലോഡ്
-                      ചെയ്യുന്നതിനുള്ള മാർഗ്ഗനിർദ്ദേശങ്ങൾ)
+                      Guidelines to Upload Photos and Videos (ഫോട്ടോകൾ &
+                      വീഡിയോകൾ അപ്‌ലോഡ് ചെയ്യുന്നതിനുള്ള മാർഗ്ഗനിർദ്ദേശങ്ങൾ)
                     </h4>
                     <ul className="text-xs text-gray-600 space-y-1">
                       <li>
-                        • Upload clear photos and Videos showing the accident from multiple
-                        angles
+                        • Upload clear photos and Videos showing the accident
+                        from multiple angles
                         <br />•{" "}
                         <MalayalamText text="വിവിധ കോണുകളിൽ നിന്ന് അപകടം കാണിക്കുന്ന വ്യക്തമായ ഫോട്ടോകൾ & വീഡിയോകൾ അപ്‌ലോഡ് ചെയ്യുക" />
                       </li>
@@ -2160,13 +2214,11 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                             </button>
                           </div>
                         ))}
-                       
-
                       </div>
                     </div>
                   ) : (
                     <p className="p-[16px] text-sm text-gray-500">
-                      No images  and Videos are uploaded. (
+                      No images and Videos are uploaded. (
                       <MalayalamText text="ചിത്രങ്ങളോ വീഡിയോകളോ അപ്‌ലോഡ് ചെയ്തിട്ടില്ല" />
                       )
                     </p>
@@ -2217,11 +2269,12 @@ const handleDrop = (e: DragEvent<HTMLDivElement>) => {
                 <button
                   type="button"
                   onClick={handleSubmitAccidentDetails}
-                  disabled={isSubmitting }
-                  className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${isSubmittingDocumentation
+                  disabled={isSubmitting}
+                  className={`flex items-center justify-center px-5 py-1 text-[12px] font-medium text-white rounded transition-all ${
+                    isSubmittingDocumentation
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[var(--sidebar)] hover:bg-[#001670]"
-                    }`}
+                  }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center">

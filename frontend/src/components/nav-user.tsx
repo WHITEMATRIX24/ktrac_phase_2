@@ -1,17 +1,8 @@
-"use client"
+"use client";
 
-import {
-  ChevronsUpDown,
-  LogOut,
-  Settings,
-  User2,
-} from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings, User2 } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,34 +11,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-
-} from "@/components/ui/sidebar"
-import { useRouter } from "next/navigation"
-
+} from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogout = () => {
     // Clear any auth tokens or user state here
-    localStorage.clear() // or remove specific keys like localStorage.removeItem("token")
+    sessionStorage.clear(); // or remove specific keys like localStorage.removeItem("token")
 
-
-    router.push("/") // Adjust path as needed
-  }
+    router.push("/"); // Adjust path as needed
+  };
 
   return (
     <SidebarMenu>
@@ -63,8 +51,12 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left  leading-tight">
-                <span className="truncate text-[11px] font-semibold">{user.name}</span>
-                <span className="truncate text-[10px] text-grey-500">{user.email}</span>
+                <span className="truncate text-[11px] font-semibold">
+                  {user.name}
+                </span>
+                <span className="truncate text-[10px] text-grey-500">
+                  {user.email}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -75,7 +67,6 @@ export function NavUser({
             align="start"
             sideOffset={8}
           >
-
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
@@ -111,5 +102,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

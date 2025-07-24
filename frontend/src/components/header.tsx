@@ -16,7 +16,6 @@ import { Calendar, SearchIcon, Settings } from "lucide-react";
 import { NavUser } from "./nav-user";
 import NotificationSystem from "./Notification";
 
-
 interface User {
   name: string;
   email: string;
@@ -26,7 +25,7 @@ interface User {
 export default function Header() {
   const [roles, setRoles] = useState<string | null>(null);
   const pathname = usePathname() ?? "";
-const pathSegments = pathname.split("/").filter(Boolean);
+  const pathSegments = pathname.split("/").filter(Boolean);
 
   const mainTitle = pathSegments[0]
     ? pathSegments[0].charAt(0).toUpperCase() + pathSegments[0].slice(1)
@@ -40,7 +39,8 @@ const pathSegments = pathname.split("/").filter(Boolean);
   });
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole") ?? "";
+    const role = sessionStorage.getItem("userRole") ?? "";
+
     setRoles(role);
     let userData = user;
     console.log(role);
@@ -56,29 +56,25 @@ const pathSegments = pathname.split("/").filter(Boolean);
         email: "Supervisor",
         avatar: "/Captureuseravathar.PNG",
       };
-    }
-    else if (role === "Employee") {
+    } else if (role === "Employee") {
       userData = {
         name: "HR Unit",
         email: "Supervisor",
         avatar: "/Captureuseravathar.PNG",
       };
-    }
-    else if (role === "Accident_Management") {
+    } else if (role === "Accident_Management") {
       userData = {
         name: "Accident Managemet",
         email: "Supervisor",
         avatar: "/Captureuseravathar.PNG",
       };
-    }
-    else if (role === "Depo") {
+    } else if (role === "Depo") {
       userData = {
         name: "Depot Managemet",
         email: "Supervisor",
         avatar: "/Captureuseravathar.PNG",
       };
-    }
-    else if (role === "Inspector") {
+    } else if (role === "Inspector") {
       userData = {
         name: "Inspector",
         email: "Supervisor",
@@ -135,8 +131,7 @@ const pathSegments = pathname.split("/").filter(Boolean);
         </div> */}
 
         {/* Add Notification System Here */}
-        {roles != "Inspector" && <NotificationSystem />
-        }
+        {roles != "Inspector" && <NotificationSystem />}
         <div className="flex items-center gap-2">
           <NavUser user={user} />
         </div>

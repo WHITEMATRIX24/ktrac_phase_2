@@ -8,18 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// TYPES
-interface ScheduleDetails {
-  schedule_number: string;
-  schedule_name: string;
-  route_from: string;
-  route_to: string;
-  distance_km: string;
-  duration_minutes: number;
-  schedule_type: string;
-  is_active: boolean;
-}
-
 interface VehicleData {
   bonet_number: string;
   registration_number: string;
@@ -32,7 +20,6 @@ interface VehicleData {
   vehicle_no: string;
   fuel_type: string;
   registration_date: string;
-  schedule_details: ScheduleDetails;
 }
 
 // INITIAL EMPTY STATE
@@ -48,16 +35,6 @@ const initialVehicleData: VehicleData = {
   vehicle_no: "",
   fuel_type: "",
   registration_date: "",
-  schedule_details: {
-    schedule_number: "",
-    schedule_name: "",
-    route_from: "",
-    route_to: "",
-    distance_km: "",
-    duration_minutes: 0,
-    schedule_type: "",
-    is_active: true,
-  },
 };
 
 const AddVehicleForm = () => {
@@ -79,7 +56,7 @@ const AddVehicleForm = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        alert(data.error.error || "something went wrong");
+        return alert(data.error.error || "something went wrong");
       }
       alert("Bus added succesfully");
     } catch (error) {
@@ -261,116 +238,29 @@ const AddVehicleForm = () => {
               }
             />
           </div>
-        </div>
-
-        <h6>Schedule Details</h6>
-
-        <div className="grid grid-cols-4 gap-2">
           <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Schedule Number</p>
-            <Input
-              value={vehicleDetails.schedule_details.schedule_number}
-              onChange={(e) =>
+            <p className="text-[12px]">Fuel type</p>
+            <Select
+              onValueChange={(value) =>
                 setVehicleDetails({
                   ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    schedule_number: e.target.value,
-                  },
+                  fuel_type: value,
                 })
               }
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Schedule Name</p>
-            <Input
-              value={vehicleDetails.schedule_details.schedule_name}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    schedule_name: e.target.value,
-                  },
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Route From</p>
-            <Input
-              value={vehicleDetails.schedule_details.route_from}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    route_from: e.target.value,
-                  },
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Route To</p>
-            <Input
-              value={vehicleDetails.schedule_details.route_to}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    route_to: e.target.value,
-                  },
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Distance Km</p>
-            <Input
-              value={vehicleDetails.schedule_details.distance_km}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    distance_km: e.target.value,
-                  },
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Duration minutes</p>
-            <Input
-              type="number"
-              value={vehicleDetails.schedule_details.duration_minutes}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    duration_minutes: Number(e.target.value),
-                  },
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Schedue Type</p>
-            <Input
-              value={vehicleDetails.schedule_details.schedule_type}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_details: {
-                    ...vehicleDetails.schedule_details,
-                    schedule_type: e.target.value,
-                  },
-                })
-              }
-            />
+              value={vehicleDetails.fuel_type}
+            >
+              <SelectTrigger
+                size="sm"
+                className="w-full px-3 py-0 border border-slate-300 rounded-md text-[12px] text-black shadow-sm "
+              >
+                <SelectValue placeholder="Select fuel type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="DIESEL">DIESEL</SelectItem>
+                <SelectItem value="ELECTRIC">ELECTRIC</SelectItem>
+                <SelectItem value="CNG">CNG</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
