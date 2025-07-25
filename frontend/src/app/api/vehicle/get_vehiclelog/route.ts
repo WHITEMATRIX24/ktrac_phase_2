@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const API_URL =
-    "https://k7bvw6t3fe.execute-api.ap-south-1.amazonaws.com/DEV/schedules";
+    "https://oyz7r1xfrf.execute-api.ap-south-1.amazonaws.com/DEV/vehicles";
 
   try {
     const response = await fetch(API_URL);
@@ -11,12 +11,12 @@ export async function GET() {
       throw new Error(`API error! status: ${response.status}`);
     }
 
-    const userData = await response.json();
-    return NextResponse.json(userData);
+    const busData = await response.json();
+    return NextResponse.json(busData);
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error("Error fetching bus log data:", error);
     return NextResponse.json(
-      { error: "Failed to fetch user data" },
+      { error: "Failed to fetch bus log data" },
       { status: 500 }
     );
   }

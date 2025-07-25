@@ -99,6 +99,8 @@ const AccedentWorkshop = () => {
   const [progressStatus, setProgressStatus] = useState(0);
 
   const handleSearchSelect = (selectedData: any) => {
+    // console.log(selectedData);
+
     const accidentId = selectedData.accident_id;
     const bonnetNo = selectedData.vehicle_info.bonet_no;
     const accidentDate = selectedData.accident_details.date_of_accident;
@@ -233,6 +235,31 @@ const AccedentWorkshop = () => {
 
         body.individual_bill_document_s3_path = billFile?.key;
         body.total_bill_document_s3_path = totalBillFile?.key;
+      }
+
+      // CHECK FOR SEVIERITY
+      const recoveryPhaseResponse = await fetch(
+        `/api/primary_report/get_recoveryphase_data?accident_id=${body.accident_id}`
+      );
+      const recoveryPhaseData = await recoveryPhaseResponse.json();
+      console.log(recoveryPhaseData);
+
+      const severity = recoveryPhaseData.data.severity;
+      let severityNewValue = null;
+
+      if (severity === "Minor") {
+        if (body.total_bill_amount && body.total_bill_amount >= 50000) {
+          severityNewValue = "Major";
+        }
+      }
+      if (severityNewValue) {
+        const updateRecoveryPhase = await fetch("/api/addRecoveryDetails", {
+          method: "post",
+          body: JSON.stringify({ severity: severityNewValue }),
+        });
+        if (!updateRecoveryPhase.ok) {
+          return alert("failed to update severity");
+        }
       }
 
       // // FORM UPLOAD

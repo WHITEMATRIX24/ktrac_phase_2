@@ -1,15 +1,22 @@
 "use client";
 import AddScheduleForm from "@/components/depot/add_schedule_form";
+import AddBasicVehicleDetailsForm from "@/components/depot/add_vehicle_basic_form";
 import AddVehicleForm from "@/components/depot/add_vehicle_form";
 import AddInsuranceForm from "@/components/insurance/add_insurance_form";
 import React, { useState } from "react";
 
-const tabs = ["Add Vehicle", "Add Schedule", "Insurance"];
+const tabs = [
+  "Add Vehicle Basic",
+  "Add Schedule",
+  "Schedule Vehicle",
+  "Insurance",
+];
 const AddVehicle = () => {
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const tabList = [
-    <AddVehicleForm />,
+    <AddBasicVehicleDetailsForm />,
     <AddScheduleForm />,
+    <AddVehicleForm />,
     <AddInsuranceForm />,
   ];
   return (

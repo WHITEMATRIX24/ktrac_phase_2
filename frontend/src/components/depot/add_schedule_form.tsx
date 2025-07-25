@@ -8,7 +8,7 @@ interface ScheduleDetails {
   route_to: string;
   distance_km: string;
   duration_minutes: number;
-  schedule_type: string;
+  // schedule_type: string;
   is_active: boolean;
 }
 
@@ -19,7 +19,7 @@ const initialScheduleData = {
   route_to: "",
   distance_km: "",
   duration_minutes: 0,
-  schedule_type: "",
+  // schedule_type: "",
   is_active: true,
 };
 
@@ -34,9 +34,26 @@ const AddScheduleForm = () => {
   };
 
   // SUBMIT HANDLER
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log(scheduleDetails);
+    try {
+      const response = await fetch("/api/depot/add_schedule", {
+        method: "POST",
+        body: JSON.stringify(scheduleDetails),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error.error || "Error in adding schedule");
+      }
+
+      alert("Successfully added Schedule");
+    } catch (error) {
+      console.error(`error in creating schedule`, error);
+      alert("error in adding schedule");
+    }
   };
 
   return (
@@ -115,7 +132,7 @@ const AddScheduleForm = () => {
             }
           />
         </div>
-        <div className="flex flex-col gap-3">
+        {/* <div className="flex flex-col gap-3">
           <p className="text-[12px]">Schedue Type</p>
           <Input
             value={scheduleDetails.schedule_type}
@@ -126,7 +143,7 @@ const AddScheduleForm = () => {
               })
             }
           />
-        </div>
+        </div> */}
       </div>
       <div className="flex gap-3 ms-auto">
         <button

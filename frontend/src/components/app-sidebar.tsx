@@ -137,8 +137,8 @@ const defaultNavItems: NavItem[] = [
         url: "/Reports/Accidents/District_Wise",
       },
       { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
-/*       { title: "Accident Driver Wise", url: "/Reports/Accidents/Driver_Wise" },
- */      {
+      /*       { title: "Accident Driver Wise", url: "/Reports/Accidents/Driver_Wise" },
+       */ {
         title: "Accident Involved Vehicle",
         url: "/Reports/Accidents/Involved_Vehicle",
       },
@@ -150,7 +150,6 @@ const defaultNavItems: NavItem[] = [
       { title: "Fatal Report", url: "/Reports/Accidents/Fatal_Report" },
       { title: "Unit Wise", url: "/Reports/Accidents/Unit_Wise" },
       { title: "Injuries", url: "/Reports/Accidents/Injuries" },
-      
     ],
   },
 ];
@@ -242,8 +241,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: "#",
           icon: PieChart,
           items: [
-            { title: "Accident Month Wise", url: "/Reports/Accidents/Month_Wise" },
-            { title: "Accident Bus Type", url: "/Reports/Accidents/Bus_Type_Wise" },
+            {
+              title: "Accident Month Wise",
+              url: "/Reports/Accidents/Month_Wise",
+            },
+            {
+              title: "Accident Bus Type",
+              url: "/Reports/Accidents/Bus_Type_Wise",
+            },
             {
               title: "Accident Collision Type",
               url: "/Reports/Accidents/Collision_Type",
@@ -252,9 +257,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               title: "Accident District Wise",
               url: "/Reports/Accidents/District_Wise",
             },
-            { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
-/*             { title: "Accident Driver Wise ", url: "/Reports/Accidents/Driver_Wise" },
- */            {
+            {
+              title: "Accident Black Spot",
+              url: "/Reports/Accidents/Black_Spot",
+            },
+            /*             { title: "Accident Driver Wise ", url: "/Reports/Accidents/Driver_Wise" },
+             */ {
               title: "Accident Involved Vehicle",
               url: "/Reports/Accidents/Involved_Vehicle",
             },
@@ -262,11 +270,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               title: "Accident Responsibility",
               url: "/Reports/Accidents/Responsibility",
             },
-            { title: "Accident Time Wise", url: "/Reports/Accidents/Time_Wise" },
+            {
+              title: "Accident Time Wise",
+              url: "/Reports/Accidents/Time_Wise",
+            },
             { title: "Fatal Report", url: "/Reports/Accidents/Fatal_Report" },
             { title: "Unit Wise", url: "/Reports/Accidents/Unit_Wise" },
             { title: "Injuries", url: "/Reports/Accidents/Injuries" },
-            
           ],
         },
       ];
@@ -501,6 +511,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           items: [
             { title: "Depot Audit Summary", url: "#" },
             { title: "Accident Analytics", url: "#" },
+          ],
+        },
+      ];
+    } else if (role === "WorkshopAdmin") {
+      computedNavItems = [
+        {
+          title: "Worshop",
+          url: "#",
+          icon: AlertTriangle,
+          items: [
+            {
+              title: "Workshop List",
+              url: "/Depot/View_Workshop_Data",
+            },
           ],
         },
       ];

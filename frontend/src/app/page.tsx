@@ -70,6 +70,12 @@ export default function Home() {
       role: "Workshop",
       depo: "ernakulam",
     },
+    {
+      username: "workshopadmin",
+      password: "workshopadmin@ktrac#",
+      role: "WorkshopAdmin",
+      depo: "ernakulam",
+    },
   ];
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
@@ -85,8 +91,7 @@ export default function Home() {
         router.replace("/Dashboard/Accidents");
       } else if (user.role === "SuperAdmin") {
         router.replace("/Dashboard/Accidents");
-      } 
-      else if (user.role === "Finance") {
+      } else if (user.role === "Finance") {
         router.replace("/Finance/Overview");
       } else if (user.role === "Maintenance") {
         router.replace("/Predictive_Maintenance_System/Overview");
@@ -100,6 +105,8 @@ export default function Home() {
         router.replace("/Accident_Management/Inspector");
       } else if (user.role == "Workshop") {
         router.replace("/Accident_Management/Work_Shop");
+      } else if (user.role == "WorkshopAdmin") {
+        router.replace("/Depot/View_Workshop_Data");
       }
     } else {
       alert("Invalid username or password");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,6 +7,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import InputFilter from "../input_filter";
+
+interface Schedule {
+  id: number;
+  schedule_number: string;
+  schedule_name: string;
+  route_from: string;
+  route_to: string;
+  distance_km: string;
+  duration_minutes: number;
+  schedule_type: string;
+  is_active: boolean;
+  created_at: string;
+}
 
 interface VehicleData {
   bonet_number: string;
@@ -20,6 +34,10 @@ interface VehicleData {
   vehicle_no: string;
   fuel_type: string;
   registration_date: string;
+}
+
+interface BonnetNumberData {
+  bonet_no: string;
 }
 
 // INITIAL EMPTY STATE
@@ -40,6 +58,11 @@ const initialVehicleData: VehicleData = {
 const AddVehicleForm = () => {
   const [vehicleDetails, setVehicleDetails] =
     useState<VehicleData>(initialVehicleData);
+  const [allSchedule, setAllSchedule] = useState<Schedule[]>([]);
+  const [scheduleLoading, setScheduleLoading] = useState<boolean>(false);
+  const [allBusInfo, setAllBusInfo] = useState<BonnetNumberData[]>([]);
+
+  const [busInfoLoading, setBusInfoLoading] = useState<boolean>(false);
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -59,24 +82,85 @@ const AddVehicleForm = () => {
         return alert(data.error.error || "something went wrong");
       }
       alert("Bus added succesfully");
+      setVehicleDetails(initialVehicleData);
     } catch (error) {
       console.error("error in adding bus");
     }
   };
+
+  // HANDLE SCHEDULE SELECT
+  const handleScheduleSelect = (selectedData: Schedule) => {
+    setVehicleDetails({
+      ...vehicleDetails,
+      schedule_number: selectedData.schedule_number,
+    });
+  };
+
+  // HANDLE BONNET NUMBER SELECT
+  const handleBonnetNumberSelect = (selectedData: BonnetNumberData) => {
+    setVehicleDetails({
+      ...vehicleDetails,
+      bonet_number: selectedData.bonet_no,
+    });
+  };
+
+  // GET ALL SCHEDULE DATA
+  const getAllScheduleData = async () => {
+    try {
+      setScheduleLoading(true);
+
+      const response = await fetch("/api/depot/get_schedule");
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log(`error in fetching schedule data`);
+        return;
+      }
+      setAllSchedule(data.data);
+    } catch (error) {
+      console.error(`error in fetching schedule data`);
+    } finally {
+      setScheduleLoading(false);
+    }
+  };
+
+  // FETCH BUS INFO
+  const fetchBusInfo = async () => {
+    try {
+      !busInfoLoading && setBusInfoLoading(true);
+
+      const response = await fetch("/api/vehicle/get_vehiclelog");
+      const data = await response.json();
+
+      if (response.ok) {
+        const formatedData = data.data.map((v: any) => {
+          return { bonet_no: v.bonet_no };
+        });
+        setAllBusInfo(formatedData);
+      }
+    } catch (error) {
+    } finally {
+      setBusInfoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAllScheduleData();
+    fetchBusInfo();
+  }, []);
+
   return (
     <div className="flex flex-col gap-0">
       <form className=" flex flex-col gap-5 pt-8">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex flex-col gap-3">
             <p className="text-[12px]">Bonet Number</p>
-            <Input
-              value={vehicleDetails.bonet_number}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  bonet_number: e.target.value,
-                })
-              }
+            <InputFilter
+              data={allBusInfo}
+              dataIsLoading={busInfoLoading}
+              filter_key="bonet_no"
+              label="bonet_no"
+              onSelectHanlder={handleBonnetNumberSelect}
             />
           </div>
 
@@ -228,14 +312,12 @@ const AddVehicleForm = () => {
           </div>
           <div className="flex flex-col gap-3">
             <p className="text-[12px]">Schedule Number</p>
-            <Input
-              value={vehicleDetails.schedule_number}
-              onChange={(e) =>
-                setVehicleDetails({
-                  ...vehicleDetails,
-                  schedule_number: e.target.value,
-                })
-              }
+            <InputFilter
+              data={allSchedule}
+              dataIsLoading={scheduleLoading}
+              filter_key="schedule_number"
+              label="schedule_number"
+              onSelectHanlder={handleScheduleSelect}
             />
           </div>
           <div className="flex flex-col gap-3">
@@ -275,7 +357,7 @@ const AddVehicleForm = () => {
             onClick={handleSubmit}
             className="text-sm bg-sidebar px-2 py-2 rounded-sm text-white"
           >
-            Add Vehicle
+            Add Details
           </button>
         </div>
       </form>

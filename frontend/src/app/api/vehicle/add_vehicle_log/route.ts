@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-
-const LAMBDA_URL =
-  "https://k7bvw6t3fe.execute-api.ap-south-1.amazonaws.com/DEV/schedules";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  const API_URL =
+    "https://oyz7r1xfrf.execute-api.ap-south-1.amazonaws.com/DEV/vehicles";
+
   try {
     const data = await request.json();
 
     const config = {
       method: "post",
-      url: `${LAMBDA_URL}`,
+      url: API_URL,
       headers: {
         "content-type": "application/json",
       },
@@ -27,8 +27,6 @@ export async function POST(request: NextRequest) {
       status: response.status,
     });
   } catch (error: any) {
-    console.error("Error in creating schedule", error);
-
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
         { error: error.response.data || "Error from Lambda" },

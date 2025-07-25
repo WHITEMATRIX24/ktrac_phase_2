@@ -66,7 +66,7 @@ const AddInsuranceForm = () => {
       const response = await fetch("/api/getAllBusInfo");
       const data = await response.json();
       const formatedData = data.data.map((v: any) => v.bonet_number);
-      // console.log(formatedData);
+      // console.log(data);
       setAllBusInfo(formatedData);
     } catch (error) {
     } finally {
@@ -119,12 +119,13 @@ const AddInsuranceForm = () => {
 
       if (!response.ok) {
         console.log(`error in adding insurance error`);
-        console.log(data);
+        // console.log(data);
 
         return alert("something went wrong");
       }
-      console.log(data);
+      // console.log(data);
       alert("successfully added insurance");
+      setInsuranceData(initialInsuranceData);
     } catch (error) {
       alert("error in adding insurance");
       console.error(`error in adding insurance error:${error}`);
