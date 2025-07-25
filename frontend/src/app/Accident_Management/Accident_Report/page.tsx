@@ -6,8 +6,8 @@ import Autocomplete from "@mui/material/Autocomplete";
 
 import dynamic from "next/dynamic";
 import ReferenceNumberSearchModal from "@/components/accident_management/search_referencenumber_modal";
-import AddNewAccidentModal from "@/components/accident_management/add_new_accident";
-import AddZerothReportModal from "@/components/accident_management/zerothreport_modal";
+/* import AddNewAccidentModal from "@/components/accident_management/add_new_accident";
+import AddZerothReportModal from "@/components/accident_management/zerothreport_modal"; */
 import AccidentReportForm from "@/components/accident_management/zerothReportForm";
 import CombinedAccidentComponent from "@/components/accident_management/zerothreport_modal";
 import { react } from "plotly.js";
@@ -54,6 +54,7 @@ interface AccidentReference {
   policeStation: string;
   /* jurisdiction_depot:string */ 
   timeOfAccident: string;
+  timeZone:string;
   homeDepot: string;
   operatedDepot: string;
   scheduleNumber: string;
@@ -393,6 +394,7 @@ const PrimaryAccidentReport: React.FC = () => {
       /* policeStation: accidentData.nearby_assistance_details.nearest_police_station, */
       /* jurisdiction_depo : accidentData.nearby_assistance_details.nearest_depot, */
       timeOfAccident: accidentData.accident_details.time_of_accident,
+      timeZone:accidentData.accident_details.time_zone_of_accident,
       ksrcOrKswift: "", // not provided
       busClass: "", // not provided
       operatedDepotZone: "", // not provided
@@ -693,7 +695,58 @@ const PrimaryAccidentReport: React.FC = () => {
   const handleRemoveFile = (index: number) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
-
+/* 
+  //function to load primary details
+  const fetchPrimaryDetails = async ()=>{
+    
+                
+                 const response = await fetch(
+              `/api/getPrimaryDetails?accident_reference_number=${selectedReference?.id.replaceAll(
+                "/",
+                "_"
+              )}`
+            );
+            const data = await response.json();
+            console.log(data.data);
+            const primary = data.data[0]
+            if(data.data){
+      setFormData(prev => ({ ...prev, 
+        homeDepot:primary?.home_depot,
+        operatedScheduleName:primary?.operated_schedule_name,
+        typeOfOtherVehicle:primary?.type_of_other_vehicles,
+        involvedVehicleRegNumbers:primary?.involved_vehicle_reg_numbers[0],
+        jurisdictionDepot:primary?.jurisdiction_of_accident_depot
+      }));
+            }
+     
+  }
+  //function to load primary details
+  const fetchAccidentDetails = async ()=>{
+    
+                
+                 const response = await fetch(
+              `/api/getPrimaryDetails?accident_reference_number=${selectedReference?.id.replaceAll(
+                "/",
+                "_"
+              )}`
+            );
+            const data = await response.json();
+            console.log(data.data);
+            const primary = data.data[0]
+            if(data.data){
+      setFormData(prev => ({ ...prev, 
+        homeDepot:primary?.home_depot,
+        operatedScheduleName:primary?.operated_schedule_name,
+        typeOfOtherVehicle:primary?.type_of_other_vehicles,
+        involvedVehicleRegNumbers:primary?.involved_vehicle_reg_numbers[0],
+        jurisdictionDepot:primary?.jurisdiction_of_accident_depot
+      }));
+            }
+     
+  }
+  React.useEffect(()=>{
+    fetchPrimaryDetails()
+  },[selectedReference]) */
   const handleCancel = () => {
     setSelectedVehicle(null);
     setSelectedReference(null);
@@ -794,13 +847,20 @@ if (shortFields.length > 0) {
       schedule_number: formData.scheduleNumber,
       type_of_other_vehicles: formData.typeOfOtherVehicle,
       involved_vehicle_reg_numbers: formData.involvedVehicleRegNumbers,
+      registration_date:formData.dateOfAccident,
+      time_of_accident:formData.timeOfAccident,
+      time_zone:formData.timeZone,  
       home_depot: formData.homeDepot,
+      gps_latitude:formData.latitude,
+      gps_longitude:formData.longitude,
       jurisdiction_of_accident_depot: formData.jurisdictionDepot,
       police_station_jurisdiction: formData.nearestPoliceStation,
       accident_state: formData.accidentState,
       accident_district: formData.accidentDistrict,
       accident_place: formData.accidentPlace,
+      description:formData.description,
       created_by: "adminksrtc",
+      status:"processing"
     };
     console.log(primaryPayload);
     const damagePayload = {
@@ -808,6 +868,7 @@ if (shortFields.length > 0) {
       damage_description: formData.damageToBus,
       third_party_properties_damaged: formData.thirdPartyPropertiesDamaged,
       created_by: "admin@ktrac",
+            status:"processing"
     };
     const accidentDetailsPayload = {
       accident_id: formData.accidentRefNo,
@@ -826,13 +887,14 @@ if (shortFields.length > 0) {
       major_injuries_third_party: formData.majorInjuriesThirdParty,
       minor_injuries_third_party: formData.minorInjuriesThirdParty,
       created_by: "admin@ktrac",
-
+      status: "processing",
     };
     const inspectorPayload = {
       accident_id: formData.accidentRefNo,
       inspector_name: formData.inquiryInspectorName,
       inspector_phone: formData.inspectorPhone,
       created_by: "admin@ksrtc",
+            status:"processing"
     };
     const onRoadPayload = {
       accident_id: formData.accidentRefNo,
@@ -841,6 +903,7 @@ if (shortFields.length > 0) {
       weather_condition_code: formData.weatherCondition,
       traffic_density_code: formData.trafficDensity,
       created_by: "admin@ksrtc",
+            status:"processing"
     };
     const recoveryPayload = {
       accident_id: formData.accidentRefNo,
@@ -855,6 +918,7 @@ if (shortFields.length > 0) {
       severity: formData.severity,
       remarks: formData.remarks,
       created_by: "admin@ksrtc",
+      status: "processing",
       created_at: "2025-06-27T04:50:01.332672",
     };
 

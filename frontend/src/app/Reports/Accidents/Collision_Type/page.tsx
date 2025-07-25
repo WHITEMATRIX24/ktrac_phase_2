@@ -4,6 +4,22 @@ import React, { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { ReportDataTable } from "@/components/reports/report_datatable";
 import { dateToLocaleFormater } from "@/utils/dateFormater";
+import { CollisionReportDataTable } from "@/components/reports/collision_report_table";
+import { Eye } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+
 
 // Define data structure
 export type AccidentCauseData = {
@@ -15,15 +31,6 @@ export type AccidentCauseData = {
   percentage: string;
 };
 
-// Column configuration for table
-const accidentCauseColumns: ColumnDef<AccidentCauseData>[] = [
-  { accessorKey: "type", header: "Accident Type" },
-  { accessorKey: "fatal", header: "Fatal" },
-  { accessorKey: "major", header: "Major" },
-  { accessorKey: "minor", header: "Minor" },
-  { accessorKey: "total", header: "Total" },
-  { accessorKey: "percentage", header: "%" },
-];
 
 // Accident cause types
 const causeTypes = [
@@ -88,7 +95,71 @@ const CollisionTypeReport = () => {
   );
   const [tableData, setTableData] = useState<AccidentCauseData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingAccidentList, setIsLoadingAccidentList] = useState<boolean>(true);
 
+  const [selectedCauseType, setSelectedCauseType] = useState<string | "">("");
+  const [accidentDetails, setAccidentDetails] = useState<any[]>([]);
+  const [showDialog, setShowDialog] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  //utility function to change text to camel case
+  const toTitleCase = (text: string) =>
+    text
+      .toLowerCase()
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    //function to make every sentence first letter capital
+const capitalizeSentences = (text: string) =>
+  text
+    .split(/([.?!]\s+)/) // split by punctuation and keep separators
+    .map(sentence =>
+      sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase()
+    )
+    .join("");
+
+  //accident list fetching for collision type
+  const fetchAccidentDetails = async (type: string) => {
+    setIsLoadingAccidentList(true)
+    try {
+      setSelectedCauseType(type);
+      setAccidentDetails([])
+      setShowDialog(true);
+
+      const formattedStartDate = formatDateForAPI(startDate);
+      const formattedEndDate = formatDateForAPI(endDate);
+
+      const response = await fetch(
+        `/api/reports/accidents/collisionwise_accidentlist?start_date=${formattedStartDate}&end_date=${formattedEndDate}&collision_type=${encodeURIComponent(
+          type
+        )}`
+      );
+
+      if (!response.ok) {
+        console.error("Failed to fetch accident details");
+        return;
+      }
+
+      const result = await response.json();
+      setAccidentDetails(result.data || []);
+      setIsLoadingAccidentList(false)
+    } catch (error) {
+      console.error("Error fetching accident details:", error);
+    }
+  };
+
+  /* const fetchAccidentDetails = async (type: string) => {
+    setSelectedCauseType(type);
+    setShowDialog(true);
+  
+    // Simulate API delay
+    await new Promise((res) => setTimeout(res, 500));
+  
+    
+  
+    setAccidentDetails(dummyAccidentDetails);
+  };
+   */
   //  report data fetching
   const fetchReportData = async () => {
     try {
@@ -126,6 +197,45 @@ const CollisionTypeReport = () => {
       setIsLoading(false);
     }
   };
+  // Column configuration for table
+  const accidentCauseColumns: ColumnDef<AccidentCauseData>[] = [
+    { accessorKey: "type", header: "Accident Type" },
+    { accessorKey: "fatal", header: "Fatal" },
+    { accessorKey: "major", header: "Major" },
+    { accessorKey: "minor", header: "Minor" },
+    { accessorKey: "total", header: "Total" },
+    { accessorKey: "percentage", header: "%" },
+    {
+      id: "view",
+      header: "View",
+      cell: ({ row }) => {
+        const rowType = row.original.type?.toLowerCase();
+        const isTotalRow =
+          rowType === "total" || rowType?.includes("total");
+
+        if (isTotalRow) return null;
+
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Eye
+                  className="w-4 h-4 text-blue-900 cursor-pointer hover:text-blue-800"
+                  onClick={() => fetchAccidentDetails(row.original.type)}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View Accidents</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
+    }
+
+
+  ];
+
 
   useEffect(() => {
     if (startDate || endDate) {
@@ -136,7 +246,7 @@ const CollisionTypeReport = () => {
   return (
     <div className="px-5 pt-5 flex flex-col gap-1 h-[85vh] overflow-auto">
       <h2 className="text-lg font-semibold">Accident Collision Report</h2>
-      <ReportDataTable
+      <CollisionReportDataTable
         columns={accidentCauseColumns}
         data={tableData}
         searchKey="type"
@@ -149,8 +259,73 @@ const CollisionTypeReport = () => {
         endDateSetter={setEndDate}
         isLoading={isLoading}
       />
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="!left-[356px] !top-1/2 !translate-x-0 !-translate-y-1/2  !w-[1200px] !max-w-none  overflow-auto max-h-[90vh]" style={{ inset: "auto" }}>
+          <DialogHeader>
+            <DialogTitle>
+              <h3 className="text-lg font-semibold">
+                Accident Details For: {toTitleCase(selectedCauseType)}
+              </h3>
+
+            </DialogTitle>
+          </DialogHeader>
+          {isLoadingAccidentList ? <p className="text-sm mt-4">Loading...</p> :
+
+
+            <div>
+              {accidentDetails.length === 0 && !isLoadingAccidentList ? (
+                <p className="text-sm mt-4">No accidents found for this type.</p>
+              ) : (
+                <div className="mt-4">
+                  <table className="w-full text-sm border-collapse border border-gray-300">
+                    <thead className="bg-green-900 text-white">
+                      <tr>
+                        <th className="border px-2 py-1">Accident ID</th>
+                        <th className="border px-2 py-1">Date</th>
+                        <th className="border px-2 py-1">Time</th>
+                        <th className="border px-2 py-1">Place</th>
+                        <th className="border px-2 py-1">Depot</th>
+                        <th className="border px-2 py-1">Bonnet No</th>
+                        <th className="border px-2 py-1">Severity</th>
+                        <th className="border px-2 py-1">Cause</th>
+                        <th className="border px-2 py-1">Responsibility</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {accidentDetails.map((accident, idx) => (
+                        <tr key={idx} className="odd:bg-white even:bg-gray-50">
+                          <td className="border px-2 py-1">{accident.accident_id}</td>
+                          <td className="border px-2 py-1">{accident.date_of_accident}</td>
+                          <td className="border px-2 py-1">{accident.time_of_accident}</td>
+                          <td className="border px-2 py-1">
+                            {accident.location_info?.place}
+                          </td>
+                          <td className="border px-2 py-1">
+                            {accident.location_info?.operated_depot}
+                          </td>
+                          <td className="border px-2 py-1">{accident.bonet_no}</td>
+                          <td className="border px-2 py-1">{accident.severity}</td>
+                          <td className="border px-2 py-1">
+                            {capitalizeSentences(accident.primary_cause_of_accident)}
+                          </td>
+                          <td className="border px-2 py-1">
+                            {accident.primary_responsiblity_of_accident}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>}
+        </DialogContent>
+      </Dialog>
+
+
     </div>
   );
 };
 
 export default CollisionTypeReport;
+
+

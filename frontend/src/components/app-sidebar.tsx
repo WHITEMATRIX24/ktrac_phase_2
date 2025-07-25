@@ -136,7 +136,9 @@ const defaultNavItems: NavItem[] = [
         title: "Accident District Wise",
         url: "/Reports/Accidents/District_Wise",
       },
-      {
+      { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
+/*       { title: "Accident Driver Wise", url: "/Reports/Accidents/Driver_Wise" },
+ */      {
         title: "Accident Involved Vehicle",
         url: "/Reports/Accidents/Involved_Vehicle",
       },
@@ -148,7 +150,7 @@ const defaultNavItems: NavItem[] = [
       { title: "Fatal Report", url: "/Reports/Accidents/Fatal_Report" },
       { title: "Unit Wise", url: "/Reports/Accidents/Unit_Wise" },
       { title: "Injuries", url: "/Reports/Accidents/Injuries" },
-      { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
+      
     ],
   },
 ];
@@ -159,7 +161,116 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const role = sessionStorage.getItem("userRole");
     let computedNavItems: NavItem[] = [];
 
-    if (role === "Finance") {
+    if (role == "SuperAdmin") {
+      computedNavItems = [
+        {
+          title: "Dashboard",
+          url: "#",
+          icon: LayoutDashboard,
+          isActive: true,
+          items: [
+            { title: "Accidents", url: "/Dashboard/Accidents" },
+            { title: "Revenue", url: "/Dashboard/Revenue" },
+            { title: "Bus Position", url: "/Dashboard/Bus_Position" },
+            // {
+            //   title: "Unit wise bus allotment",
+            //   url: "/Dashboard/Unit_Wise_Bus_Allotment",
+            // },
+            { title: "Bus Attendance", url: "/Dashboard/Bus_Attendance" },
+
+            { title: "Bus Allotment", url: "/Dashboard/Bus_Allotment" },
+            { title: "Dockyard", url: "/Dashboard/Dockyard" },
+            {
+              title: "Predictive Revenue",
+              url: "/Dashboard/Predictive_Revenue",
+            },
+            {
+              title: "Predictive Expense",
+              url: "/Dashboard/Predictive_Expense",
+            },
+            {
+              title: "Predictive Maintenance",
+              url: "/Dashboard/Predictive_Maintenance",
+            },
+          ],
+        },
+        {
+          title: "Revenue",
+          url: "#",
+          icon: WalletCards,
+          items: [
+            { title: "Income", url: "#" },
+            { title: "Expense", url: "#" },
+          ],
+        },
+        {
+          title: "Schedule Management",
+          url: "#",
+          icon: Layers,
+          items: [
+            { title: "Add Schedule", url: "#" },
+            { title: "Update Schedule", url: "#" },
+          ],
+        },
+        {
+          title: "Dock Management",
+          url: "#",
+          icon: Layers,
+          items: [
+            { title: "Report Dock", url: "/Dock_Management/Report_Dock" },
+            { title: "Release Dock", url: "#" },
+          ],
+        },
+        {
+          title: "Accident management",
+          url: "#",
+          icon: User2,
+          items: [
+            {
+              title: "Primary Report",
+              url: "/Accident_Management/Accident_Report",
+            },
+            {
+              title: "Inspector Report",
+              url: "/Accident_Management/Inspector",
+            },
+            { title: "Workshop Report", url: "/Accident_Management/Work_Shop" },
+          ],
+        },
+        {
+          title: "Reports",
+          url: "#",
+          icon: PieChart,
+          items: [
+            { title: "Accident Month Wise", url: "/Reports/Accidents/Month_Wise" },
+            { title: "Accident Bus Type", url: "/Reports/Accidents/Bus_Type_Wise" },
+            {
+              title: "Accident Collision Type",
+              url: "/Reports/Accidents/Collision_Type",
+            },
+            {
+              title: "Accident District Wise",
+              url: "/Reports/Accidents/District_Wise",
+            },
+            { title: "Accident Black Spot", url: "/Reports/Accidents/Black_Spot" },
+/*             { title: "Accident Driver Wise ", url: "/Reports/Accidents/Driver_Wise" },
+ */            {
+              title: "Accident Involved Vehicle",
+              url: "/Reports/Accidents/Involved_Vehicle",
+            },
+            {
+              title: "Accident Responsibility",
+              url: "/Reports/Accidents/Responsibility",
+            },
+            { title: "Accident Time Wise", url: "/Reports/Accidents/Time_Wise" },
+            { title: "Fatal Report", url: "/Reports/Accidents/Fatal_Report" },
+            { title: "Unit Wise", url: "/Reports/Accidents/Unit_Wise" },
+            { title: "Injuries", url: "/Reports/Accidents/Injuries" },
+            
+          ],
+        },
+      ];
+    } else if (role === "Finance") {
       computedNavItems = [
         {
           title: "Dashboard",

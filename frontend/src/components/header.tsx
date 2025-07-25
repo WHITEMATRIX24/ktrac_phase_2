@@ -62,7 +62,17 @@ export default function Header() {
         email: "Supervisor",
         avatar: "/Captureuseravathar.PNG",
       };
-    } else if (role === "Accident_Management") {
+      
+    } 
+    else if (role === "superAdmin") {
+      userData = {
+        name: "Pramoj Sanker",
+        email: "SuperAdmin",
+        avatar: "/PRAMOJ.png",
+      };
+      
+    }
+    else if (role === "Accident_Management") {
       userData = {
         name: "Accident Managemet",
         email: "Supervisor",

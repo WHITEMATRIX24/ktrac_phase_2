@@ -128,6 +128,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
         fetchDepots();
     }, []);
     
+const [allAccidentList, setAllAccidentList] = useState<{}[] | null>([]);
 
   // search handler
   const handleSearch = async () => {
@@ -164,6 +165,7 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
         console.log(data.data);
         
         setAccidentList(data.data || []);
+        setAllAccidentList(data.data || [])
       }
     } catch (error) {
       console.log("error in filtering");
@@ -171,6 +173,42 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
       setIsLoading(false);
     }
   };
+ 
+const [completedAccidentList, setCompletedAccidentList] = useState<{}[] | null>([]);
+
+  const handleAccidentFilter = async(status:string)=>{
+    setStage(status)
+    
+    if(status == "All"){
+      handleSearch()
+    }
+    else{
+       const response = await fetch(
+          `/api/zerothForInspectorAndWorkshop?date=${date}&district=${district}&depo=${depo}&bonnet_no=${bonnetNo}`
+        );
+        const data = await response.json();
+        console.log(data.data);
+
+        setCompletedAccidentList(data.data ? [data.data] : []);
+        if(status === "Completed"){
+        setAccidentList(data.data || []);
+        }
+        else{
+          const pendingItems =
+  allAccidentList && data.data
+    ? allAccidentList.filter((acc: any) =>
+        !data.data.some(
+          (completed: any) => completed.accident_id === acc.accident_id
+        )
+      )
+    : []; // fallback to empty array
+
+setAccidentList(pendingItems); // ✅ safe to set
+
+        }
+    }
+    
+  }
 
   // clear handler
   const handleClear = () => {
@@ -587,13 +625,14 @@ const CombinedAccidentComponent = ({ caseSelectHandler }: { caseSelectHandler?: 
                         Accident Status <span className="text-[10px]"> </span>
                       </label>
                       <select
-                        onChange={(e) => setStage(e.target.value)}
+                        onChange={(e) => handleAccidentFilter(e.target.value)}
                         className="px-3 py-3 border rounded-sm"
-                        value={district}
+                        value={stage}
                       >
                         <option value="">Select Status</option>
+                        <option value="All">All</option>
                         <option value="Pending">Pending</option>
-                        <option value="Comapleted">Completed</option>
+                        <option value="Completed">Completed</option>
                       </select>
                     </div>
                   </div>

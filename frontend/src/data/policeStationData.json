@@ -1,0 +1,119 @@
+{
+  "Ernakulam": [
+    {
+      "name": "Fort Kochi Police Station",
+      "phone": "0484‑2215055"
+    },
+    {
+      "name": "Ernakulam Central Police Station",
+      "phone": "0484‑2394500"
+    },
+    {
+      "name": "Infopark Police Station",
+      "phone": "0484‑2415400"
+    },
+    {
+        "name":"Cheranalloor", 
+        "phone":"0484 2555375"
+    },
+    {
+      "name":"Ernakulam Town",
+      "phone":"0484 2394742"  
+    },
+    {
+      "name":"Ernakulam South",
+      "phone":"0484 2372223"  
+    },
+    {
+        "name":"Police Control Room",
+        "phone":"0484 2359200"
+    }
+  ],
+  "Thiruvananthapuram": [
+    {
+      "name": "Police Control Room",
+      "phone": "0471‑2331843"  
+    },
+    {
+      "name": "Fort Police Station",
+      "phone": "0471‑2461105"
+    },
+    {
+      "name": "City Traffic Police Station (Pattom)",
+      "phone": "0471‑2558726"
+    }
+  ],
+  "Kollam": [
+    {
+      "name": "Police Control Room",
+      "phone": "0474 2746000"
+    }
+  ],
+  "Pathanamthitta": [
+    {
+      "name": "Police Control Room",
+      "phone": "0468 2222226"
+    }
+  ],
+  "Alappuzha": [
+    {
+      "name": "Police Control Room",
+      "phone": "0477 2251166"
+    }
+  ],
+  "Kottayam": [
+    {
+      "name": "Police Control Room",
+      "phone": "0481 5550400"
+    }
+  ],
+  "Idukki": [
+    {
+      "name": "Police Control Room",
+      "phone": "0486 2221100"
+    }
+  ],
+  "Thrissur": [
+    {
+      "name": "Police Control Room",
+      "phone": "0487 2424193"
+    }
+  ],
+  "Palakkad": [
+    {
+      "name": "Police Control Room",
+      "phone": "0491 2522340"
+    }
+  ],
+  "Malappuram": [
+    {
+      "name": "Police Control Room",
+      "phone": "0483 27349"
+    }
+  ],
+  "Kozhikode": [
+    {
+      "name": "Police Control Room",
+      "phone": "0495 2721831"
+    }
+  ],
+  "Wayanad": [
+    {
+      "name": "Police Control Room",
+      "phone": "0493 6205808"
+    }
+  ],
+  "Kannur": [
+    {
+      "name": "Police Control Room",
+      "phone": "0497 2763337"
+    }
+  ],
+  "Kasaragod": [
+    {
+      "name": "Police Control Room",
+      "phone": "0499 4222960"
+    }
+  ]
+  
+}

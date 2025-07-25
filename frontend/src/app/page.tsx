@@ -17,6 +17,12 @@ export default function Home() {
       depo: "Admin",
     },
     {
+      username: "cmd",
+      password: "cmd@ktrac#",
+      role: "superAdmin",
+      depo: "Admin",
+    },
+    {
       username: "financeunit",
       password: "finance@ktrac#",
       role: "Finance",
@@ -77,7 +83,10 @@ export default function Home() {
       sessionStorage.setItem("userDepo", user.depo);
       if (user.role === "Admin") {
         router.replace("/Dashboard/Accidents");
-      } else if (user.role === "Finance") {
+      } else if (user.role === "SuperAdmin") {
+        router.replace("/Dashboard/Accidents");
+      } 
+      else if (user.role === "Finance") {
         router.replace("/Finance/Overview");
       } else if (user.role === "Maintenance") {
         router.replace("/Predictive_Maintenance_System/Overview");
