@@ -280,6 +280,7 @@ const AccedentWorkshop = () => {
         alert(errorData.error.error || "something went wrong");
       }
     } catch (error) {
+      alert("something went wrong");
       console.error("Network error or unexpected error:", error);
     }
   };
