@@ -96,34 +96,31 @@ export function AccidentDashboardAreaChart({
             <Area
               dataKey="all"
               type="natural"
-              fill="var(--color-all)"
+              fill={chartConfig.all.color} //"var(--color-all)"
               fillOpacity={0.4}
-              stroke="var(--color-all)"
-              stackId="a"
+              stroke={chartConfig.all.color} //"var(--color-all)"
             />
             <Area
               dataKey="primary"
               type="natural"
-              fill="var(--color-primary)"
+              fill={chartConfig.primary.color} //"var(--color-primary)"
               fillOpacity={0.4}
-              stroke="var(--color-primary)"
-              stackId="a"
+              stroke={chartConfig.primary.color} //"var(--color-primary)"
             />
             <Area
-              dataKey="inProgress"
+              dataKey="in_progress"
               type="natural"
-              fill="var(--color-inProgress)"
+              fill={chartConfig.inProgress.color} //"var(--color-inProgress)"
               fillOpacity={0.4}
-              stroke="var(--color-inProgress)"
-              stackId="a"
+              stroke={chartConfig.inProgress.color} //"var(--color-inProgress)"
             />
             <Area
               dataKey="completed"
               type="natural"
-              fill="var(--color-completed)"
+              fill={chartConfig.completed.color} //"var(--color-completed)"
               fillOpacity={0.4}
-              stroke="var(--color-completed)"
-              stackId="a"
+              stroke={chartConfig.completed.color} //"var(--color-completed)"
+              // stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>

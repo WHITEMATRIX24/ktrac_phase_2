@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -221,7 +221,8 @@ const AccidentsDashboard = () => {
       // CLEAR OBJECT FROM ARRAY WHERE EVERY VALUE AS ZERO
       const formatedDepotTable = data.depotData.filter(
         (obj: any) => !Object.values(obj).every((value) => value === 0)
-      );
+      ).sort((a: any, b: any) => b.total_accidents - a.total_accidents);
+      
       console.log(formatedDepotTable);
 
       setDashboardData({
