@@ -97,6 +97,9 @@ const AccedentWorkshop = () => {
   ];
   const [selectedTab, setSelectedtab] = useState<number>(0);
   const [progressStatus, setProgressStatus] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
 
   const handleSearchSelect = (selectedData: any) => {
     // console.log(selectedData);
@@ -222,12 +225,16 @@ const AccedentWorkshop = () => {
         if (!response.ok) {
           return alert("error in uploading files");
         }
+        console.log(response);
+        
         const fileUploadResponseData = await response.json();
+        console.log(fileUploadResponseData);
+        
         const fileUploadData: {
           name: string;
           key: string;
         }[] = fileUploadResponseData.data;
-        // console.log(fileUploadData);
+        console.log(fileUploadData);
         const billFile = fileUploadData.find((v) => v.name === "bill");
         const totalBillFile = fileUploadData.find(
           (v) => v.name === "total_bill"
@@ -270,8 +277,8 @@ const AccedentWorkshop = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        // console.log(responseData);
-        alert("create successufully");
+        console.log(responseData);
+        setShowSuccessModal(true);
         setSelectedAccedentData(null);
       } else {
         const errorData = await response.json();
@@ -284,7 +291,18 @@ const AccedentWorkshop = () => {
       console.error("Network error or unexpected error:", error);
     }
   };
+//useEffect to close success modal
+  useEffect(() => {
+    if (showSuccessModal) {
+      let count = 3;
+      const countdownInterval = setInterval(() => {
+        count--;
+        if (count <= 0) clearInterval(countdownInterval);
+      }, 1000);
 
+      return () => clearInterval(countdownInterval);
+    }
+  }, [showSuccessModal]);
   return (
     <React.Fragment>
       <div className="flex flex-col h-[88vh] pt-1 text-[12px] gap-3">
@@ -340,12 +358,12 @@ const AccedentWorkshop = () => {
                 )}
               </div>
               <div className="flex gap-3">
-                <button
+                { selectedTab !== tabs.length - 1 && (<button
                   onClick={handelCancel}
                   className="border font-[500] px-5 py-2 rounded-xs bg-themeRed"
                 >
                   Cancel
-                </button>
+                </button>)}
                 {/* <button className="border font-[500] px-5 py-1 rounded-xs">
                   Save Draft
                 </button> */}
@@ -362,6 +380,46 @@ const AccedentWorkshop = () => {
           </>
         )}
       </div>
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-xl p-8 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 animate-scaleIn">
+            <div className="flex flex-col items-center">
+              {/* Success icon animation */}
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-pulseOnce">
+                <svg
+                  className="w-12 h-12 text-green-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+
+              {/* Success message */}
+              <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
+                Workshop Report Submitted Successfully!
+              </h3>
+
+              {/* OK button */}
+              <button
+                onClick={() => {
+                  if (timeoutId) clearTimeout(timeoutId);
+                  setShowSuccessModal(false);
+                }}
+                className="px-8 py-3 bg-[var(--sidebar)] text-white rounded-lg hover:bg-[#001670] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--sidebar)] focus:ring-opacity-50 transform hover:scale-105 transition-transform duration-200"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
 };

@@ -16,6 +16,7 @@ interface SeverityDistribution {
   minor: number;
   major: number;
   fatal: number;
+  insignificant:number;
 }
 
 interface Coordinate {
@@ -25,8 +26,8 @@ interface Coordinate {
   severity: "Minor" | "Major" | "Fatal";
   details: {
     total: number;
-    fatalities: number;
-    severity_distribution: SeverityDistribution;
+/*     fatalities: number;
+ */    severity_distribution: SeverityDistribution;
   };
 }
 
@@ -118,10 +119,11 @@ const ReportMap: React.FC<ReportMapProps> = ({ data, title, isLoading }) => {
         <div className="text-sm">
           <strong>{loc.label}</strong><br />
           Total Accidents: {loc.details.total}<br />
-          Fatalities: {loc.details.fatalities}<br />
-          Minor: {loc.details.severity_distribution.minor},{" "}
+{/*           Fatalities: {loc.details.fatalities}<br />
+ */}          Minor: {loc.details.severity_distribution.minor},{" "}
           Major: {loc.details.severity_distribution.major},{" "}
-          Fatal: {loc.details.severity_distribution.fatal}
+          Fatal: {loc.details.severity_distribution.fatal},{" "}
+          Insignificant:{loc.details.severity_distribution.insignificant}
         </div>
       </Popup>
     </Marker>

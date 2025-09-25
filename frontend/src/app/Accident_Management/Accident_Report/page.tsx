@@ -113,6 +113,7 @@ type PlaceSuggestion = {
   display_name: string;
 };
 const PrimaryAccidentReport: React.FC = () => {
+  const regNumberPattern = /^[A-Z]{2}\d{1,2}[A-Z]{1,3}\d{1,4}$/i;
   const [searchQuery, setSearchQuery] = React.useState('');
   const [suggestions, setSuggestions] = React.useState<PlaceSuggestion[]>([]);
   const [debounceTimer, setDebounceTimer] = React.useState<NodeJS.Timeout | null>(null);
@@ -793,8 +794,8 @@ setIsSubmitting(true)
     caseSettled: "Case Settled",
     severity: "Severity",
     inquiryInspectorName:"Inspector Name",
-    inspectorPhone:"Inspector Phone Number"
-  };
+/*     inspectorPhone:"Inspector Phone Number"
+ */  };
 
   // Utility function to check for empty values
 const isEmpty = (value: any) =>
@@ -931,8 +932,8 @@ if (shortFields.length > 0) {
       body: JSON.stringify(payload),
     });
 
-    console.log(res);
-    
+   // console.log(res);
+     // important since onRoad submision doesnot allow resubmission only for demo remove it after that || res.status == 409
     if (!(res.status>=200 && res.status<300 )) {
       const errorText = await res.text(); // Try to read response body      
      // alert(`Already Saved Data`)
@@ -1745,11 +1746,11 @@ if (shortFields.length > 0) {
                                   </div>
                                 </div>
                                 <div>
-                                  <label className="text-xs font-semibold text-gray-700 mb-0 block">
+                                  <label className="text-xs font-semibold text-gray-700 mb-0 block ms-1">
                                     District{" "}
                                     <span className="text-[10px]">(ജില്ല)</span>
                                   </label>
-                                  <div className="text-[12px] text-[var(--sidebar-bg)]">
+                                  <div className="text-[12px] text-[var(--sidebar-bg)] ms-1">
                                     {formData.accidentDistrict}
                                   </div>
                                 </div>
@@ -2067,6 +2068,12 @@ if (shortFields.length > 0) {
                                   name="involvedVehicleRegNumbers"
                                   value={formData.involvedVehicleRegNumbers}
                                   onChange={handleChange}
+                                  onBlur={(e) => {
+                                  const value = e.target.value.trim().toUpperCase();
+                                  if (!regNumberPattern.test(value)) {
+                                  alert("Please enter a valid vehicle registration number");
+                                  }
+                                  }}
                                   className="w-full py-[8px] px-[12px] border-1 border-[#d1d5db] rounded text-xs bg-white"
                                 />
                               </div>
@@ -2533,6 +2540,9 @@ if (shortFields.length > 0) {
                                   <span className="text-[10px]">
                                     (പരിശോധകരുടെ ഫോൺ നമ്പർ)
                                   </span>
+                                  <span className="text-[10px] text-red-600">
+                                      {"*"}
+                                    </span> 
                                 </label>
                                 <input
                                   type="text"
@@ -2634,9 +2644,9 @@ if (shortFields.length > 0) {
                             ) : (
                               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-[16px]">
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block mb-1">
                                     Fatalities (KSRTC Crew){" "}
-                                    <span className="text-[10px]">
+                                    <span className="text-[10px] ">
                                       (മരണങ്ങൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))
                                     </span>
                                   </label>
@@ -2649,7 +2659,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[rem] block mb-1">
                                     Fatalities (Passengers){" "}
                                     <span className="text-[10px]">
                                       (മരണങ്ങൾ (യാത്രക്കാർ))
@@ -2664,7 +2674,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block mb-1">
                                     Fatalities (3rd Party){" "}
                                     <span className="text-[10px]">
                                       (മരണങ്ങൾ (മൂന്നാം കക്ഷി))
@@ -2679,7 +2689,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block mb-1">
                                     Major Injuries (KSRTC Crew){" "}
                                     <span className="text-[10px]">
                                       (കടുത്ത പരിക്കുകൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))
@@ -2696,7 +2706,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block mb-1">
                                     Major Injuries (Passengers){" "}
                                     <span className="text-[10px]">
                                       (കടുത്ത പരിക്കുകൾ (യാത്രക്കാർ))
@@ -2713,7 +2723,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block mb-1">
                                     Major Injuries (3rd Party){" "}
                                     <span className="text-[10px]">
                                       (കടുത്ത പരിക്കുകൾ (മൂന്നാം കക്ഷി))
@@ -2730,7 +2740,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block mb-1 mb-md-0">
                                     Minor Injuries (KSRTC Crew){" "}
                                     <span className="text-[10px]">
                                       (ചെറിയ പരിക്കുകൾ (കെ.എസ്.ആർ.ടി.സി ക്രൂ))
@@ -2747,7 +2757,7 @@ if (shortFields.length > 0) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block">
+                                  <label className="text-[12px] text-[#374151] min-h-[3rem] block  mb-1 mb-md-0">
                                     Minor Injuries (Passengers){" "}
                                     <span className="text-[10px]">
                                       (ചെറിയ പരിക്കുകൾ (യാത്രക്കാർ))

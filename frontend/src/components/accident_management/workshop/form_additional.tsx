@@ -22,6 +22,7 @@ const AdditionalInfoForm = ({
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
             COD Recovered /<span className="text-[10px]">COD വീണ്ടെടുത്തോ</span>
+            <span className="text-[12px] text-red-600"> *</span>
           </label>
           <div className="flex items-center gap-8">
             <label htmlFor="#is_cod_recovered" className="text-[12px]">
@@ -58,7 +59,8 @@ const AdditionalInfoForm = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px] text-[#374151] mb-[6px]">
-            Remarks /<span className="text-[10px]">അഭിപ്രായങ്ങൾ</span>
+            Remarks /<span className="text-[10px]">അഭിപ്രായങ്ങൾ </span>
+                        <span className="text-[12px] text-red-600">*</span>
           </label>
           <textarea
             value={workShopFormData?.remarks}
@@ -82,7 +84,7 @@ const AdditionalInfoForm = ({
             <label className="text-[12px] text-[#374151] mb-[6px]">
               Total Bill / <span className="text-[10px]">ബിൽ</span>
             </label>
-            <Input type="file" id="accidentWorkshopTotalBillFileInput" />
+            <Input type="file" id="accidentWorkshopTotalBillFileInput"  />
           </div>
         </div>
       </div>

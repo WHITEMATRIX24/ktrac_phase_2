@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "../ui/input";
+import toast from "react-hot-toast";
 
 interface ScheduleDetails {
   schedule_number: string;
@@ -8,18 +9,16 @@ interface ScheduleDetails {
   route_to: string;
   distance_km: string;
   duration_minutes: number;
-  // schedule_type: string;
   is_active: boolean;
 }
 
-const initialScheduleData = {
+const initialScheduleData: ScheduleDetails = {
   schedule_number: "",
   schedule_name: "",
   route_from: "",
   route_to: "",
   distance_km: "",
   duration_minutes: 0,
-  // schedule_type: "",
   is_active: true,
 };
 
@@ -27,41 +26,73 @@ const AddScheduleForm = () => {
   const [scheduleDetails, setScheduleDetails] =
     useState<ScheduleDetails>(initialScheduleData);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // VALIDATION
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!scheduleDetails.schedule_number.trim()) {
+      newErrors.schedule_number = "Schedule Number is required";
+    }
+    if (!scheduleDetails.schedule_name.trim()) {
+      newErrors.schedule_name = "Schedule Name is required";
+    }
+
+    return newErrors;
+  };
+
   // CANCEL HANDLER
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setScheduleDetails(initialScheduleData);
+    setErrors({});
   };
 
   // SUBMIT HANDLER
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log(scheduleDetails);
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
+/*     console.log(scheduleDetails);
+ */
     try {
       const response = await fetch("/api/depot/add_schedule", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(scheduleDetails),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        return alert(data.error.error || "Error in adding schedule");
+        return alert(data.error?.error || "Error in adding schedule");
       }
 
-      alert("Successfully added Schedule");
+      toast.success("Successfully added Schedule");
+      setScheduleDetails(initialScheduleData);
     } catch (error) {
       console.error(`error in creating schedule`, error);
-      alert("error in adding schedule");
+      alert("Error in adding schedule");
     }
   };
 
   return (
-    <form className=" flex flex-col gap-5 pt-8">
+    <form className="flex flex-col gap-5 pt-8">
       <div className="grid grid-cols-4 gap-2">
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Schedule Number</p>
+        {/* Schedule Number */}
+        <div className="flex flex-col gap-1">
+          <p className="text-[12px]">
+            Schedule Number <span className="text-red-600">*</span>
+          </p>
           <Input
+            className={errors.schedule_number ? "border-red-500" : ""}
             value={scheduleDetails.schedule_number}
             onChange={(e) =>
               setScheduleDetails({
@@ -70,10 +101,20 @@ const AddScheduleForm = () => {
               })
             }
           />
+          {errors.schedule_number && (
+            <span className="text-red-500 text-xs">
+              {errors.schedule_number}
+            </span>
+          )}
         </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Schedule Name</p>
+
+        {/* Schedule Name */}
+        <div className="flex flex-col gap-1">
+          <p className="text-[12px]">
+            Schedule Name <span className="text-red-600">*</span>
+          </p>
           <Input
+            className={errors.schedule_name ? "border-red-500" : ""}
             value={scheduleDetails.schedule_name}
             onChange={(e) =>
               setScheduleDetails({
@@ -82,8 +123,15 @@ const AddScheduleForm = () => {
               })
             }
           />
+          {errors.schedule_name && (
+            <span className="text-red-500 text-xs">
+              {errors.schedule_name}
+            </span>
+          )}
         </div>
-        <div className="flex flex-col gap-3">
+
+        {/* Route From */}
+        <div className="flex flex-col gap-1">
           <p className="text-[12px]">Route From</p>
           <Input
             value={scheduleDetails.route_from}
@@ -95,7 +143,9 @@ const AddScheduleForm = () => {
             }
           />
         </div>
-        <div className="flex flex-col gap-3">
+
+        {/* Route To */}
+        <div className="flex flex-col gap-1">
           <p className="text-[12px]">Route To</p>
           <Input
             value={scheduleDetails.route_to}
@@ -107,7 +157,9 @@ const AddScheduleForm = () => {
             }
           />
         </div>
-        <div className="flex flex-col gap-3">
+
+        {/* Distance Km */}
+        <div className="flex flex-col gap-1">
           <p className="text-[12px]">Distance Km</p>
           <Input
             value={scheduleDetails.distance_km}
@@ -119,8 +171,10 @@ const AddScheduleForm = () => {
             }
           />
         </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Duration minutes</p>
+
+        {/* Duration Minutes */}
+        <div className="flex flex-col gap-1">
+          <p className="text-[12px]">Duration Minutes</p>
           <Input
             type="number"
             value={scheduleDetails.duration_minutes}
@@ -132,19 +186,9 @@ const AddScheduleForm = () => {
             }
           />
         </div>
-        {/* <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Schedue Type</p>
-          <Input
-            value={scheduleDetails.schedule_type}
-            onChange={(e) =>
-              setScheduleDetails({
-                ...scheduleDetails,
-                schedule_type: e.target.value,
-              })
-            }
-          />
-        </div> */}
       </div>
+
+      {/* Buttons */}
       <div className="flex gap-3 ms-auto">
         <button
           onClick={handleCancel}

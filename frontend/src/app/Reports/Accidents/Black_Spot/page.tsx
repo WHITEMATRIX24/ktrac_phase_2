@@ -18,6 +18,7 @@ interface MapPoint {
     total: number;
     fatalities: number;
     severity_distribution: {
+      insignificant:number;
       minor: number;
       major: number;
       fatal: number;
@@ -168,15 +169,18 @@ const [mapData, setMapData] = useState<MapPoint[]>([]);
           item.severity_distribution.fatal > 0
             ? "Fatal"
             : item.severity_distribution.major > 0
-            ? "Major"
-            : "Minor",
+            ? "Major":item.severity_distribution.minor>0
+            ? "Minor"
+            : "Insignificant",
         details: {
           total: item.accidents_count,
-          fatalities: item.fatalities_count,
-          severity_distribution: item.severity_distribution,
+/*           fatalities: item.fatalities_count,
+ */          severity_distribution: item.severity_distribution,
         },
       }));
 
+      console.log(formatted);
+      
       setMapData(formatted);
     } catch (err) {
       console.error("Failed to fetch blackspot data", err);

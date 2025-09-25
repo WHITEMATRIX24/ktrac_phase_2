@@ -1,5 +1,7 @@
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Input } from "../ui/input";
+import toast from "react-hot-toast";
 
 interface AddInsurance {
   bonet_no: string;
@@ -10,7 +12,7 @@ interface AddInsurance {
   insurance_end_date: string;
 }
 
-const initialInsuranceData = {
+const initialInsuranceData: AddInsurance = {
   bonet_no: "",
   type_of_insurance: "",
   insurance_company_name: "",
@@ -22,6 +24,10 @@ const initialInsuranceData = {
 const AddInsuranceForm = () => {
   const [insuranceData, setInsuranceData] =
     useState<AddInsurance>(initialInsuranceData);
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof AddInsurance, string>>
+  >({});
   const [allBusInfo, setAllBusInfo] = useState<string[]>([]);
   const [busInfoLoading, setBusInfoLoading] = useState<boolean>(false);
   const [showBonnetNumberList, setShowBonnetNumberList] =
@@ -41,7 +47,7 @@ const AddInsuranceForm = () => {
       return;
     }
     setShowBonnetNumberList(true);
-    setBonnetNumberList((prevData) => {
+    setBonnetNumberList(() => {
       const similarBonnetNumber = allBusInfo.filter((val) =>
         val.toLowerCase().includes(searchValue.toLowerCase())
       );
@@ -66,7 +72,6 @@ const AddInsuranceForm = () => {
       const response = await fetch("/api/getAllBusInfo");
       const data = await response.json();
       const formatedData = data.data.map((v: any) => v.bonet_number);
-      // console.log(data);
       setAllBusInfo(formatedData);
     } catch (error) {
     } finally {
@@ -74,67 +79,47 @@ const AddInsuranceForm = () => {
     }
   };
 
+  // VALIDATE REQUIRED FIELDS
+  const validateForm = () => {
+    let newErrors: Partial<Record<keyof AddInsurance, string>> = {};
+    Object.entries(insuranceData).forEach(([key, value]) => {
+      if (!value) newErrors[key as keyof AddInsurance] = "Required";
+    });
+     setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // HANDLE SUBMIT
   const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
     try {
-      const {
-        bonet_no,
-        insurance_company_name,
-        insurance_end_date,
-        insurance_start_date,
-        policy_number,
-        type_of_insurance,
-      } = insuranceData;
-
-      if (
-        !bonet_no ||
-        !insurance_company_name ||
-        !insurance_end_date ||
-        !insurance_start_date ||
-        !policy_number ||
-        !type_of_insurance
-      ) {
-        return alert("requires full fields");
-      }
-
-      // const startDate = new Date(insurance_start_date);
-      // startDate.setUTCHours(0, 0, 0, 0);
-      // const endDate = new Date(insurance_end_date);
-      // endDate.setUTCHours(23, 59, 59, 999);
-
-      const body: AddInsurance = {
-        bonet_no,
-        policy_number,
-        type_of_insurance,
-        insurance_company_name,
-        insurance_end_date,
-        insurance_start_date,
-      };
-
       const response = await fetch("/api/Insurance/add_insurance", {
         method: "post",
-        body: JSON.stringify(body),
+        body: JSON.stringify(insuranceData),
       });
-      const data = await response.json();
 
       if (!response.ok) {
-        console.log(`error in adding insurance error`);
-        // console.log(data);
-
-        return alert("something went wrong");
+        toast.error("Something went wrong while adding insurance");
+        return;
       }
-      // console.log(data);
-      alert("successfully added insurance");
+
+      toast.success("Insurance added successfully 🎉");
       setInsuranceData(initialInsuranceData);
+      setErrors({});
     } catch (error) {
-      alert("error in adding insurance");
-      console.error(`error in adding insurance error:${error}`);
+      toast.error("Failed to add insurance");
+      console.error(error);
     }
   };
 
   // HANDLE CANCEL
   const handleCancel = () => {
     setInsuranceData(initialInsuranceData);
+    setErrors({});
   };
 
   useEffect(() => {
@@ -144,15 +129,23 @@ const AddInsuranceForm = () => {
   return (
     <div className="flex flex-col gap-8">
       <div className="grid grid-cols-4 gap-2 py-8">
+        {/* Bonet Number */}
         <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Bonet Number</p>
+          <p className="text-[12px]">
+            Bonet Number <span className="text-red-600">*</span>
+          </p>
           <div className="relative">
             <Input
               onChange={(e) => handleSearchBonnetnumber(e.target.value)}
               value={insuranceData.bonet_no}
               placeholder="Bonnet no"
-              className="bg-white h-8 w-full"
+              className={`bg-white h-8 w-full ${
+                errors.bonet_no ? "border-red-500" : ""
+              }`}
             />
+            {errors.bonet_no && (
+              <span className="text-xs text-red-500">{errors.bonet_no}</span>
+            )}
             {showBonnetNumberList && (
               <ul
                 ref={bonnetNumberListRef}
@@ -161,8 +154,6 @@ const AddInsuranceForm = () => {
                 {busInfoLoading ? (
                   <p>loading...</p>
                 ) : (
-                  !busInfoLoading &&
-                  bonnetNumberList.length > 0 &&
                   bonnetNumberList.map((b, index) => (
                     <li
                       onClick={() => handleSelectBonnetNumber(b)}
@@ -177,69 +168,41 @@ const AddInsuranceForm = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Type Of Insurance</p>
-          <Input
-            value={insuranceData.type_of_insurance}
-            onChange={(e) =>
-              setInsuranceData({
-                ...insuranceData,
-                type_of_insurance: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Insurance Comapny Name</p>
-          <Input
-            value={insuranceData.insurance_company_name}
-            onChange={(e) =>
-              setInsuranceData({
-                ...insuranceData,
-                insurance_company_name: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Policy Number</p>
-          <Input
-            value={insuranceData.policy_number}
-            onChange={(e) =>
-              setInsuranceData({
-                ...insuranceData,
-                policy_number: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">Start Date</p>
-          <Input
-            type="date"
-            value={insuranceData.insurance_start_date}
-            onChange={(e) =>
-              setInsuranceData({
-                ...insuranceData,
-                insurance_start_date: e.target.value,
-              })
-            }
-          />
-        </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-[12px]">End Date</p>
-          <Input
-            type="date"
-            value={insuranceData.insurance_end_date}
-            onChange={(e) =>
-              setInsuranceData({
-                ...insuranceData,
-                insurance_end_date: e.target.value,
-              })
-            }
-          />
-        </div>
+
+        {/* Other Fields */}
+        {[
+          { label: "Type Of Insurance", key: "type_of_insurance" },
+          { label: "Insurance Company Name", key: "insurance_company_name" },
+          { label: "Policy Number", key: "policy_number" },
+          { label: "Start Date", key: "insurance_start_date", type: "date" },
+          { label: "End Date", key: "insurance_end_date", type: "date" },
+        ].map(({ label, key, type }) => (
+          <div className="flex flex-col gap-3" key={key}>
+            <p className="text-[12px]">
+              {label} <span className="text-red-600">*</span>
+            </p>
+            <Input
+              type={type || "text"}
+              value={insuranceData[key as keyof AddInsurance]}
+              onChange={(e) =>
+                setInsuranceData({
+                  ...insuranceData,
+                  [key]: e.target.value,
+                })
+              }
+              className={`${
+                errors[key as keyof AddInsurance] ? "border-red-500" : ""
+              }`}
+            />
+            {errors[key as keyof AddInsurance] && (
+              <span className="text-xs text-red-500">
+                {errors[key as keyof AddInsurance]}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
+
       <div className="flex gap-3 ms-auto">
         <button
           onClick={handleCancel}

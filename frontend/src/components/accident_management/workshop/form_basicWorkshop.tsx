@@ -59,6 +59,24 @@ const BasicAndWorkShopForm = ({
       return filteredDepot;
     });
   };
+  // 🟢 AUTO-CALCULATE total bill amount
+  useEffect(() => {
+    const labour = Number(workShopFormData?.labour_cost) || 0;
+    const spare = Number(workShopFormData?.spare_part_cost) || 0;
+    const thirdParty = Number(workShopFormData?.cost_of_damage) || 0;
+
+    const total = labour + spare + thirdParty;
+
+    formUpdateController((prev) => ({
+      ...prev,
+      total_bill_amount: total,
+    }));
+  }, [
+    workShopFormData?.labour_cost,
+    workShopFormData?.spare_part_cost,
+    workShopFormData?.cost_of_damage,
+    formUpdateController,
+  ]);
 
   // DISABLE DROP DOWN ON OUTER CLICK
   useEffect(() => {
@@ -219,7 +237,7 @@ const BasicAndWorkShopForm = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
-            Date Of Entry(DD-MM-YYYY) /
+            Date of Entry(DD-MM-YYYY) /
             <span className="text-[10px]">പ്രവേശന തീയതി</span>
           </label>
           <Input
@@ -236,7 +254,7 @@ const BasicAndWorkShopForm = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
-            Date Of Work Start (DD-MM-YYYY) /
+            Date of Work Start (DD-MM-YYYY) /
             <span className="text-[10px]">ജോലി ആരംഭിക്കുന്ന തീയതി</span>
           </label>
           <Input
@@ -253,7 +271,7 @@ const BasicAndWorkShopForm = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
-            Date Of Released (DD-MM-YYYY) /
+            Date of Released (DD-MM-YYYY) /
             <span className="text-[10px]">റിലീസ് ചെയ്ത തീയതി</span>
           </label>
           <Input
@@ -270,8 +288,8 @@ const BasicAndWorkShopForm = ({
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px]">
-            No Of Days At W/S /Depot / W/S /
-            <span className="text-[10px]">ഡിപ്പോയിലെ ദിവസങ്ങളുടെ എണ്ണം</span>
+            No Of Days At Workshop/ Depot
+            <span className="text-[10px]"> / വർക്ക് ഷോപ്പ്/ ഡിപ്പോയിലെ ദിവസങ്ങളുടെ എണ്ണം</span>
           </label>
           <Input
             type="number"
@@ -343,7 +361,7 @@ const BasicAndWorkShopForm = ({
             </label>
             <Input
               type="number"
-              value={workShopFormData?.total_bill_amount}
+              value={workShopFormData?.total_bill_amount || 0}
               onChange={(e) =>
                 formUpdateController((prev) => ({
                   ...prev,

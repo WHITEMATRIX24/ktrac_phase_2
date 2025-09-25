@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import InputFilter from "../input_filter";
+import toast from "react-hot-toast";
 
 interface Schedule {
   id: number;
@@ -58,20 +59,42 @@ const initialVehicleData: VehicleData = {
 const AddVehicleForm = () => {
   const [vehicleDetails, setVehicleDetails] =
     useState<VehicleData>(initialVehicleData);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [allSchedule, setAllSchedule] = useState<Schedule[]>([]);
   const [scheduleLoading, setScheduleLoading] = useState<boolean>(false);
   const [allBusInfo, setAllBusInfo] = useState<BonnetNumberData[]>([]);
 
   const [busInfoLoading, setBusInfoLoading] = useState<boolean>(false);
-
+// ✅ Validation
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!vehicleDetails.bonet_number.trim()) {
+      newErrors.bonet_number = "Bonnet Number is required";
+    }
+    if (!vehicleDetails.registration_number.trim()) {
+      newErrors.registration_number = "Registration Number is required";
+    }
+    if (!vehicleDetails.schedule_number.trim()) {
+      newErrors.schedule_number = "Schedule Number is required";
+    }
+    return newErrors;
+  };
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setVehicleDetails(initialVehicleData);
+    setErrors({});
   };
 
   // HANDLE SUBMIT
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
+
     try {
       const response = await fetch("/api/getAllBusInfo", {
         method: "POST",
@@ -81,7 +104,7 @@ const AddVehicleForm = () => {
       if (!response.ok) {
         return alert(data.error.error || "something went wrong");
       }
-      alert("Bus added succesfully");
+      toast.success("Bus added succesfully");
       setVehicleDetails(initialVehicleData);
     } catch (error) {
       console.error("error in adding bus");
@@ -154,7 +177,7 @@ const AddVehicleForm = () => {
       <form className=" flex flex-col gap-5 pt-8">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Bonet Number</p>
+            <p className="text-[12px]">Bonnet Number <span className="text-[12px] text-red-600"> *</span></p>
             <InputFilter
               data={allBusInfo}
               dataIsLoading={busInfoLoading}
@@ -162,10 +185,13 @@ const AddVehicleForm = () => {
               label="bonet_no"
               onSelectHanlder={handleBonnetNumberSelect}
             />
+            {errors.bonet_number && (
+              <span className="text-red-500 text-xs">{errors.bonet_number}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Registration Number</p>
+            <p className="text-[12px]">Registration Number <span className="text-[12px] text-red-600"> *</span></p>
             <Input
               value={vehicleDetails.registration_number}
               onChange={(e) =>
@@ -175,6 +201,11 @@ const AddVehicleForm = () => {
                 })
               }
             />
+            {errors.registration_number && (
+              <span className="text-red-500 text-xs">
+                {errors.registration_number}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
@@ -311,7 +342,7 @@ const AddVehicleForm = () => {
             />
           </div>
           <div className="flex flex-col gap-3">
-            <p className="text-[12px]">Schedule Number</p>
+            <p className="text-[12px]">Schedule Number <span className="text-[12px] text-red-600"> *</span></p>
             <InputFilter
               data={allSchedule}
               dataIsLoading={scheduleLoading}
@@ -319,6 +350,9 @@ const AddVehicleForm = () => {
               label="schedule_number"
               onSelectHanlder={handleScheduleSelect}
             />
+             {errors.schedule_number && (
+              <span className="text-red-500 text-xs">{errors.schedule_number}</span>
+            )}
           </div>
           <div className="flex flex-col gap-3">
             <p className="text-[12px]">Fuel type</p>
